@@ -31,6 +31,14 @@ version()
 # Options
 MAJOR=""
 INFO=0
+FORCE=0
+ROOT=0
+NEWROOT=""
+NODEPS=0
+BUILD=0
+REFRESH=0
+SYSUPGRADE=0
+DOWNLOAD=0
 
 ARGLIST=$@
 ARGSANS=""
@@ -72,13 +80,46 @@ while [ "$#" -ne "0" ]; do
 			INFO=1
 			ARGSANS="$ARGSANS $1"
 			;;
+		--force)
+			FORCE=1
+			ARGSANS="$ARGSANS $1"
+			;;
+		--root)
+			ROOT=1
+			NEWROOT="$2"
+			ARGSANS="$ARGSANS $1 $2"
+			shift
+			;;
+		--nodeps)
+			NODEPS=1
+			ARGSANS="$ARGSANS $1"
+			;;
+		--build)
+			BUILD=1
+			ARGSANS="$ARGSANS $1"
+			;;
+		--refresh)
+			REFRESH=1
+			ARGSANS="$ARGSANS $1"
+			;;
+		--sysupgrade)
+			SYSUPGRADE=1
+			ARGSANS="$ARGSANS $1"
+			;;
+		--downloadonly)
+			DOWNLOAD=1
+			ARGSANS="$ARGSANS $1"
+			;;
 		--*)
 			usage
 			exit 1
 			;;
 		-*)
 			ARGSANS="$ARGSANS $1"
-			while getopts "VARUFQSi" opt $1; do
+			if [ `echo $1 | grep r` ]; then
+				OPTIONAL=$2
+			fi
+			while getopts "VARUFQSidfbyur:w" opt $1 $OPTIONAL; do
 				case $opt in
 					V) version ;;
 					A) MAJOR="add" ;;
@@ -87,6 +128,17 @@ while [ "$#" -ne "0" ]; do
 					F) MAJOR="freshen" ;;
 					Q) MAJOR="query" ;;
 					S) MAJOR="sync" ;;
+					i) INFO=1 ;;
+					f) FORCE=1 ;;
+					r)
+						ROOT=1
+						NEWROOT="$OPTARG"
+						;;
+					d) NODEPS=1 ;;
+					b) BUILD=1 ;;
+					y) REFRESH=1 ;;
+					u) SYSUPGRADE=1 ;;
+					w) DOWNLOAD=1 ;;
 				esac
 			done
 			;;
@@ -121,5 +173,13 @@ if [ "$MAJOR" = "query" ]; then
 		done
 	else
 		pacman $ARGLIST
+	fi
+fi
+
+if [ "$MAJOR" = "sync" ]; then
+	if [ $BUILD -eq 0 ]; then
+		pacman $ARGLIST
+	else
+		# Insert magic here
 	fi
 fi
