@@ -50,10 +50,78 @@ version()
 	exit 0
 }
 
-strip_url() {
+strip_url()
+{
 	echo $1 | sed 's|^.*://.*/||g'
 }
 
+build_packages()
+{
+	while [ $# -ne 0 ]; do
+		i=$1
+		candidates=`find $ABSROOT -type d -name $i`
+		if [ "$candidates" = "" ]; then
+			echo "Error: Could not find \"$i\" under $ABSROOT"
+
+			exit 1
+		fi
+		success=0
+		for pkgdir in $candidates; do
+			if [ -f $pkgdir/PKGBUILD ]; then
+				cd $pkgdir
+				makepkg -cfw /var/cache/pacman/pkg
+				if [ $? -eq 0 ]; then
+					success=1
+					break
+				fi
+			fi
+		done
+		if [ $success -eq 0 ]; then
+			echo "Error: Failed to build \"$i\""
+
+			exit 1
+		fi
+		shift
+	done
+}
+
+build_and_install_packages()
+{
+	while [ $# -ne 0 ]; do
+		i=$1
+		iorg=$i
+		i=${i%-*-*}
+		candidates=`find $ABSROOT -type d -name $i`
+		if [ "$candidates" = "" ]; then
+			echo "Error: Could not find \"$i\" under $ABSROOT"
+
+			exit 1
+		fi
+		success=0
+		for pkgdir in $candidates; do
+			if [ -f $pkgdir/PKGBUILD ]; then
+				cd $pkgdir
+				makepkg -icfw /var/cache/pacman/pkg
+				if [ $? -eq 0 ]; then
+					success=1
+					break
+				fi
+			fi
+		done
+		if [ $success -eq 0 ]; then
+			echo "Error: Failed to build \"$i\""
+
+			exit 1
+		fi
+
+		if [ ! -d /var/lib/srcpac ]; then
+			mkdir /var/lib/srcpac
+		fi
+
+		touch /var/lib/srcpac/$i
+		shift
+	done
+}
 
 
 # Options
@@ -185,6 +253,16 @@ fi
 
 if [ "$MAJOR" = "add" -o "$MAJOR" = "remove" -o "$MAJOR" = "freshen" -o "$MAJOR" = "upgrade" ]; then
 	pacman $ARGLIST
+
+	if [ -d /var/lib/srcpac -a "$MAJOR" = "remove" ]; then
+		for i in ${args[@]}; do
+			if [ -f /var/lib/srcpac/$i ]; then
+				echo -n "removing source reference $i... "
+				rm /var/lib/srcpac/$i
+				echo "done"
+			fi
+		done
+	fi
 fi
 
 if [ "$MAJOR" = "query" ]; then
@@ -197,7 +275,7 @@ if [ "$MAJOR" = "query" ]; then
 			fi
 
 			echo -n "Source         : "
-			if [ -L /var/lib/srcpac/$arg ]; then
+			if [ -f /var/lib/srcpac/$arg ]; then
 				echo "Yes"
 			else
 				echo "No"
@@ -211,7 +289,59 @@ fi
 
 if [ "$MAJOR" = "sync" ]; then
 	if [ $BUILD -eq 0 ]; then
-		pacman $ARGLIST
+		if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
+			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
+			if [ $REFRESH -eq 1 ]; then
+				output=`yes "" | pacman -Spyu`
+			else
+				output=`yes "" | pacman -Spu`
+			fi
+
+			if [ $? -ne 0 ]; then
+				echo output
+				exit $?
+			fi
+
+			declare -a packages
+			for i in $output; do
+				if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\)` ]; then
+					i=${i%.pkg.tar.gz}
+					packages[${#packages[@]}]=`strip_url $i`
+				fi
+			done
+
+			declare -a sourcepac
+			declare -a regepac
+			for i in ${packages[@]}; do
+				j=${i%-*-*}
+				if [ -f /var/lib/srcpac/$j ]; then
+					sourcepac[${#sourcepac[@]}]=$i
+				else
+					regpac[${#sourcepac[@]}]=$j
+				fi
+			done
+
+			pacargs="-S"
+			[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
+			[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
+			pacman $pacargs ${regpac[*]}
+			echo
+			echo "Source Targets: " ${packages[*]}
+			echo
+			echo -n "Proceed with upgrade? [Y/n] "
+			read
+			if [ "$REPLY" != "y" -a "$REPLY" != "Y" ]; then
+				exit 0
+			fi
+
+			if [ $ROOT -eq 0 ]; then
+				build_and_install_packages ${sourcepac[@]}
+			else
+				echo "This feature isn't done yet"
+			fi
+		else
+			pacman $ARGLIST
+		fi
 	else
 		# Insert magic here
 
@@ -231,52 +361,31 @@ if [ "$MAJOR" = "sync" ]; then
 		fi
 
 		if [ $DOWNLOAD -eq 1 ]; then
-			for i in ${args[@]}; do
-				candidates=`find $ABSROOT -type d -name $i`
-				if [ "$candidates" = "" ]; then
-					echo "Error: Could not find \"$i\" under $ABSROOT"
-
-					exit 1
-				fi
-				success=0
-				for pkgdir in $candidates; do
-					if [ -f $pkgdir/PKGBUILD ]; then
-						cd $pkgdir
-						makepkg -cfw /var/cache/pacman/pkg
-						if [ $? -eq 0 ]; then
-							success=1
-							break
-						fi
-					fi
-				done
-				if [ $success -eq 0 ]; then
-					echo "Error: Failed to build \"$i\""
-
-					exit 1
-				fi
-			done
+			build_packages ${args[@]}
 
 			exit 0
 		fi
 
 		if [ $SYSUPGRADE -eq 1 ]; then
-			true
+			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
+			output=`yes "" | pacman -Spu`
 		else
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
 			output=`yes "" | pacman -Sp ${args[*]}`
-
-			if [ $? -ne 0 ]; then
-				exit $?
-			fi
-
-			declare -a packages
-			for i in $output; do
-				if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\)` ]; then
-					i=${i%.pkg.tar.gz}
-					packages[${#packages[@]}]=`strip_url $i`
-				fi
-			done
 		fi
+
+		if [ $? -ne 0 ]; then
+			echo $output
+			exit $?
+		fi
+
+		declare -a packages
+		for i in $output; do
+			if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\)` ]; then
+				i=${i%.pkg.tar.gz}
+				packages[${#packages[@]}]=`strip_url $i`
+			fi
+		done
 
 		echo
 		echo "Source Targets: " ${packages[*]}
@@ -288,32 +397,7 @@ if [ "$MAJOR" = "sync" ]; then
 		fi
 
 		if [ $ROOT -eq 0 ]; then
-			for i in ${packages[@]}; do
-				candidates=`find $ABSROOT -type d -name $i`
-				if [ "$candidates" = "" ]; then
-					echo "Error: Could not find \"$i\" under $ABSROOT"
-
-					exit 1
-				fi
-				success=0
-				for pkgdir in $candidates; do
-					if [ -f $pkgdir/PKGBUILD ]; then
-						cd $pkgdir
-						makepkg -icfw /var/cache/pacman/pkg
-						if [ $? -eq 0 ]; then
-							success=1
-							break
-						fi
-					fi
-				done
-				if [ $success -eq 0 ]; then
-					echo "Error: Failed to build \"$i\""
-
-					exit 1
-				fi
-			done
-
-			exit 0
+			build_and_install_packages ${packages[@]}
 		else
 			echo "This feature isn't done yet"
 		fi
