@@ -136,6 +136,8 @@ REFRESH=0
 SYSUPGRADE=0
 DOWNLOAD=0
 ONLYCONF=0
+IGNORE=0
+IGNOREPKG=""
 
 ARGLIST=$@
 ARGSANS=""
@@ -210,6 +212,11 @@ while [ "$#" -ne "0" ]; do
 		--onlyconf)
 			ONLYCONF=1
 			ARGSANS="$ARGSANS $1"
+			;;
+		--ignore)
+			IGNORE=1
+			IGNOREPKG="$IGNOREPKG $2"
+			ARGSANS="$ARGSANS $1 $2"
 			;;
 		--*)
 #			usage
@@ -309,7 +316,11 @@ if [ "$MAJOR" = "sync" ]; then
 				pacman -Sy
 			fi
 
-			output=`yes "" | pacman -Spu`
+			ignorestr=""
+			if [ $IGNORE -eq 1 ]; then
+				ignorestr="--ignore $IGNOREPKG"
+			fi
+			output=`pacman -Spu --noconfirm $ignorestr`
 
 			if [ $? -ne 0 ]; then
 				echo output
@@ -338,7 +349,7 @@ if [ "$MAJOR" = "sync" ]; then
 			pacargs="-S"
 			[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
 			[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
-			pacman $pacargs ${regpac[*]}
+			pacman $pacargs ${regpac[*]} $ignorestr
 			if [ ${#sourcepac[@]} -eq 0 ]; then
 				exit 0
 			fi
@@ -379,10 +390,10 @@ if [ "$MAJOR" = "sync" ]; then
 
 		if [ $SYSUPGRADE -eq 1 ]; then
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-			output=`yes "" | pacman -Spu`
+			output=`pacman -Spu --noconfirm`
 		else
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-			output=`yes "" | pacman -Sp ${args[*]}`
+			output=`pacman -Sp ${args[*]} --noconfirm`
 		fi
 
 		if [ $? -ne 0 ]; then
