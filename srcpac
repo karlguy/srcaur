@@ -75,3 +75,7 @@ if [ "$MAJOR" = "" ]; then
 
 	exit 0
 fi
+
+if [ "$MAJOR" = "add" -o "$MAJOR" = "remove" -o "$MAJOR" = "freshen" -o "$MAJOR" = "upgrade" ]; then
+	pacman $ARGLIST
+fi
