@@ -30,8 +30,12 @@ version()
 
 # Options
 MAJOR=""
+INFO=0
 
 ARGLIST=$@
+ARGSANS=""
+
+declare -a args
 
 while [ "$#" -ne "0" ]; do
 	case $1 in
@@ -40,18 +44,41 @@ while [ "$#" -ne "0" ]; do
 				exit 0
 				;;
 		--version) version ;;
-		--add) MAJOR="add" ;;
-		--remove) MAJOR="remove" ;;
-		--upgrade) MAJOR="upgrade" ;;
-		--freshen) MAJOR="freshen" ;;
-		--query) MAJOR="query" ;;
-		--sync) MAJOR="sync" ;;
+		--add)
+			MAJOR="add"
+			ARGSANS="$ARGSANS $1"
+			;;
+		--remove)
+			MAJOR="remove"
+			ARGSANS="$ARGSANS $1"
+			;;
+		--upgrade)
+			MAJOR="upgrade"
+			ARGSANS="$ARGSANS $1"
+			;;
+		--freshen)
+			MAJOR="freshen"
+			ARGSANS="$ARGSANS $1"
+			;;
+		--query)
+			MAJOR="query"
+			ARGSANS="$ARGSANS $1"
+			;;
+		--sync)
+			MAJOR="sync"
+			ARGSANS="$ARGSANS $1"
+			;;
+		--info)
+			INFO=1
+			ARGSANS="$ARGSANS $1"
+			;;
 		--*)
 			usage
 			exit 1
 			;;
 		-*)
-			while getopts "VARUFQS" opt; do
+			ARGSANS="$ARGSANS $1"
+			while getopts "VARUFQSi" opt $1; do
 				case $opt in
 					V) version ;;
 					A) MAJOR="add" ;;
@@ -64,7 +91,7 @@ while [ "$#" -ne "0" ]; do
 			done
 			;;
 		*)
-			true
+			args[${#args[@]}]=$1
 			;;
 	esac
 	shift
@@ -78,4 +105,21 @@ fi
 
 if [ "$MAJOR" = "add" -o "$MAJOR" = "remove" -o "$MAJOR" = "freshen" -o "$MAJOR" = "upgrade" ]; then
 	pacman $ARGLIST
+fi
+
+if [ "$MAJOR" = "query" ]; then
+	if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
+		for arg in ${args[@]}; do
+			pacman $ARGSANS $arg | head -n -1
+			echo -n "Source         : "
+			if [ -L /var/lib/srcpac/$arg ]; then
+				echo "Yes"
+			else
+				echo "No"
+			fi
+			echo
+		done
+	else
+		pacman $ARGLIST
+	fi
 fi
