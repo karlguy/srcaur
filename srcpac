@@ -20,7 +20,7 @@
 #   USA.
 #
 
-ver=0.4
+ver=0.3
 
 [ -f /etc/abs/abs.conf ] && source /etc/abs/abs.conf
 [ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
