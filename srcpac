@@ -23,6 +23,7 @@
 ver=0.1
 
 [ -f /etc/abs/abs.conf ] && source /etc/abs/abs.conf
+[ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
 
 usage()
 {
@@ -68,6 +69,15 @@ build_packages()
 		success=0
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
+				var_conf=conf_$i[@]
+				str_conf=conf_$i[*]
+				if [ "${!str_conf}" != "" ]; then
+					sedvar=""
+					for i in ${!var_conf}; do
+						sedvar="$sedvar;s$i"
+					done
+					sed -i "$sedvar" $pkgdir/PKGBUILD
+				fi
 				cd $pkgdir
 				makepkg -cbrfw /var/cache/pacman/pkg
 				if [ $? -eq 0 ]; then
@@ -100,6 +110,15 @@ build_and_install_packages()
 		success=0
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
+				var_conf=conf_$i[@]
+				str_conf=conf_$i[*]
+				if [ "${!str_conf}" != "" ]; then
+					sedvar=""
+					for i in ${!var_conf}; do
+						sedvar="$sedvar;s$i"
+					done
+					sed -i "$sedvar" $pkgdir/PKGBUILD
+				fi
 				cd $pkgdir
 				makepkg -icfw /var/cache/pacman/pkg
 				if [ $? -eq 0 ]; then
