@@ -61,7 +61,7 @@ strip_url()
 
 do_confs()
 {
-	varname=`echo $1 | sed 's#-#X#'`
+	varname=`echo $1 | sed 's#-#X#g'`
 	eval num_conf=\$\{\#conf_$varname[@]\}
 	if [ $num_conf -gt 0 ]; then
 		sedvar=""
