@@ -329,7 +329,7 @@ if [ "$MAJOR" = "sync" ]; then
 
 			declare -a packages
 			for i in $output; do
-				if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\)` ]; then
+				if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\|file\\\\\\)` ]; then
 					i=${i%.pkg.tar.gz}
 					packages[${#packages[@]}]=`strip_url $i`
 				fi
@@ -403,7 +403,7 @@ if [ "$MAJOR" = "sync" ]; then
 
 		declare -a packages
 		for i in $output; do
-			if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\)` ]; then
+			if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\|file\\\\\\)` ]; then
 				i=${i%.pkg.tar.gz}
 				packages[${#packages[@]}]=`strip_url $i`
 			fi
