@@ -69,7 +69,7 @@ build_packages()
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
 				cd $pkgdir
-				makepkg -cfw /var/cache/pacman/pkg
+				makepkg -cbrfw /var/cache/pacman/pkg
 				if [ $? -eq 0 ]; then
 					success=1
 					break
@@ -400,7 +400,7 @@ if [ "$MAJOR" = "sync" ]; then
 		echo
 		echo -n "Proceed with upgrade? [Y/n] "
 		read
-		if [ "$REPLY" != "y" -a "$REPLY" != "Y" ]; then
+		if [ "$REPLY" != "y" -a "$REPLY" != "Y" -a "$REPLY" != "" ]; then
 			exit 0
 		fi
 
