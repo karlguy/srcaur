@@ -366,7 +366,7 @@ if [ "$MAJOR" = "sync" ]; then
 			echo
 			echo -n "Proceed with upgrade? [Y/n] "
 			read
-			if [ "$REPLY" != "y" -a "$REPLY" != "Y" ]; then
+			if [ "$REPLY" != "y" -a "$REPLY" != "Y" -a "$REPLY" != "" ]; then
 				exit 0
 			fi
 
