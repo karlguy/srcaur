@@ -1,0 +1,77 @@
+#/bin/bash
+
+ver=0.1
+
+usage()
+{
+	echo "usage:  srcpac {-h --help}"
+	echo "        srcpac {-V --version}"
+	echo "        srcpac {-A --add}     [options] <file>"
+	echo "        srcpac {-R --remove}  [options] <package>"
+	echo "        srcpac {-U --upgrade} [options] <file>"
+	echo "        srcpac {-F --freshen} [options] <file>"
+	echo "        srcpac {-Q --query}   [options] [package]"
+	echo "        srcpac {-S --sync}    [options] [package]"
+	echo
+	echo "use 'srcpac --help' with other options for more syntax"
+}
+
+version()
+{
+	echo "                       Srcpac v$ver"
+	echo "                       Copyright (C) 2004 Jason Chu <jason@archlinux.org>"
+	echo
+	echo "                       This program may be freely redistributed under"
+	echo "                       the terms of the GNU General Public License"
+	pacman -V
+
+	exit 0
+}
+
+# Options
+MAJOR=""
+
+ARGLIST=$@
+
+while [ "$#" -ne "0" ]; do
+	case $1 in
+		--help)
+				usage
+				exit 0
+				;;
+		--version) version ;;
+		--add) MAJOR="add" ;;
+		--remove) MAJOR="remove" ;;
+		--upgrade) MAJOR="upgrade" ;;
+		--freshen) MAJOR="freshen" ;;
+		--query) MAJOR="query" ;;
+		--sync) MAJOR="sync" ;;
+		--*)
+			usage
+			exit 1
+			;;
+		-*)
+			while getopts "VARUFQS" opt; do
+				case $opt in
+					V) version ;;
+					A) MAJOR="add" ;;
+					R) MAJOR="remove" ;;
+					U) MAJOR="upgrade" ;;
+					F) MAJOR="freshen" ;;
+					Q) MAJOR="query" ;;
+					S) MAJOR="sync" ;;
+				esac
+			done
+			;;
+		*)
+			true
+			;;
+	esac
+	shift
+done
+
+if [ "$MAJOR" = "" ]; then
+	usage
+
+	exit 0
+fi
