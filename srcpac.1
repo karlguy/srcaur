@@ -3,7 +3,7 @@
 srcpac \- A bash build wrapper for pacman.
 
 .SH "SYNOPSIS"
-\fBsrcpac\fR <operation> [options] <package name>
+\fBsrcpac\fR <operation> [options] [package] ...
 
 .SH "DESCRIPTION"
 \fBsrcpac\fR is a wrapper for pacman. It allows for automatic building of specified packages from source. The built package is then installed via pacman. If you never tell srcpac to build anything from source, it will act just like pacman.
@@ -12,7 +12,7 @@ For additional OPERATIONS not specified below, see pacman manpage. Only those OP
 
 .TP 
 \fB\-R, \-\-remove\fR
-Remove a package from the system. Works the same as \fBpacman\fR. In addition, packages marked as 'from\-source' will be removed.
+Remove a package from the system. Works the same as \fBpacman\fR. In addition, the 'from\-source' marking will be removed.
 
 .TP 
 \fB\-Q, \-\-query\fR
@@ -43,7 +43,7 @@ If \fB\-b\fR is specified, this command updates the abs tree before attempting a
 .TP 
 \fB\-o\fR
 .br 
-Applies the sed command to a PKGBUILD, then pipes the output to less. This allows you to make sure the changes are applied properly. No actual build occurs when using \fB\-o\fR.
+Applies the sed command to a PKGBUILD (see CONFIGURATION), then pipes the output to less. This allows you to make sure the changes are applied properly. No actual build occurs when using \fB\-o\fR.
 .SH "CONFIGURATION"
 \fBsrcpac\fR lets you specify custom configs based on sed commands applied to PKGBUILDs. The config file is \fI/etc/srcpac.conf\fR. 
 
