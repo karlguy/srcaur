@@ -20,7 +20,7 @@
 #   USA.
 #
 
-ver=0.3
+ver=0.4
 
 [ -f /etc/abs/abs.conf ] && source /etc/abs/abs.conf
 [ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
@@ -36,7 +36,10 @@ usage()
 	echo "        srcpac {-Q --query}   [options] [package]"
 	echo "        srcpac {-S --sync}    [options] [package]"
 	echo
-	echo "use 'srcpac --help' with other options for more syntax"
+	echo "srcpac's options are based on pacman's, so check the pacman man page"
+	echo "srcpac adds two options to -S: -b and -o"
+	echo "-b : builds the targets from source"
+	echo "-o : applies config changes and less's the PKGBUILD without building"
 }
 
 version()
@@ -58,11 +61,12 @@ strip_url()
 
 do_confs()
 {
-	eval num_conf=\$\{\#conf_$1[@]\}
+	varname=`echo $1 | sed 's#-#X#'`
+	eval num_conf=\$\{\#conf_$varname[@]\}
 	if [ $num_conf -gt 0 ]; then
 		sedvar=""
 		eval "for (( j = 0 ; j < $num_conf ; j++ )); do
-			sedvar=\"\${sedvar}s\${conf_$i[\$j]};\"
+			sedvar=\"\${sedvar}s\${conf_$varname[\$j]};\"
 		done"
 		eval sed -i \"$sedvar\" $2/PKGBUILD
 	fi
@@ -70,39 +74,11 @@ do_confs()
 
 build_packages()
 {
-	while [ $# -ne 0 ]; do
-		i=$1
-		candidates=`find $ABSROOT -type d -name $i`
-		if [ "$candidates" = "" ]; then
-			echo "Error: Could not find \"$i\" under $ABSROOT"
-
-			exit 1
-		fi
-		success=0
-		for pkgdir in $candidates; do
-			if [ -f $pkgdir/PKGBUILD ]; then
-				# Look for config options and apply them
-				do_confs $i $pkgdir
-
-				cd $pkgdir
-				makepkg -cbrfw /var/cache/pacman/pkg
-				if [ $? -eq 0 ]; then
-					success=1
-					break
-				fi
-			fi
-		done
-		if [ $success -eq 0 ]; then
-			echo "Error: Failed to build \"$i\""
-
-			exit 1
-		fi
-		shift
-	done
-}
-
-build_and_install_packages()
-{
+	action="build"
+	if [ "$1" = "install" ]; then
+		action="install"
+	fi
+	shift
 	while [ $# -ne 0 ]; do
 		i=$1
 		iorg=$i
@@ -120,7 +96,11 @@ build_and_install_packages()
 				do_confs $i $pkgdir
 
 				cd $pkgdir
-				makepkg -ibrcfw /var/cache/pacman/pkg
+				if [ "$action" = "install" ]; then
+					makepkg -icbrfw /var/cache/pacman/pkg
+				else
+					makepkg -cbrfw /var/cache/pacman/pkg
+				fi
 				if [ $? -eq 0 ]; then
 					success=1
 					break
@@ -133,15 +113,16 @@ build_and_install_packages()
 			exit 1
 		fi
 
-		if [ ! -d /var/lib/srcpac ]; then
-			mkdir /var/lib/srcpac
-		fi
+		if [ "$action" = "install" ]; then
+			if [ ! -d /var/lib/srcpac ]; then
+				mkdir /var/lib/srcpac
+			fi
 
-		touch /var/lib/srcpac/$i
+			touch /var/lib/srcpac/$i
+		fi
 		shift
 	done
 }
-
 
 # Options
 MAJOR=""
@@ -371,7 +352,7 @@ if [ "$MAJOR" = "sync" ]; then
 			fi
 
 			if [ $ROOT -eq 0 ]; then
-				build_and_install_packages ${sourcepac[@]}
+				build_packages "install" ${sourcepac[@]}
 			else
 				echo "This feature isn't done yet"
 			fi
@@ -391,7 +372,7 @@ if [ "$MAJOR" = "sync" ]; then
 		fi
 
 		if [ $DOWNLOAD -eq 1 ]; then
-			build_packages ${args[@]}
+			build_packages "build" ${args[@]}
 
 			exit 0
 		fi
@@ -459,7 +440,7 @@ if [ "$MAJOR" = "sync" ]; then
 		fi
 
 		if [ $ROOT -eq 0 ]; then
-			build_and_install_packages ${packages[@]}
+			build_packages "install" ${packages[@]}
 		else
 			echo "This feature isn't done yet"
 		fi
