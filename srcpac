@@ -69,15 +69,16 @@ build_packages()
 		success=0
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
-				var_conf=conf_$i[@]
-				str_conf=conf_$i[*]
-				if [ "${!str_conf}" != "" ]; then
+				# Look for config options and apply them
+				eval num_conf=\$\{\#conf_$i[@]\}
+				if [ $num_conf -gt 0 ]; then
 					sedvar=""
-					for i in ${!var_conf}; do
-						sedvar="$sedvar;s$i"
-					done
-					sed -i "$sedvar" $pkgdir/PKGBUILD
+					eval "for (( j = 0 ; j < $num_conf ; j++ )); do
+						sedvar=\"\${sedvar}s\${conf_$i[\$j]};\"
+					done"
+					eval sed -i \'$sedvar\' $pkgdir/PKGBUILD
 				fi
+
 				cd $pkgdir
 				makepkg -cbrfw /var/cache/pacman/pkg
 				if [ $? -eq 0 ]; then
@@ -110,17 +111,19 @@ build_and_install_packages()
 		success=0
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
-				var_conf=conf_$i[@]
-				str_conf=conf_$i[*]
-				if [ "${!str_conf}" != "" ]; then
+				# Look for config options and apply them
+				eval num_conf=\$\{\#conf_$i[@]\}
+				if [ $num_conf -gt 0 ]; then
 					sedvar=""
-					for i in ${!var_conf}; do
-						sedvar="$sedvar;s$i"
-					done
-					sed -i "$sedvar" $pkgdir/PKGBUILD
+					eval "for (( j = 0 ; j < $num_conf ; j++ )); do
+						sedvar=\"\${sedvar}s\${conf_$i[\$j]};\"
+					done"
+#					eval echo sed -i \'$sedvar\' $pkgdir/PKGBUILD
+					eval sed -i \'$sedvar\' $pkgdir/PKGBUILD
 				fi
+
 				cd $pkgdir
-				makepkg -icfw /var/cache/pacman/pkg
+				makepkg -ibrcfw /var/cache/pacman/pkg
 				if [ $? -eq 0 ]; then
 					success=1
 					break
