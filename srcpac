@@ -251,6 +251,12 @@ if [ "$MAJOR" = "" ]; then
 	exit 0
 fi
 
+if [ "$ABSROOT" = "" ]; then
+	echo "Error: The ABSROOT environment variable is not defined."
+
+	exit 1
+fi
+
 if [ "$MAJOR" = "add" -o "$MAJOR" = "remove" -o "$MAJOR" = "freshen" -o "$MAJOR" = "upgrade" ]; then
 	pacman $ARGLIST
 
@@ -292,10 +298,11 @@ if [ "$MAJOR" = "sync" ]; then
 		if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
 			if [ $REFRESH -eq 1 ]; then
-				output=`yes "" | pacman -Spyu`
-			else
-				output=`yes "" | pacman -Spu`
+				abs
+				pacman -Sy
 			fi
+
+			output=`yes "" | pacman -Spu`
 
 			if [ $? -ne 0 ]; then
 				echo output
@@ -317,7 +324,7 @@ if [ "$MAJOR" = "sync" ]; then
 				if [ -f /var/lib/srcpac/$j ]; then
 					sourcepac[${#sourcepac[@]}]=$i
 				else
-					regpac[${#sourcepac[@]}]=$j
+					regpac[${#regpac[@]}]=$j
 				fi
 			done
 
@@ -325,8 +332,11 @@ if [ "$MAJOR" = "sync" ]; then
 			[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
 			[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
 			pacman $pacargs ${regpac[*]}
+			if [ ${#sourcepac[@]} -eq 0 ]; then
+				exit 0
+			fi
 			echo
-			echo "Source Targets: " ${packages[*]}
+			echo "Source Targets: ${sourcepac[*]}"
 			echo
 			echo -n "Proceed with upgrade? [Y/n] "
 			read
@@ -345,17 +355,11 @@ if [ "$MAJOR" = "sync" ]; then
 	else
 		# Insert magic here
 
-		if [ "$ABSROOT" = "" ]; then
-			echo "Error: The ABSROOT environment variable is not defined."
-
-			exit 1
-		fi
-
 		if [ $REFRESH -eq 1 ]; then
 			abs
 			pacman -Sy
 
-			if [ "${args[*]}" = "" ]; then
+			if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
 				exit 0
 			fi
 		fi
@@ -387,8 +391,12 @@ if [ "$MAJOR" = "sync" ]; then
 			fi
 		done
 
+		if [ ${#packages[@]} -eq 0 ]; then
+			exit 0
+		fi
+
 		echo
-		echo "Source Targets: " ${packages[*]}
+		echo "Source Targets: ${packages[*]}"
 		echo
 		echo -n "Proceed with upgrade? [Y/n] "
 		read
