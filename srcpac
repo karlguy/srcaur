@@ -20,7 +20,7 @@
 #   USA.
 #
 
-ver=0.2
+ver=0.3
 
 [ -f /etc/abs/abs.conf ] && source /etc/abs/abs.conf
 [ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
@@ -231,8 +231,9 @@ while [ "$#" -ne "0" ]; do
 			ARGSANS="$ARGSANS $1"
 			;;
 		--*)
-			usage
-			exit 1
+#			usage
+#			exit 1
+			ARGSANS="$ARGSANS $1"
 			;;
 		-*)
 			ARGSANS="$ARGSANS $1"
