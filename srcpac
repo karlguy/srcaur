@@ -1,4 +1,4 @@
-
+#!/bin/bash
 # 
 #   srcpac
 #  
@@ -20,7 +20,7 @@
 #   USA.
 #
 
-ver=0.1
+ver=0.2
 
 [ -f /etc/abs/abs.conf ] && source /etc/abs/abs.conf
 [ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
