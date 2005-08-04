@@ -228,6 +228,7 @@ while [ "$#" -ne "0" ]; do
 			if [ `echo $1 | grep r` ]; then
 				OPTIONAL=$2
 			fi
+			OPTIND=1
 			while getopts ":VARUFQSidfbyur:wo" opt $1 $OPTIONAL; do
 				case $opt in
 					V) version ;;
