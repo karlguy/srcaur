@@ -20,7 +20,7 @@
 #   USA.
 #
 
-ver=0.3
+ver=0.5
 
 [ -f /etc/abs/abs.conf ] && source /etc/abs/abs.conf
 [ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
@@ -61,7 +61,7 @@ strip_url()
 
 do_confs()
 {
-	varname=`echo $1 | sed 's#-#X#g'`
+	varname=$(echo $1 | sed 's#-#X#g')
 	eval num_conf=\$\{\#conf_$varname[@]\}
 	if [ $num_conf -gt 0 ]; then
 		sedvar=""
@@ -83,10 +83,9 @@ build_packages()
 		i=$1
 		iorg=$i
 		i=${i%-*-*}
-		candidates=`find $ABSROOT -type d -name $i`
+		candidates=$(find $ABSROOT -type d -name $i)
 		if [ "$candidates" = "" ]; then
 			echo "Error: Could not find \"$i\" under $ABSROOT"
-
 			exit 1
 		fi
 		success=0
@@ -96,20 +95,31 @@ build_packages()
 				do_confs $i $pkgdir
 
 				cd $pkgdir
+				# Seperate out our makepkg flags
+				MAKEPKGOPTS="-c -b -r -f"
+				DESTDIR="/var/cache/pacman/pkg"
+
 				if [ "$action" = "install" ]; then
-					makepkg -icbrfw /var/cache/pacman/pkg
-				else
-					makepkg -cbrfw /var/cache/pacman/pkg
+					MAKEPKGOPTS="$MAKEPKGOPTS -i"
 				fi
-				if [ $? -eq 0 ]; then
-					success=1
+				# For now, keep backward compatability with makepkg2
+				if makepkg --help | grep -qF -e "-w <destdir>"; then
+					#makepkg 2.9.8 and down
+					makepkg $MAKEPKGOPTS -w $DESTDIR
+				else
+					#makepkg 3.0.0 and up
+					PKGDEST=$DESTDIR makepkg $MAKEPKGOPTS
+				fi
+				ret=$?
+				if [ $ret -eq 0 ]; then
 					break
 				fi
 			fi
 		done
-		if [ $success -eq 0 ]; then
-			echo "Error: Failed to build \"$i\""
+		unset MAKEPKGOPTS DESTDIR
 
+		if [ $ret -ne 0 ]; then
+			echo "Error: Failed to build \"$i\""
 			exit 1
 		fi
 
@@ -225,7 +235,7 @@ while [ "$#" -ne "0" ]; do
 			;;
 		-*)
 			ARGSANS="$ARGSANS $1"
-			if [ `echo $1 | grep r` ]; then
+			if [ $(echo $1 | grep r) ]; then
 				OPTIONAL=$2
 			fi
 			OPTIND=1
@@ -321,18 +331,25 @@ if [ "$MAJOR" = "sync" ]; then
 			if [ $IGNORE -eq 1 ]; then
 				ignorestr="--ignore $IGNOREPKG"
 			fi
-			output=`pacman -Spu --noconfirm $ignorestr`
+			output=$(pacman -Spu --noconfirm $ignorestr)
+			ret=$?
 
-			if [ $? -ne 0 ]; then
-				echo output
-				exit $?
+			if [ $ret -ne 0 ]; then
+				echo $output
+				exit $ret
+			fi
+
+			# if output is empty, there is nothing to upgrade
+			if [ -z "$output" ]; then
+				exit $ret
 			fi
 
 			declare -a packages
 			for i in $output; do
-				if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\|file\\\\\\)` ]; then
+				# ensure the string is a URL
+				if [ $( echo "$i" | grep -F '://' ) ]; then
 					i=${i%.pkg.tar.gz}
-					packages[${#packages[@]}]=`strip_url $i`
+					packages[${#packages[@]}]=$(strip_url $i)
 				fi
 			done
 
@@ -391,10 +408,10 @@ if [ "$MAJOR" = "sync" ]; then
 
 		if [ $SYSUPGRADE -eq 1 ]; then
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-			output=`pacman -Spu --noconfirm`
+			output=$(pacman -Spu --noconfirm)
 		else
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-			output=`pacman -Sp ${args[*]} --noconfirm`
+			output=$(pacman -Sp ${args[*]} --noconfirm)
 		fi
 
 		if [ $? -ne 0 ]; then
@@ -404,9 +421,10 @@ if [ "$MAJOR" = "sync" ]; then
 
 		declare -a packages
 		for i in $output; do
-			if [ `echo $i | grep ^\\\\\\(ftp\\\\\\|http\\\\\\|file\\\\\\)` ]; then
+			# ensure the string is a URL
+			if [ $( echo "$i" | grep -F '://' ) ]; then
 				i=${i%.pkg.tar.gz}
-				packages[${#packages[@]}]=`strip_url $i`
+				packages[${#packages[@]}]=$(strip_url $i)
 			fi
 		done
 
@@ -417,7 +435,7 @@ if [ "$MAJOR" = "sync" ]; then
 		if [ $ONLYCONF -eq 1 ]; then
 			for i in ${packages[@]}; do
 				i=${i%-*-*}
-				candidates=`find $ABSROOT -type d -name $i`
+				candidates=$(find $ABSROOT -type d -name $i)
 				if [ "$candidates" = "" ]; then
 					echo "Error: Could not find \"$i\" under $ABSROOT"
 
