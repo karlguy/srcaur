@@ -366,6 +366,7 @@ if [ "$MAJOR" = "sync" ]; then
 
 			pacargs="-S"
 			[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
+			[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
 			[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
 			pacman $pacargs ${regpac[*]} $ignorestr
 			if [ ${#sourcepac[@]} -eq 0 ]; then
