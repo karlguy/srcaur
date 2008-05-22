@@ -61,28 +61,18 @@ strip_url()
 
 do_confs()
 {
-	varname=$(echo $1 | sed 's#-#X#g')
-	eval num_conf=\$\{\#conf_$varname[@]\}
-	if [ $num_conf -gt 0 ]; then
-		sedvar=""
-		eval "for (( j = 0 ; j < $num_conf ; j++ )); do
-			sedvar=\"\${sedvar}s\${conf_$varname[\$j]};\"
-		done"
-		eval sed -i \"$sedvar\" $2/PKGBUILD
-	fi
-}
-
-output_confs()
-{
-	varname=`echo $1 | sed 's#-#X#g'`
-	eval num_conf=\$\{\#conf_$varname[@]\}
-	if [ $num_conf -gt 0 ]; then
-		sedvar=""
-		eval "for (( j = 0 ; j < $num_conf ; j++ )); do
-		sedvar=\"\${sedvar}s\${conf_$varname[\$j]};\"
-		done"
-		eval sed \"$sedvar\" $2/PKGBUILD
-	fi
+    conf=/etc/srcpac.d/${1}
+    if [ -f ${conf} ]; then
+        if [ "${3}" == 'noreplace' ]; then
+            if [ "${PAGER}" != '' ]; then
+                sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
+            else
+                sed -f ${conf} ${2}/PKGBUILD | less
+            fi
+        else
+            sed -i -f ${conf} ${2}/PKGBUILD
+        fi
+    fi
 }
 
 build_packages()
@@ -459,7 +449,7 @@ if [ "$MAJOR" = "sync" ]; then
 				for pkgdir in $candidates; do
 					if [ -f $pkgdir/PKGBUILD ]; then
 						# Look for config options and apply them
-						output_confs $i $pkgdir | less
+                        do_confs $i $pkgdir noreplace
 						success=1
 						break
 					fi
