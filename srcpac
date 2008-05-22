@@ -22,7 +22,7 @@
 
 ver=0.5
 
-[ -f /etc/abs/abs.conf ] && source /etc/abs/abs.conf
+[ -f /etc/abs.conf ] && source /etc/abs.conf
 [ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
 
 usage()
