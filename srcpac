@@ -58,7 +58,7 @@ strip_url()
 	echo $1 | sed 's|^.*://.*/||g'
 }
 
-#
+##
 # Applies changes of source build packages to PKGUILDs,
 # if -o option is set we only display the PKGBUILD in a pager
 ##
@@ -93,7 +93,8 @@ get_candidates()
 ##
 # FIXME this can be replaced with sth like:
 #   pkg = ${pkg%-*-*-*}
-# once all packages follow this naming scheme
+# once all packages follow this naming scheme or I figure out
+# a way how to do this with sed
 ##
 get_pkgname()
 {
@@ -151,7 +152,11 @@ build_packages()
 				cp ${builddir}/*.pkg.tar.gz /var/cache/pacman/pkg/
 
 				if [ "${action}" = "install" ]; then
-                    pacman -U ${builddir}/*.pkg.tar.gz
+					pacargs="-U"
+					[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
+					[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
+					[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
+                    pacman $pacargs ${builddir}/*.pkg.tar.gz
 				fi
 
 			fi
@@ -285,10 +290,9 @@ while [ "$#" -ne "0" ]; do
 					S) MAJOR="sync" ;;
 					i) INFO=1 ;;
 					f) FORCE=1 ;;
-					r)
-						ROOT=1
-						NEWROOT="${OPTARG}"
-						;;
+					r) ROOT=1
+					   NEWROOT="${OPTARG}"
+					   ;;
 					d) NODEPS=1 ;;
 					b) BUILD=1 ;;
 					y) REFRESH=1 ;;
@@ -406,6 +410,7 @@ if [ "${MAJOR}" = "sync" ]; then
 
 			pacman $pacargs ${regpac[*]} $ignorestr
 
+			# no packages to install from source, quit then
 			if [ ${#sourcepac[@]} -eq 0 ]; then
 				exit 0
 			fi
@@ -420,12 +425,8 @@ if [ "${MAJOR}" = "sync" ]; then
 				exit 0
 			fi
 
-			# FIXME
-			if [ $ROOT -eq 0 ]; then
-				build_packages "install" ${sourcepac[@]}
-			else
-				echo "This feature isn't done yet"
-			fi
+			build_packages "install" ${sourcepac[@]}
+
 		else
 			pacman $ARGLIST
 		fi
@@ -496,12 +497,8 @@ if [ "${MAJOR}" = "sync" ]; then
 			exit 0
 		fi
 
-        # FIXME
-		if [ $ROOT -eq 0 ]; then
-			build_packages "install" ${packages[@]}
-		else
-			echo "This feature isn't done yet"
-		fi
+		build_packages "install" ${packages[@]}
+
 	fi
 fi
 # vim:ts=4:sw=4:noet:enc=utf-8:
