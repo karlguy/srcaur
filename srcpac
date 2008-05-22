@@ -58,24 +58,24 @@ strip_url()
 	echo $1 | sed 's|^.*://.*/||g'
 }
 
-##
+#
 # Applies changes of source build packages to PKGUILDs,
 # if -o option is set we only display the PKGBUILD in a pager
 ##
 apply_config()
 {
-    conf=/etc/srcpac.d/${1}
-    if [ -f ${conf} ]; then
-        if [ "${3}" == 'noreplace' ]; then
-            if [ "${PAGER}" != '' ]; then
-                sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
-            else
-                sed -f ${conf} ${2}/PKGBUILD | less
-            fi
-        else
-            sed -i -f ${conf} ${2}/PKGBUILD
-        fi
-    fi
+	conf=/etc/srcpac.d/${1}
+	if [ -f ${conf} ]; then
+		if [ "${3}" == 'noreplace' ]; then
+			if [ "${PAGER}" != '' ]; then
+				sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
+			else
+				sed -f ${conf} ${2}/PKGBUILD | less
+			fi
+		else
+			sed -i -f ${conf} ${2}/PKGBUILD
+		fi
+	fi
 }
 
 ##
@@ -97,16 +97,16 @@ get_candidates()
 ##
 get_pkgname()
 {
-    echo ${1} | perl -pe 's/-{1}[0-9]+[0-9a-z-.]*?$//'
+	echo ${1} | perl -pe 's/-{1}[0-9]+[0-9a-z-.]*?$//'
 }
 
 refresh()
 {
-    abs
-    pacman -Sy
-    if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
-        exit 0
-    fi
+	abs
+	pacman -Sy
+	if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
+		exit 0
+	fi
 }
 
 build_packages()
@@ -119,19 +119,19 @@ build_packages()
 	while [ $# -ne 0 ]; do
 		i=$1
 		iorg=$i
-        i=$(get_pkgname ${i})
-        get_candidates $i
+		i=$(get_pkgname ${i})
+		get_candidates $i
 		success=0
 
 		for pkgdir in ${candidates}; do
 			if [ -f ${pkgdir}/PKGBUILD ]; then
-                builddir=/var/srcpac${pkgdir/${ABSROOT}//}
+				builddir=/var/srcpac${pkgdir/${ABSROOT}//}
 
-                if [ ! -d ${builddir} ]; then
-                    su srcpac -m -c "mkdir -p ${builddir}"
-                fi
+				if [ ! -d ${builddir} ]; then
+					su srcpac -m -c "mkdir -p ${builddir}"
+				fi
 
-                su srcpac -m -c "cp ${pkgdir}/PKGBUILD ${builddir}"
+				su srcpac -m -c "cp ${pkgdir}/PKGBUILD ${builddir}"
 
 				# apply configuration
 				apply_config $i ${builddir}
@@ -141,14 +141,14 @@ build_packages()
 				# Seperate out our makepkg flags
 				MAKEPKGOPTS="-c -b -r -f"
 
-			    su srcpac -c "makepkg ${MAKEPKGOPTS}"
+				su srcpac -c "makepkg ${MAKEPKGOPTS}"
 
 				ret=$?
 				if [ $ret -ne 0 ]; then
 					break
 				fi
 
-                cp ${builddir}/*.pkg.tar.gz /var/cache/pacman/pkg/
+				cp ${builddir}/*.pkg.tar.gz /var/cache/pacman/pkg/
 
 				if [ "${action}" = "install" ]; then
                     pacman -U ${builddir}/*.pkg.tar.gz
@@ -358,7 +358,7 @@ if [ "$MAJOR" = "sync" ]; then
 		if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
 			if [ $REFRESH -eq 1 ]; then
-                refresh
+				refresh
 			fi
 
 			ignorestr=""
@@ -420,7 +420,7 @@ if [ "$MAJOR" = "sync" ]; then
 				exit 0
 			fi
 
-            # FIXME
+			# FIXME
 			if [ $ROOT -eq 0 ]; then
 				build_packages "install" ${sourcepac[@]}
 			else
@@ -468,8 +468,8 @@ if [ "$MAJOR" = "sync" ]; then
 
 		if [ ${ONLYCONF} -eq 1 ]; then
 			for pkg in ${packages[@]}; do
-                pkgname=$(get_pkgname ${pkg})
-                get_candidates $pkgname
+				pkgname=$(get_pkgname ${pkg})
+				get_candidates $pkgname
 				success=0
 				for pkgdir in ${candidates}; do
 					if [ -f ${pkgdir}/PKGBUILD ]; then
@@ -504,4 +504,4 @@ if [ "$MAJOR" = "sync" ]; then
 		fi
 	fi
 fi
-# vim:ts=4:sw=4:et:enc=utf-8:
+# vim:ts=4:sw=4:noet:enc=utf-8:
