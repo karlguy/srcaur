@@ -84,6 +84,11 @@ get_candidates()
     fi
 }
 
+get_pkgname()
+{
+    echo ${1} | perl -pe 's/-{1}[0-9]+[0-9a-z-.]*?$//'
+}
+
 build_packages()
 {
 	action="build"
@@ -94,7 +99,7 @@ build_packages()
 	while [ $# -ne 0 ]; do
 		i=$1
 		iorg=$i
-		i=${i%-*-*-*}
+        i=$(get_pkgname ${i})
         get_candidates $i
 		success=0
 		for pkgdir in $candidates; do
@@ -364,7 +369,7 @@ if [ "$MAJOR" = "sync" ]; then
 			declare -a sourcepac
 			declare -a regepac
 			for i in ${packages[@]}; do
-				j=${i%-*-*-*}
+                j=$(get_pkgname ${i})
 				if [ -f /var/lib/srcpac/$j ]; then
 					sourcepac[${#sourcepac[@]}]=$i
 				else
@@ -443,7 +448,7 @@ if [ "$MAJOR" = "sync" ]; then
 
 		if [ $ONLYCONF -eq 1 ]; then
 			for i in ${packages[@]}; do
-				i=${i%-*-*-*}
+                i=$(get_pkgname ${i})
                 get_candidates $i
 				success=0
 				for pkgdir in $candidates; do
