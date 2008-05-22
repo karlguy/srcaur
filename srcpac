@@ -1,22 +1,22 @@
 #!/bin/bash
-# 
+#
 #   srcpac
-#  
+#
 #   Copyright (c) 2004 by Jason Chu <jason@archlinux.org>
 #
 #   This program is free software; you can redistribute it and/or modify
 #   it under the terms of the GNU General Public License as published by
 #   the Free Software Foundation; either version 2 of the License, or
 #   (at your option) any later version.
-# 
+#
 #   This program is distributed in the hope that it will be useful,
 #   but WITHOUT ANY WARRANTY; without even the implied warranty of
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #   GNU General Public License for more details.
-#  
+#
 #   You should have received a copy of the GNU General Public License
 #   along with this program; if not, write to the Free Software
-#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
 #   USA.
 #
 
@@ -58,7 +58,11 @@ strip_url()
 	echo $1 | sed 's|^.*://.*/||g'
 }
 
-do_confs()
+##
+# Applies changes of source build packages to PKGUILDs,
+# if -o option is set we only display the PKGBUILD in a pager
+##
+apply_config()
 {
     conf=/etc/srcpac.d/${1}
     if [ -f ${conf} ]; then
@@ -74,6 +78,9 @@ do_confs()
     fi
 }
 
+##
+# Searches the ABS tree for a possible package candidates
+##
 get_candidates()
 {
     candidates=$(find ${ABSROOT} -type d -name ${1})
@@ -93,6 +100,15 @@ get_pkgname()
     echo ${1} | perl -pe 's/-{1}[0-9]+[0-9a-z-.]*?$//'
 }
 
+refresh()
+{
+    abs
+    pacman -Sy
+    if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
+        exit 0
+    fi
+}
+
 build_packages()
 {
 	action="build"
@@ -107,51 +123,47 @@ build_packages()
         get_candidates $i
 		success=0
 
-		for pkgdir in $candidates; do
-			if [ -f $pkgdir/PKGBUILD ]; then
-				# Look for config options and apply them
-                # FIXME define srcpacdir
+		for pkgdir in ${candidates}; do
+			if [ -f ${pkgdir}/PKGBUILD ]; then
                 builddir=/var/srcpac${pkgdir/${ABSROOT}//}
 
                 if [ ! -d ${builddir} ]; then
                     su srcpac -m -c "mkdir -p ${builddir}"
-                else
-                    echo "Removing files from previous builds"
-                    su srcpac -m -c "rm -vrf ${builddir}/*"
                 fi
 
                 su srcpac -m -c "cp ${pkgdir}/PKGBUILD ${builddir}"
 
-				do_confs $i ${builddir}
+				# apply configuration
+				apply_config $i ${builddir}
 
 				cd ${builddir}
 
 				# Seperate out our makepkg flags
 				MAKEPKGOPTS="-c -b -r -f"
 
-			    su srcpac -c "makepkg $MAKEPKGOPTS"
+			    su srcpac -c "makepkg ${MAKEPKGOPTS}"
 
 				ret=$?
-				if [ $ret -eq 0 ]; then
+				if [ $ret -ne 0 ]; then
 					break
 				fi
 
                 cp ${builddir}/*.pkg.tar.gz /var/cache/pacman/pkg/
 
-				if [ "$action" = "install" ]; then
+				if [ "${action}" = "install" ]; then
                     pacman -U ${builddir}/*.pkg.tar.gz
 				fi
 
 			fi
 		done
-		unset MAKEPKGOPTS DESTDIR
+		unset MAKEPKGOPTS
 
 		if [ $ret -ne 0 ]; then
 			echo "Error: Failed to build \"$i\""
 			exit 1
 		fi
 
-		if [ "$action" = "install" ]; then
+		if [ "${action}" = "install" ]; then
 			if [ ! -d /var/lib/srcpac ]; then
 				mkdir /var/lib/srcpac
 			fi
@@ -185,9 +197,9 @@ declare -a args
 while [ "$#" -ne "0" ]; do
 	case $1 in
 		--help)
-				usage
-				exit 0
-				;;
+		    usage
+			exit 0
+			;;
 		--version) version ;;
 		--add)
 			MAJOR="add"
@@ -293,33 +305,33 @@ while [ "$#" -ne "0" ]; do
 	shift
 done
 
-if [ "$MAJOR" = "" ]; then
+if [ "${MAJOR}" = "" ]; then
 	usage
 
 	exit 0
 fi
 
-if [ "$ABSROOT" = "" ]; then
+if [ "${ABSROOT}" = "" ]; then
 	echo "Error: The ABSROOT environment variable is not defined."
 
 	exit 1
 fi
 
-if [ "$MAJOR" = "add" -o "$MAJOR" = "remove" -o "$MAJOR" = "upgrade" ]; then
+if [ "${MAJOR}" = "add" -o "${MAJOR}" = "remove" -o "${MAJOR}" = "upgrade" ]; then
 	pacman $ARGLIST
 
-	if [ -d /var/lib/srcpac -a "$MAJOR" = "remove" ]; then
+	if [ -d /var/lib/srcpac -a "${MAJOR}" = "remove" ]; then
 		for i in ${args[@]}; do
-			if [ -f /var/lib/srcpac/$i ]; then
-				echo -n "removing source reference $i... "
-				rm /var/lib/srcpac/$i
+			if [ -f /var/lib/srcpac/${i} ]; then
+				echo -n "removing source reference ${i}... "
+				rm /var/lib/srcpac/${i}
 				echo "done"
 			fi
 		done
 	fi
 fi
 
-if [ "$MAJOR" = "query" ]; then
+if [ "${MAJOR}" = "query" ]; then
 	if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
 		for arg in ${args[@]}; do
 			pacman $ARGSANS $arg | head -n -1
@@ -329,7 +341,7 @@ if [ "$MAJOR" = "query" ]; then
 			fi
 
 			echo -n "Source         : "
-			if [ -f /var/lib/srcpac/$arg ]; then
+			if [ -f /var/lib/srcpac/${arg} ]; then
 				echo "Yes"
 			else
 				echo "No"
@@ -346,15 +358,14 @@ if [ "$MAJOR" = "sync" ]; then
 		if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
 			if [ $REFRESH -eq 1 ]; then
-				abs
-				pacman -Sy
+                refresh
 			fi
 
 			ignorestr=""
 			if [ $IGNORE -eq 1 ]; then
 				ignorestr="--ignore $IGNOREPKG"
 			fi
-			output=$(pacman -Spu --noconfirm $ignorestr)
+			output=$(pacman -Spu --noconfirm ${ignorestr})
 			ret=$?
 
 			if [ $ret -ne 0 ]; then
@@ -363,27 +374,28 @@ if [ "$MAJOR" = "sync" ]; then
 			fi
 
 			# if output is empty, there is nothing to upgrade
-			if [ -z "$output" ]; then
+			if [ -z "${output}" ]; then
 				exit $ret
 			fi
 
 			declare -a packages
-			for i in $output; do
+			for line in $output; do
 				# ensure the string is a URL
-				if [ $( echo "$i" | grep -F '://' ) ]; then
-					i=${i%.pkg.tar.gz}
-					packages[${#packages[@]}]=$(strip_url $i)
+				if [ $( echo "${line}" | grep -F '://' ) ]; then
+					line=${line%.pkg.tar.gz}
+					packages[${#packages[@]}]=$(strip_url ${line})
 				fi
 			done
 
 			declare -a sourcepac
 			declare -a regepac
-			for i in ${packages[@]}; do
-                j=$(get_pkgname ${i})
-				if [ -f /var/lib/srcpac/$j ]; then
-					sourcepac[${#sourcepac[@]}]=$i
+
+			for pkg in ${packages[@]}; do
+                pkgname=$(get_pkgname ${pkg})
+				if [ -f /var/lib/srcpac/${pkgname} ]; then
+					sourcepac[${#sourcepac[@]}]=$pkg
 				else
-					regpac[${#regpac[@]}]=$j
+					regpac[${#regpac[@]}]=$pkgname
 				fi
 			done
 
@@ -391,19 +403,24 @@ if [ "$MAJOR" = "sync" ]; then
 			[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
 			[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
 			[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
+
 			pacman $pacargs ${regpac[*]} $ignorestr
+
 			if [ ${#sourcepac[@]} -eq 0 ]; then
 				exit 0
 			fi
+
 			echo
 			echo "Source Targets: ${sourcepac[*]}"
 			echo
 			echo -n "Proceed with upgrade? [Y/n] "
 			read
-			if [ "$REPLY" != "y" -a "$REPLY" != "Y" -a "$REPLY" != "" ]; then
+
+			if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
 				exit 0
 			fi
 
+            # FIXME
 			if [ $ROOT -eq 0 ]; then
 				build_packages "install" ${sourcepac[@]}
 			else
@@ -413,15 +430,8 @@ if [ "$MAJOR" = "sync" ]; then
 			pacman $ARGLIST
 		fi
 	else
-		# Insert magic here
-
 		if [ $REFRESH -eq 1 ]; then
-			abs
-			pacman -Sy
-
-			if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
-				exit 0
-			fi
+            refresh
 		fi
 
 		if [ $DOWNLOAD -eq 1 ]; then
@@ -444,11 +454,11 @@ if [ "$MAJOR" = "sync" ]; then
 		fi
 
 		declare -a packages
-		for i in $output; do
+		for line in $output; do
 			# ensure the string is a URL
-			if [ $( echo "$i" | grep -F '://' ) ]; then
-				i=${i%.pkg.tar.gz}
-				packages[${#packages[@]}]=$(strip_url $i)
+			if [ $( echo "${line}" | grep -F '://' ) ]; then
+				line=${line%.pkg.tar.gz}
+				packages[${#packages[@]}]=$(strip_url ${line})
 			fi
 		done
 
@@ -456,22 +466,21 @@ if [ "$MAJOR" = "sync" ]; then
 			exit 0
 		fi
 
-		if [ $ONLYCONF -eq 1 ]; then
-			for i in ${packages[@]}; do
-                i=$(get_pkgname ${i})
-                get_candidates $i
+		if [ ${ONLYCONF} -eq 1 ]; then
+			for pkg in ${packages[@]}; do
+                pkgname=$(get_pkgname ${pkg})
+                get_candidates $pkgname
 				success=0
-				for pkgdir in $candidates; do
-					if [ -f $pkgdir/PKGBUILD ]; then
+				for pkgdir in ${candidates}; do
+					if [ -f ${pkgdir}/PKGBUILD ]; then
 						# Look for config options and apply them
-                        do_confs $i $pkgdir noreplace
+                        apply_config $pkgname $pkgdir noreplace
 						success=1
 						break
 					fi
 				done
-				if [ $success -eq 0 ]; then
-					echo "Error: Failed to find \"$i\""
-
+				if [ ${success} -eq 0 ]; then
+					echo "Error: Failed to find \"${pkg}\""
 					exit 1
 				fi
 			done
@@ -483,10 +492,11 @@ if [ "$MAJOR" = "sync" ]; then
 		echo
 		echo -n "Proceed with upgrade? [Y/n] "
 		read
-		if [ "$REPLY" != "y" -a "$REPLY" != "Y" -a "$REPLY" != "" ]; then
+		if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
 			exit 0
 		fi
 
+        # FIXME
 		if [ $ROOT -eq 0 ]; then
 			build_packages "install" ${packages[@]}
 		else
@@ -494,3 +504,4 @@ if [ "$MAJOR" = "sync" ]; then
 		fi
 	fi
 fi
+# vim:ts=4:sw=4:et:enc=utf-8:
