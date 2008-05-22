@@ -95,7 +95,7 @@ build_packages()
 	while [ $# -ne 0 ]; do
 		i=$1
 		iorg=$i
-		i=${i%-*-*}
+		i=${i%-*-*-*}
 		candidates=$(find $ABSROOT -type d -name $i)
 		if [ "$candidates" = "" ]; then
 			echo "Error: Could not find \"$i\" under $ABSROOT"
@@ -369,7 +369,7 @@ if [ "$MAJOR" = "sync" ]; then
 			declare -a sourcepac
 			declare -a regepac
 			for i in ${packages[@]}; do
-				j=${i%-*-*}
+				j=${i%-*-*-*}
 				if [ -f /var/lib/srcpac/$j ]; then
 					sourcepac[${#sourcepac[@]}]=$i
 				else
@@ -448,7 +448,7 @@ if [ "$MAJOR" = "sync" ]; then
 
 		if [ $ONLYCONF -eq 1 ]; then
 			for i in ${packages[@]}; do
-				i=${i%-*-*}
+				i=${i%-*-*-*}
 				candidates=$(find $ABSROOT -type d -name $i)
 				if [ "$candidates" = "" ]; then
 					echo "Error: Could not find \"$i\" under $ABSROOT"
