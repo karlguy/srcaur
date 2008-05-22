@@ -75,6 +75,15 @@ do_confs()
     fi
 }
 
+get_candidates()
+{
+    candidates=$(find ${ABSROOT} -type d -name ${1})
+    if [ "${candidates}" = "" ]; then
+        echo "Error: Could not find \"${1}\" under ${ABSROOT}"
+        exit 1
+    fi
+}
+
 build_packages()
 {
 	action="build"
@@ -86,11 +95,7 @@ build_packages()
 		i=$1
 		iorg=$i
 		i=${i%-*-*-*}
-		candidates=$(find $ABSROOT -type d -name $i)
-		if [ "$candidates" = "" ]; then
-			echo "Error: Could not find \"$i\" under $ABSROOT"
-			exit 1
-		fi
+        get_candidates $i
 		success=0
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
@@ -439,12 +444,7 @@ if [ "$MAJOR" = "sync" ]; then
 		if [ $ONLYCONF -eq 1 ]; then
 			for i in ${packages[@]}; do
 				i=${i%-*-*-*}
-				candidates=$(find $ABSROOT -type d -name $i)
-				if [ "$candidates" = "" ]; then
-					echo "Error: Could not find \"$i\" under $ABSROOT"
-
-					exit 1
-				fi
+                get_candidates $i
 				success=0
 				for pkgdir in $candidates; do
 					if [ -f $pkgdir/PKGBUILD ]; then
