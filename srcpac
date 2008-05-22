@@ -102,27 +102,35 @@ build_packages()
         i=$(get_pkgname ${i})
         get_candidates $i
 		success=0
+
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
 				# Look for config options and apply them
-				do_confs $i $pkgdir
+                builddir=/var/srcpac${pkgdir/${ABSROOT}\///}
 
-				cd $pkgdir
+                if [ ! -d ${builddir} ]; then
+                    su srcpac -m -c "mkdir -p ${builddir}"
+                else
+                    echo "Removing files from previous builds"
+                    su srcpac -m -c "rm -vrf ${builddir}/*"
+                fi
+
+                su srcpac -m -c "cp ${pkgdir}/PKGBUILD ${builddir}/"
+
+				do_confs $i ${builddir}
+
+				cd ${builddir}
+
 				# Seperate out our makepkg flags
 				MAKEPKGOPTS="-c -b -r -f"
-				DESTDIR="/var/cache/pacman/pkg"
+
+			    su srcpac -m -c "makepkg $MAKEPKGOPTS"
+                cp ${builddir}/*.pkg.tar.gz /var/cache/pacman/pkg/
 
 				if [ "$action" = "install" ]; then
-					MAKEPKGOPTS="$MAKEPKGOPTS -i"
+                    pacman -U ${builddir}/*.pkg.tar.gz
 				fi
-				# For now, keep backward compatability with makepkg2
-				if makepkg --help | grep -qF -e "-w <destdir>"; then
-					#makepkg 2.9.8 and down
-					makepkg $MAKEPKGOPTS -w $DESTDIR
-				else
-					#makepkg 3.0.0 and up
-					PKGDEST=$DESTDIR makepkg $MAKEPKGOPTS
-				fi
+
 				ret=$?
 				if [ $ret -eq 0 ]; then
 					break
@@ -136,6 +144,7 @@ build_packages()
 			exit 1
 		fi
 
+        # WHY?
 		if [ "$action" = "install" ]; then
 			if [ ! -d /var/lib/srcpac ]; then
 				mkdir /var/lib/srcpac
