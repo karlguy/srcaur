@@ -287,7 +287,7 @@ while [ "$#" -ne "0" ]; do
 					f) FORCE=1 ;;
 					r)
 						ROOT=1
-						NEWROOT="$OPTARG"
+						NEWROOT="${OPTARG}"
 						;;
 					d) NODEPS=1 ;;
 					b) BUILD=1 ;;
@@ -353,7 +353,7 @@ if [ "${MAJOR}" = "query" ]; then
 	fi
 fi
 
-if [ "$MAJOR" = "sync" ]; then
+if [ "${MAJOR}" = "sync" ]; then
 	if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
 		if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
 			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
@@ -388,7 +388,7 @@ if [ "$MAJOR" = "sync" ]; then
 			done
 
 			declare -a sourcepac
-			declare -a regepac
+			declare -a regpac
 
 			for pkg in ${packages[@]}; do
                 pkgname=$(get_pkgname ${pkg})
@@ -466,7 +466,7 @@ if [ "$MAJOR" = "sync" ]; then
 			exit 0
 		fi
 
-		if [ ${ONLYCONF} -eq 1 ]; then
+		if [ $ONLYCONF -eq 1 ]; then
 			for pkg in ${packages[@]}; do
 				pkgname=$(get_pkgname ${pkg})
 				get_candidates $pkgname
