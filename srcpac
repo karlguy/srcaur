@@ -32,14 +32,13 @@ usage()
 	echo "        srcpac {-A --add}     [options] <file>"
 	echo "        srcpac {-R --remove}  [options] <package>"
 	echo "        srcpac {-U --upgrade} [options] <file>"
-	echo "        srcpac {-F --freshen} [options] <file>"
 	echo "        srcpac {-Q --query}   [options] [package]"
 	echo "        srcpac {-S --sync}    [options] [package]"
 	echo
 	echo "srcpac's options are based on pacman's, so check the pacman man page"
 	echo "srcpac adds two options to -S: -b and -o"
 	echo "-b : builds the targets from source"
-	echo "-o : applies config changes and less's the PKGBUILD without building"
+	echo "-o : applies config changes and displays the PKGBUILD in your pager app without building"
 }
 
 version()
@@ -84,6 +83,11 @@ get_candidates()
     fi
 }
 
+##
+# FIXME this can be replaced with sth like:
+#   pkg = ${pkg%-*-*-*}
+# once all packages follow this naming scheme
+##
 get_pkgname()
 {
     echo ${1} | perl -pe 's/-{1}[0-9]+[0-9a-z-.]*?$//'
@@ -106,7 +110,8 @@ build_packages()
 		for pkgdir in $candidates; do
 			if [ -f $pkgdir/PKGBUILD ]; then
 				# Look for config options and apply them
-                builddir=/var/srcpac${pkgdir/${ABSROOT}\///}
+                # FIXME define srcpacdir
+                builddir=/var/srcpac${pkgdir/${ABSROOT}//}
 
                 if [ ! -d ${builddir} ]; then
                     su srcpac -m -c "mkdir -p ${builddir}"
@@ -115,7 +120,7 @@ build_packages()
                     su srcpac -m -c "rm -vrf ${builddir}/*"
                 fi
 
-                su srcpac -m -c "cp ${pkgdir}/PKGBUILD ${builddir}/"
+                su srcpac -m -c "cp ${pkgdir}/PKGBUILD ${builddir}"
 
 				do_confs $i ${builddir}
 
@@ -124,17 +129,19 @@ build_packages()
 				# Seperate out our makepkg flags
 				MAKEPKGOPTS="-c -b -r -f"
 
-			    su srcpac -m -c "makepkg $MAKEPKGOPTS"
+			    su srcpac -c "makepkg $MAKEPKGOPTS"
+
+				ret=$?
+				if [ $ret -eq 0 ]; then
+					break
+				fi
+
                 cp ${builddir}/*.pkg.tar.gz /var/cache/pacman/pkg/
 
 				if [ "$action" = "install" ]; then
                     pacman -U ${builddir}/*.pkg.tar.gz
 				fi
 
-				ret=$?
-				if [ $ret -eq 0 ]; then
-					break
-				fi
 			fi
 		done
 		unset MAKEPKGOPTS DESTDIR
@@ -144,7 +151,6 @@ build_packages()
 			exit 1
 		fi
 
-        # WHY?
 		if [ "$action" = "install" ]; then
 			if [ ! -d /var/lib/srcpac ]; then
 				mkdir /var/lib/srcpac
@@ -193,10 +199,6 @@ while [ "$#" -ne "0" ]; do
 			;;
 		--upgrade)
 			MAJOR="upgrade"
-			ARGSANS="$ARGSANS $1"
-			;;
-		--freshen)
-			MAJOR="freshen"
 			ARGSANS="$ARGSANS $1"
 			;;
 		--query)
@@ -267,7 +269,6 @@ while [ "$#" -ne "0" ]; do
 					A) MAJOR="add" ;;
 					R) MAJOR="remove" ;;
 					U) MAJOR="upgrade" ;;
-					F) MAJOR="freshen" ;;
 					Q) MAJOR="query" ;;
 					S) MAJOR="sync" ;;
 					i) INFO=1 ;;
@@ -304,7 +305,7 @@ if [ "$ABSROOT" = "" ]; then
 	exit 1
 fi
 
-if [ "$MAJOR" = "add" -o "$MAJOR" = "remove" -o "$MAJOR" = "freshen" -o "$MAJOR" = "upgrade" ]; then
+if [ "$MAJOR" = "add" -o "$MAJOR" = "remove" -o "$MAJOR" = "upgrade" ]; then
 	pacman $ARGLIST
 
 	if [ -d /var/lib/srcpac -a "$MAJOR" = "remove" ]; then
