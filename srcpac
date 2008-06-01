@@ -23,7 +23,7 @@
 ver=0.5
 
 [ -f /etc/abs.conf ] && source /etc/abs.conf
-[ -f /etc/srcpac.conf ] && source /etc/srcpac.conf
+[ -f /etc/makepkg.conf ] && source /etc/makepkg.conf
 
 usage()
 {
@@ -51,11 +51,6 @@ version()
 	pacman -V
 
 	exit 0
-}
-
-strip_url()
-{
-	echo $1 | sed 's|^.*://.*/||g'
 }
 
 ##
@@ -90,15 +85,15 @@ get_candidates()
     fi
 }
 
-##
-# FIXME this can be replaced with sth like:
-#   pkg = ${pkg%-*-*-*}
-# once all packages follow this naming scheme or I figure out
-# a way how to do this with sed
-##
 get_pkgname()
 {
-	echo ${1} | perl -pe 's/-{1}[0-9]+[0-9a-z-.]*?$//'
+	local tmp
+
+	tmp=${1##*/}
+	tmp=${tmp%$PKGEXT}
+	tmp=${tmp%-$CARCH}
+	tmp=${tmp%-any}
+	echo ${tmp%-*-*}
 }
 
 refresh()
@@ -116,12 +111,12 @@ build_packages()
 	if [ "$1" = "install" ]; then
 		action="install"
 	fi
+
 	shift
+
 	while [ $# -ne 0 ]; do
-		i=$1
-		iorg=$i
-		i=$(get_pkgname ${i})
-		get_candidates $i
+		pkg=$1
+		get_candidates $pkg
 		success=0
 
 		for pkgdir in ${candidates}; do
@@ -135,7 +130,7 @@ build_packages()
 				su srcpac -m -c "cp ${pkgdir}/PKGBUILD ${builddir}"
 
 				# apply configuration
-				apply_config $i ${builddir}
+				apply_config ${pkg} ${builddir}
 
 				cd ${builddir}
 
@@ -164,7 +159,7 @@ build_packages()
 		unset MAKEPKGOPTS
 
 		if [ $ret -ne 0 ]; then
-			echo "Error: Failed to build \"$i\""
+			echo "Error: Failed to build \"${pkg}\""
 			exit 1
 		fi
 
@@ -173,7 +168,7 @@ build_packages()
 				mkdir /var/lib/srcpac
 			fi
 
-			touch /var/lib/srcpac/$i
+			touch /var/lib/srcpac/${pkg}
 		fi
 		shift
 	done
@@ -386,8 +381,7 @@ if [ "${MAJOR}" = "sync" ]; then
 			for line in $output; do
 				# ensure the string is a URL
 				if [ $( echo "${line}" | grep -F '://' ) ]; then
-					line=${line%.pkg.tar.gz}
-					packages[${#packages[@]}]=$(strip_url ${line})
+					packages[${#packages[@]}]=$(get_pkgname ${line})
 				fi
 			done
 
@@ -395,11 +389,10 @@ if [ "${MAJOR}" = "sync" ]; then
 			declare -a regpac
 
 			for pkg in ${packages[@]}; do
-                pkgname=$(get_pkgname ${pkg})
-				if [ -f /var/lib/srcpac/${pkgname} ]; then
+				if [ -f /etc/srcpac.d/${pkg} ]; then
 					sourcepac[${#sourcepac[@]}]=$pkg
 				else
-					regpac[${#regpac[@]}]=$pkgname
+					regpac[${#regpac[@]}]=$pkg
 				fi
 			done
 
@@ -458,8 +451,7 @@ if [ "${MAJOR}" = "sync" ]; then
 		for line in $output; do
 			# ensure the string is a URL
 			if [ $( echo "${line}" | grep -F '://' ) ]; then
-				line=${line%.pkg.tar.gz}
-				packages[${#packages[@]}]=$(strip_url ${line})
+				packages[${#packages[@]}]=$(get_pkgname ${line})
 			fi
 		done
 
@@ -469,13 +461,12 @@ if [ "${MAJOR}" = "sync" ]; then
 
 		if [ $ONLYCONF -eq 1 ]; then
 			for pkg in ${packages[@]}; do
-				pkgname=$(get_pkgname ${pkg})
-				get_candidates $pkgname
+				get_candidates $pkg
 				success=0
 				for pkgdir in ${candidates}; do
 					if [ -f ${pkgdir}/PKGBUILD ]; then
 						# Look for config options and apply them
-                        apply_config $pkgname $pkgdir noreplace
+                        apply_config $pkg $pkgdir noreplace
 						success=1
 						break
 					fi
