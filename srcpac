@@ -43,7 +43,7 @@ usage()
 
 version()
 {
-	echo "                       Srcpac v$ver"
+	echo "                       Srcpac v${ver}"
 	echo "                       Copyright (C) 2004 Jason Chu <jason@archlinux.org>"
 	echo
 	echo "                       This program may be freely redistributed under"
@@ -78,11 +78,11 @@ apply_config()
 ##
 get_candidates()
 {
-    candidates=$(find ${ABSROOT} -type d -name ${1})
-    if [ "${candidates}" = "" ]; then
-        echo "Error: Could not find \"${1}\" under ${ABSROOT}"
-        exit 1
-    fi
+	candidates=$(find ${ABSROOT} -type d -name ${1})
+	if [ "${candidates}" = "" ]; then
+		echo "Error: Could not find \"${1}\" under ${ABSROOT}"
+		exit 1
+	fi
 }
 
 get_pkgname()
@@ -157,7 +157,7 @@ build_packages()
 					[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
 					[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
 					[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
-                    pacman $pacargs ${builddir}/*.pkg.tar.gz
+					pacman $pacargs ${builddir}/*.pkg.tar.gz
 				fi
 
 			fi
