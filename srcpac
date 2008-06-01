@@ -112,12 +112,6 @@ build_packages()
 		action="install"
 	fi
 
-	if [ "${SUDO_USER}" = "" ]; then
-		BUILD_USER=srcpac
-	else
-		BUILD_USER=${SUDO_USER}
-	fi
-
 	shift
 
 	while [ $# -ne 0 ]; do
@@ -129,21 +123,29 @@ build_packages()
 			if [ -f ${pkgdir}/PKGBUILD ]; then
 				builddir=/var/srcpac${pkgdir/${ABSROOT}//}
 
-				if [ ! -d ${builddir} ]; then
-					su ${BUILD_USER} -m -c "mkdir -p ${builddir}"
+				# remove files from previous builds
+				if [ -d ${builddir} ]; then
+					rm -r ${builddir}
 				fi
 
-				su ${BUILD_USER} -m -c "cp ${pkgdir}/PKGBUILD ${builddir}"
-
+				mkdir -p ${builddir}
+				cp ${pkgdir}/PKGBUILD ${builddir}
+				
 				# apply configuration
 				apply_config ${pkg} ${builddir}
 
-				cd ${builddir}
-
-				# Seperate out our makepkg flags
+				# seperate out our makepkg flags
 				MAKEPKGOPTS="-c -b -r -f"
 
-				su ${BUILD_USER} -c "makepkg ${MAKEPKGOPTS}"
+				cd ${builddir}
+
+				if [ "${SUDO_USER}" = "" ]; then
+					chown -R nobody ${builddir}
+					sudo -u nobody makepkg ${MAKEPKGOPTS}
+				else
+					chown -R ${SUDO_USER} ${builddir}
+					su ${SUDO_USER} -m -c "makepkg ${MAKEPKGOPTS}"
+				fi
 
 				ret=$?
 				if [ $ret -ne 0 ]; then
