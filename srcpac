@@ -429,6 +429,9 @@ if [ "${MAJOR}" = "sync" ]; then
 			build_packages "install" ${sourcepac[@]}
 
 		else
+			if [ $REFRESH -eq 1 ]; then
+				refresh
+			fi
 			pacman $ARGLIST
 		fi
 	else
