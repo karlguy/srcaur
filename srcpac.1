@@ -33,7 +33,7 @@ For additional SYNC options not specified below, see pacman manpage. Only those 
 .TP 
 \fB\-b\fR
 .br 
-Build specified package from source. This runs \fBmakepkg\fR in your abs tree. This may build an older version of the package if the abs tree is not updated.
+Build specified package from source. This runs \fBmakepkg\fR in /var/srcpac/<repo>/<package>. This may build an older version of the package if the abs tree is not updated.
 
 .TP 
 \fB\-y\fR
@@ -42,32 +42,23 @@ This command updates the abs tree and the pacman database.
 .TP 
 \fB\-o\fR
 .br 
-Applies the sed command to a PKGBUILD (see CONFIGURATION), then pipes the output to less. This allows you to make sure the changes are applied properly. No actual build occurs when using \fB\-o\fR.
+Applies the sed command to a PKGBUILD (see CONFIGURATION), then pipes the output to less or the pager set in the PAGER environment variable. This allows you to make sure the changes are applied properly. No actual build occurs when using \fB\-o\fR.
 .SH "CONFIGURATION"
-\fBsrcpac\fR lets you specify custom configs based on sed commands applied to PKGBUILDs. The config file is \fI/etc/srcpac.conf\fR. 
-
-You specify a bash variable in the config file, which is a set of sed substitutes. All configs have \fBconf_\fR prepended to them.
+\fBsrcpac\fR lets you specify custom configs based on sed commands applied to PKGBUILDs. The config files are simple sed script files and have to be put in \fI/etc/srcpac.d/\fR. The config files have to be named like the packages they apply to. ie \fI/etc/srcpac.d/less\fR.
 
 .TP 
-\fBExample:\fR
-conf_gaim=('#./configure \-\-prefix#./configure \-\-with\-gtkspell \-\-prefix#'
-"#depends=('startup\-notification'#depends=(gtkspell 'startup\-notification'#")
+\fBExample\fI /etc/srcpac.d/less\fB:\fR
+
+#--prefix=/usr#--prefix=/usr/local#
 
 .TP 
-Every element in the above example \fBconf_\fR statement is supplied to the PKGBUILD in a big sed command like this:
-sed \-i "s<string1>;s<string2>;[...]" PKGBUILD
+The above example config is supplied to the PKGBUILD in a sed command like this:
 
-.TP 
-So the command above, combined with the \fBconf_\fR directive, yeilds:
-sed \-i "'s#./configure \-\-prefix#./configure \-\-with\-gtkspell
-\-\-prefix#';s#depends=('startup\-notification'#depends=(gtkspell'startup\-notification'#;" PKGBUILD
+sed \-f CONFIG PKGBUILD
 
 .TP 
 Since writing these rules can be kind of tricky, it is best to use the \fB\-o\fR flag (see above) until you are sure things look right.
-.SH "CONFIGURATION CAVEATS"
-You cannot have bash variables that have hyphens in them, so package names with hyphens are replaced with X's. 
 
-For example, the package 'foo\-bar' would be \fBconf_fooXbar\fR.
 .SH "SEE ALSO"
 .B pacman
 is the ArchLinux package manager.
