@@ -328,10 +328,10 @@ if [ "${MAJOR}" = "add" -o "${MAJOR}" = "remove" -o "${MAJOR}" = "upgrade" ]; th
 	pacman $ARGLIST
 
 	if [ -d /var/lib/srcpac -a "${MAJOR}" = "remove" ]; then
-		for i in ${args[@]}; do
-			if [ -f /var/lib/srcpac/${i} ]; then
-				echo -n "removing source reference ${i}... "
-				rm /var/lib/srcpac/${i}
+		for pkg in ${args[@]}; do
+			if [ -f /var/lib/srcpac/${pkg} ]; then
+				echo -n "removing source reference ${pkg}... "
+				rm /var/lib/srcpac/${pkg}
 				echo "done"
 			fi
 		done
