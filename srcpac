@@ -20,7 +20,7 @@
 #   USA.
 #
 
-ver=0.5
+ver=0.6
 
 [ -f /etc/abs.conf ] && source /etc/abs.conf
 [ -f /etc/makepkg.conf ] && source /etc/makepkg.conf
