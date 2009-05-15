@@ -129,13 +129,13 @@ build_packages()
 				fi
 
 				mkdir -p ${builddir}
-				cp ${pkgdir}/PKGBUILD ${builddir}
+				cp ${pkgdir}/* ${builddir}
 				
 				# apply configuration
 				apply_config ${pkg} ${builddir}
 
 				# seperate out our makepkg flags
-				MAKEPKGOPTS="-c -b -r -f"
+				MAKEPKGOPTS="-c -s -r -f"
 
 				cd ${builddir}
 
