@@ -10,19 +10,19 @@ srcpac \- A bash build wrapper for pacman.
 .SH "OPERATIONS"
 For additional OPERATIONS not specified below, see pacman manpage. Only those OPERATIONS specified below have been modified.
 
-.TP 
+.TP
 \fB\-R, \-\-remove\fR
 Remove a package from the system. Works the same as \fBpacman\fR. In addition, the 'from\-source' marking will be removed.
 
-.TP 
+.TP
 \fB\-Q, \-\-query\fR
-Query the package database. Works the same as \fBpacman\fR. Additionally, use of the \fB\-i\fR option tells you whether a package is marked as 'from\-source' or not. 
+Query the package database. Works the same as \fBpacman\fR. Additionally, use of the \fB\-i\fR option tells you whether a package is marked as 'from\-source' or not.
 
-.TP 
+.TP
 \fB\-S, \-\-sync\fR
-Synchronize packages. Works the same as \fBpacman\fR. Additional flags may be specified to build something from source (see below). 
+Synchronize packages. Works the same as \fBpacman\fR. Additional flags may be specified to build something from source (see below).
 
-.TP 
+.TP
 \fB\-h, \-\-help\fR
 Display syntax for the given operation. If no operation was supplied then the general syntax is shown.
 .SH "OPTIONS"
@@ -30,38 +30,38 @@ See pacman manpage. No additional general options beyond what pacman provides. S
 .SH "SYNC OPTIONS"
 For additional SYNC options not specified below, see pacman manpage. Only those options specified below have been modified.
 
-.TP 
+.TP
 \fB\-b\fR
-.br 
+.br
 Build specified package from source. This runs \fBmakepkg\fR in /var/srcpac/<repo>/<package>. This may build an older version of the package if the abs tree is not updated.
 
-.TP 
+.TP
 \fB\-y\fR
-.br 
+.br
 This command updates the abs tree and the pacman database.
-.TP 
+.TP
 \fB\-o\fR
-.br 
+.br
 Applies the sed command to a PKGBUILD (see CONFIGURATION), then pipes the output to less or the pager set in the PAGER environment variable. This allows you to make sure the changes are applied properly. No actual build occurs when using \fB\-o\fR.
 .SH "CONFIGURATION"
 \fBsrcpac\fR lets you specify custom configs based on sed commands applied to PKGBUILDs. The config files are simple sed script files and have to be put in \fI/etc/srcpac.d/\fR. The config files have to be named like the packages they apply to. ie \fI/etc/srcpac.d/less\fR.
 
-.TP 
+.TP
 \fBExample\fI /etc/srcpac.d/less\fB:\fR
 
 #--prefix=/usr#--prefix=/usr/local#
 
-.TP 
+.TP
 The above example config is supplied to the PKGBUILD in a sed command like this:
 
 sed \-f CONFIG PKGBUILD
 
-.TP 
+.TP
 Since writing these rules can be kind of tricky, it is best to use the \fB\-o\fR flag (see above) until you are sure things look right.
 
 .SH "SEE ALSO"
 .B pacman
-is the ArchLinux package manager.
+is the Arch Linux package manager.
 .SH "AUTHORS"
 Jason Chu <jason@archlinux.org>
 

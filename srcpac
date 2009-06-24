@@ -130,7 +130,7 @@ build_packages()
 
 				mkdir -p ${builddir}
 				cp ${pkgdir}/* ${builddir}
-				
+
 				# apply configuration
 				apply_config ${pkg} ${builddir}
 
