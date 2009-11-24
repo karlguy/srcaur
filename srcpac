@@ -32,7 +32,6 @@ usage()
 	echo "        srcpac {-A --add}     [options] <file>"
 	echo "        srcpac {-R --remove}  [options] <package>"
 	echo "        srcpac {-U --upgrade} [options] <file>"
-	echo "        srcpac {-Q --query}   [options] [package]"
 	echo "        srcpac {-S --sync}    [options] [package]"
 	echo
 	echo "srcpac's options are based on pacman, so check the pacman man page"
@@ -187,7 +186,6 @@ build_packages()
 
 # Options
 MAJOR=""
-INFO=0
 FORCE=0
 ROOT=0
 NEWROOT=""
@@ -223,16 +221,8 @@ function check_args()
 			  MAJOR="upgrade"
 			  ARGSANS="$ARGSANS $1"
 			  ;;
-		  --query)
-			  MAJOR="query"
-			  ARGSANS="$ARGSANS $1"
-			  ;;
 		  --sync)
 			  MAJOR="sync"
-			  ARGSANS="$ARGSANS $1"
-			  ;;
-		  --info)
-			  INFO=1
 			  ARGSANS="$ARGSANS $1"
 			  ;;
 		  --force)
@@ -283,15 +273,13 @@ function check_args()
 				  OPTIONAL=$2
 			  fi
 			  OPTIND=1
-			  while getopts ":VARUFQSidfbyur:wo" opt $1 $OPTIONAL; do
+			  while getopts ":VARUFSdfbyur:wo" opt $1 $OPTIONAL; do
 				  case $opt in
 					  V) version ;;
 					  A) MAJOR="add" ;;
 					  R) MAJOR="remove" ;;
 					  U) MAJOR="upgrade" ;;
-					  Q) MAJOR="query" ;;
 					  S) MAJOR="sync" ;;
-					  i) INFO=1 ;;
 					  f) FORCE=1 ;;
 					  r) ROOT=1
 					     NEWROOT="${OPTARG}"
@@ -337,28 +325,6 @@ function main()
 				  echo "done"
 			  fi
 		  done
-	  fi
-  fi
-
-  if [ "${MAJOR}" = "query" ]; then
-	  if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
-		  for arg in ${args[@]}; do
-			  pacman $ARGSANS $arg | head -n -1
-
-			  if [ $? -ne 0 ]; then
-				  exit $?
-			  fi
-
-			  echo -n "Source         : "
-			  if [ -f /var/lib/srcpac/${arg} ]; then
-				  echo "Yes"
-			  else
-				  echo "No"
-			  fi
-			  echo
-		  done
-	  else
-		  pacman $ARGLIST
 	  fi
   fi
 
