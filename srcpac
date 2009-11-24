@@ -1,29 +1,29 @@
 #!/bin/bash
 #
-#   srcpac
+#   srcpac - A tool to rebuild official Arch Linux package from source
 #
-#   Copyright (c) 2004 by Jason Chu <jason@archlinux.org>
+#   Copyright (C) 2004 Jason Chu <jason@archlinux.org>
+#   Copyright (C) 2009 Andrea Scarpino <andrea@archlinux.org>
 #
-#   This program is free software; you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation; either version 2 of the License, or
-#   (at your option) any later version.
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 #
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 #
-#   You should have received a copy of the GNU General Public License
-#   along with this program; if not, write to the Free Software
-#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
-#   USA.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ver=0.6
+ver=0.7
 
 [ -f /etc/abs.conf ] && source /etc/abs.conf
 [ -f /etc/makepkg.conf ] && source /etc/makepkg.conf
+[ -f ~/.makepkg.conf ] && source ~/.makepkg.conf
 
 usage()
 {
@@ -35,16 +35,19 @@ usage()
 	echo "        srcpac {-Q --query}   [options] [package]"
 	echo "        srcpac {-S --sync}    [options] [package]"
 	echo
-	echo "srcpac's options are based on pacman's, so check the pacman man page"
+	echo "srcpac's options are based on pacman, so check the pacman man page"
 	echo "srcpac adds two options to -S: -b and -o"
 	echo "-b : builds the targets from source"
 	echo "-o : applies config changes and displays the PKGBUILD in your pager app without building"
+	
+	exit 0
 }
 
 version()
 {
-	echo "                       Srcpac v${ver}"
+	echo "                       srcpac v${ver}"
 	echo "                       Copyright (C) 2004 Jason Chu <jason@archlinux.org>"
+	echo "                       Copyright (C) 2009 Andrea Scarpino <andrea@archlinux.org>"
 	echo
 	echo "                       This program may be freely redistributed under"
 	echo "                       the terms of the GNU General Public License"
@@ -197,310 +200,313 @@ ONLYCONF=0
 IGNORE=0
 IGNOREPKG=""
 
-ARGLIST=$@
-ARGSANS=""
+function check_args()
+{
+  ARGLIST=$@
+  ARGSANS=""
 
-declare -a args
+  declare -a args
 
-while [ "$#" -ne "0" ]; do
-	case $1 in
-		--help)
-		    usage
-			exit 0
-			;;
-		--version) version ;;
-		--add)
-			MAJOR="add"
-			ARGSANS="$ARGSANS $1"
-			;;
-		--remove)
-			MAJOR="remove"
-			ARGSANS="$ARGSANS $1"
-			;;
-		--upgrade)
-			MAJOR="upgrade"
-			ARGSANS="$ARGSANS $1"
-			;;
-		--query)
-			MAJOR="query"
-			ARGSANS="$ARGSANS $1"
-			;;
-		--sync)
-			MAJOR="sync"
-			ARGSANS="$ARGSANS $1"
-			;;
-		--info)
-			INFO=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--force)
-			FORCE=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--root)
-			ROOT=1
-			NEWROOT="$2"
-			ARGSANS="$ARGSANS $1 $2"
-			shift
-			;;
-		--nodeps)
-			NODEPS=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--build)
-			BUILD=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--refresh)
-			REFRESH=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--sysupgrade)
-			SYSUPGRADE=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--downloadonly)
-			DOWNLOAD=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--onlyconf)
-			ONLYCONF=1
-			ARGSANS="$ARGSANS $1"
-			;;
-		--ignore)
-			IGNORE=1
-			IGNOREPKG="$IGNOREPKG $2"
-			ARGSANS="$ARGSANS $1 $2"
-			;;
-		--*)
-#			usage
-#			exit 1
-			ARGSANS="$ARGSANS $1"
-			;;
-		-*)
-			ARGSANS="$ARGSANS $1"
-			if [ $(echo $1 | grep r) ]; then
-				OPTIONAL=$2
-			fi
-			OPTIND=1
-			while getopts ":VARUFQSidfbyur:wo" opt $1 $OPTIONAL; do
-				case $opt in
-					V) version ;;
-					A) MAJOR="add" ;;
-					R) MAJOR="remove" ;;
-					U) MAJOR="upgrade" ;;
-					Q) MAJOR="query" ;;
-					S) MAJOR="sync" ;;
-					i) INFO=1 ;;
-					f) FORCE=1 ;;
-					r) ROOT=1
-					   NEWROOT="${OPTARG}"
-					   ;;
-					d) NODEPS=1 ;;
-					b) BUILD=1 ;;
-					y) REFRESH=1 ;;
-					u) SYSUPGRADE=1 ;;
-					w) DOWNLOAD=1 ;;
-					o) ONLYCONF=1 ;;
-				esac
-			done
-			;;
-		*)
-			args[${#args[@]}]=$1
-			;;
-	esac
-	shift
-done
+  while [ "$#" -ne "0" ]; do
+	  case $1 in
+		  --help) usage ;;
+		  --version) version ;;
+		  --add)
+			  MAJOR="add"
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --remove)
+			  MAJOR="remove"
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --upgrade)
+			  MAJOR="upgrade"
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --query)
+			  MAJOR="query"
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --sync)
+			  MAJOR="sync"
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --info)
+			  INFO=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --force)
+			  FORCE=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --root)
+			  ROOT=1
+			  NEWROOT="$2"
+			  ARGSANS="$ARGSANS $1 $2"
+			  shift
+			  ;;
+		  --nodeps)
+			  NODEPS=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --build)
+			  BUILD=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --refresh)
+			  REFRESH=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --sysupgrade)
+			  SYSUPGRADE=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --downloadonly)
+			  DOWNLOAD=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --onlyconf)
+			  ONLYCONF=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  --ignore)
+			  IGNORE=1
+			  IGNOREPKG="$IGNOREPKG $2"
+			  ARGSANS="$ARGSANS $1 $2"
+			  ;;
+		  --*)
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+		  -*)
+			  ARGSANS="$ARGSANS $1"
+			  if [ $(echo $1 | grep r) ]; then
+				  OPTIONAL=$2
+			  fi
+			  OPTIND=1
+			  while getopts ":VARUFQSidfbyur:wo" opt $1 $OPTIONAL; do
+				  case $opt in
+					  V) version ;;
+					  A) MAJOR="add" ;;
+					  R) MAJOR="remove" ;;
+					  U) MAJOR="upgrade" ;;
+					  Q) MAJOR="query" ;;
+					  S) MAJOR="sync" ;;
+					  i) INFO=1 ;;
+					  f) FORCE=1 ;;
+					  r) ROOT=1
+					     NEWROOT="${OPTARG}"
+					     ;;
+					  d) NODEPS=1 ;;
+					  b) BUILD=1 ;;
+					  y) REFRESH=1 ;;
+					  u) SYSUPGRADE=1 ;;
+					  w) DOWNLOAD=1 ;;
+					  o) ONLYCONF=1 ;;
+				  esac
+			  done
+			  ;;
+		  *)
+			  args[${#args[@]}]=$1
+			  ;;
+	  esac
+	  shift
+  done
+}
 
-if [ "${MAJOR}" = "" ]; then
-	usage
+function main()
+{
+  check_args $@
 
-	exit 0
-fi
+  if [ "${MAJOR}" = "" ]; then
+	  usage
+  fi
 
-if [ "${ABSROOT}" = "" ]; then
-	echo "Error: The ABSROOT environment variable is not defined."
+  if [ "${ABSROOT}" = "" ]; then
+	  echo "Error: The ABSROOT environment variable is not defined."
+	  exit 1
+  fi
 
-	exit 1
-fi
+  if [ "${MAJOR}" = "add" -o "${MAJOR}" = "remove" -o "${MAJOR}" = "upgrade" ]; then
+	  pacman $ARGLIST
 
-if [ "${MAJOR}" = "add" -o "${MAJOR}" = "remove" -o "${MAJOR}" = "upgrade" ]; then
-	pacman $ARGLIST
+	  if [ -d /var/lib/srcpac -a "${MAJOR}" = "remove" ]; then
+		  for pkg in ${args[@]}; do
+			  if [ -f /var/lib/srcpac/${pkg} ]; then
+				  echo -n "removing source reference ${pkg}... "
+				  rm /var/lib/srcpac/${pkg}
+				  echo "done"
+			  fi
+		  done
+	  fi
+  fi
 
-	if [ -d /var/lib/srcpac -a "${MAJOR}" = "remove" ]; then
-		for pkg in ${args[@]}; do
-			if [ -f /var/lib/srcpac/${pkg} ]; then
-				echo -n "removing source reference ${pkg}... "
-				rm /var/lib/srcpac/${pkg}
-				echo "done"
-			fi
-		done
-	fi
-fi
+  if [ "${MAJOR}" = "query" ]; then
+	  if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
+		  for arg in ${args[@]}; do
+			  pacman $ARGSANS $arg | head -n -1
 
-if [ "${MAJOR}" = "query" ]; then
-	if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
-		for arg in ${args[@]}; do
-			pacman $ARGSANS $arg | head -n -1
+			  if [ $? -ne 0 ]; then
+				  exit $?
+			  fi
 
-			if [ $? -ne 0 ]; then
-				exit $?
-			fi
+			  echo -n "Source         : "
+			  if [ -f /var/lib/srcpac/${arg} ]; then
+				  echo "Yes"
+			  else
+				  echo "No"
+			  fi
+			  echo
+		  done
+	  else
+		  pacman $ARGLIST
+	  fi
+  fi
 
-			echo -n "Source         : "
-			if [ -f /var/lib/srcpac/${arg} ]; then
-				echo "Yes"
-			else
-				echo "No"
-			fi
-			echo
-		done
-	else
-		pacman $ARGLIST
-	fi
-fi
+  if [ "${MAJOR}" = "sync" ]; then
+	  if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
+		  if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
+			  # TODO: Needs support for "x is up to date.  Upgrade anyway?"
+			  if [ $REFRESH -eq 1 ]; then
+				  refresh
+			  fi
 
-if [ "${MAJOR}" = "sync" ]; then
-	if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
-		if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
-			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-			if [ $REFRESH -eq 1 ]; then
-				refresh
-			fi
+			  ignorestr=""
+			  if [ $IGNORE -eq 1 ]; then
+				  ignorestr="--ignore $IGNOREPKG"
+			  fi
+			  output=$(pacman -Spu --noconfirm ${ignorestr})
+			  ret=$?
 
-			ignorestr=""
-			if [ $IGNORE -eq 1 ]; then
-				ignorestr="--ignore $IGNOREPKG"
-			fi
-			output=$(pacman -Spu --noconfirm ${ignorestr})
-			ret=$?
+			  if [ $ret -ne 0 ]; then
+				  echo $output
+				  exit $ret
+			  fi
 
-			if [ $ret -ne 0 ]; then
-				echo $output
-				exit $ret
-			fi
+			  # if output is empty, there is nothing to upgrade
+			  if [ -z "${output}" ]; then
+				  exit $ret
+			  fi
 
-			# if output is empty, there is nothing to upgrade
-			if [ -z "${output}" ]; then
-				exit $ret
-			fi
+			  declare -a packages
+			  for line in $output; do
+				  # ensure the string is a URL
+				  if [ $( echo "${line}" | grep -F '://' ) ]; then
+					  packages[${#packages[@]}]=$(get_pkgname ${line})
+				  fi
+			  done
 
-			declare -a packages
-			for line in $output; do
-				# ensure the string is a URL
-				if [ $( echo "${line}" | grep -F '://' ) ]; then
-					packages[${#packages[@]}]=$(get_pkgname ${line})
-				fi
-			done
+			  declare -a sourcepac
+			  declare -a regpac
 
-			declare -a sourcepac
-			declare -a regpac
+			  for pkg in ${packages[@]}; do
+				  if [ -f /etc/srcpac.d/${pkg} ]; then
+					  sourcepac[${#sourcepac[@]}]=$pkg
+				  else
+					  regpac[${#regpac[@]}]=$pkg
+				  fi
+			  done
 
-			for pkg in ${packages[@]}; do
-				if [ -f /etc/srcpac.d/${pkg} ]; then
-					sourcepac[${#sourcepac[@]}]=$pkg
-				else
-					regpac[${#regpac[@]}]=$pkg
-				fi
-			done
+			  pacargs="-S"
+			  [ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
+			  [ $FORCE -eq 1 ] && pacargs="${pacargs}f"
+			  [ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
 
-			pacargs="-S"
-			[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
-			[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
-			[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
+			  pacman $pacargs ${regpac[*]} $ignorestr
 
-			pacman $pacargs ${regpac[*]} $ignorestr
+			  # no packages to install from source, quit then
+			  if [ ${#sourcepac[@]} -eq 0 ]; then
+				  exit 0
+			  fi
 
-			# no packages to install from source, quit then
-			if [ ${#sourcepac[@]} -eq 0 ]; then
-				exit 0
-			fi
+			  echo
+			  echo "Source Targets: ${sourcepac[*]}"
+			  echo
+			  echo -n "Proceed? [Y/n] "
+			  read
 
-			echo
-			echo "Source Targets: ${sourcepac[*]}"
-			echo
-			echo -n "Proceed with upgrade? [Y/n] "
-			read
+			  if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
+				  exit 0
+			  fi
 
-			if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
-				exit 0
-			fi
+			  build_packages "install" ${sourcepac[@]}
 
-			build_packages "install" ${sourcepac[@]}
+		  else
+			  if [ $REFRESH -eq 1 ]; then
+				  refresh
+			  fi
+			  pacman $ARGLIST
+		  fi
+	  else
+		  if [ $REFRESH -eq 1 ]; then
+			  refresh
+		  fi
 
-		else
-			if [ $REFRESH -eq 1 ]; then
-				refresh
-			fi
-			pacman $ARGLIST
-		fi
-	else
-		if [ $REFRESH -eq 1 ]; then
-            refresh
-		fi
+		  if [ $DOWNLOAD -eq 1 ]; then
+			  build_packages "build" ${args[@]}
 
-		if [ $DOWNLOAD -eq 1 ]; then
-			build_packages "build" ${args[@]}
+			  exit 0
+		  fi
 
-			exit 0
-		fi
+		  if [ $SYSUPGRADE -eq 1 ]; then
+			  # TODO: Needs support for "x is up to date.  Upgrade anyway?"
+			  output=$(pacman -Spu --noconfirm)
+		  else
+			  # TODO: Needs support for "x is up to date.  Upgrade anyway?"
+			  output=$(pacman -Sp ${args[*]} --noconfirm)
+		  fi
 
-		if [ $SYSUPGRADE -eq 1 ]; then
-			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-			output=$(pacman -Spu --noconfirm)
-		else
-			# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-			output=$(pacman -Sp ${args[*]} --noconfirm)
-		fi
+		  if [ $? -ne 0 ]; then
+			  echo $output
+			  exit $?
+		  fi
 
-		if [ $? -ne 0 ]; then
-			echo $output
-			exit $?
-		fi
+		  declare -a packages
+		  for line in $output; do
+			  # ensure the string is a URL
+			  if [ $( echo "${line}" | grep -F '://' ) ]; then
+				  packages[${#packages[@]}]=$(get_pkgname ${line})
+			  fi
+		  done
 
-		declare -a packages
-		for line in $output; do
-			# ensure the string is a URL
-			if [ $( echo "${line}" | grep -F '://' ) ]; then
-				packages[${#packages[@]}]=$(get_pkgname ${line})
-			fi
-		done
+		  if [ ${#packages[@]} -eq 0 ]; then
+			  exit 0
+		  fi
 
-		if [ ${#packages[@]} -eq 0 ]; then
-			exit 0
-		fi
+		  if [ $ONLYCONF -eq 1 ]; then
+			  for pkg in ${packages[@]}; do
+				  get_candidates $pkg
+				  success=0
+				  for pkgdir in ${candidates}; do
+					  if [ -f ${pkgdir}/PKGBUILD ]; then
+						  # Look for config options and apply them
+						  apply_config $pkg $pkgdir noreplace
+						  success=1
+						  break
+					  fi
+				  done
+				  if [ ${success} -eq 0 ]; then
+					  echo "Error: Failed to find \"${pkg}\""
+					  exit 1
+				  fi
+			  done
+			  exit 0
+		  fi
 
-		if [ $ONLYCONF -eq 1 ]; then
-			for pkg in ${packages[@]}; do
-				get_candidates $pkg
-				success=0
-				for pkgdir in ${candidates}; do
-					if [ -f ${pkgdir}/PKGBUILD ]; then
-						# Look for config options and apply them
-                        apply_config $pkg $pkgdir noreplace
-						success=1
-						break
-					fi
-				done
-				if [ ${success} -eq 0 ]; then
-					echo "Error: Failed to find \"${pkg}\""
-					exit 1
-				fi
-			done
-			exit 0
-		fi
+		  echo
+		  echo "Source Targets: ${packages[*]}"
+		  echo
+		  echo -n "Proceed with upgrade? [Y/n] "
+		  read
+		  if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
+			  exit 0
+		  fi
 
-		echo
-		echo "Source Targets: ${packages[*]}"
-		echo
-		echo -n "Proceed with upgrade? [Y/n] "
-		read
-		if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
-			exit 0
-		fi
+		  build_packages "install" ${packages[@]}
 
-		build_packages "install" ${packages[@]}
+	  fi
+  fi
+}
 
-	fi
-fi
+main $@
+
 # vim:ts=4:sw=4:noet:enc=utf-8:
