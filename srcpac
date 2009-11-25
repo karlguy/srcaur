@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#   srcpac - A tool to rebuild official Arch Linux package from source
+#   srcpac - A tool to rebuild official Arch Linux packages from source
 #
 #   Copyright (C) 2004 Jason Chu <jason@archlinux.org>
 #   Copyright (C) 2009 Andrea Scarpino <andrea@archlinux.org>
@@ -126,22 +126,17 @@ build_packages()
 			if [ -f ${pkgdir}/PKGBUILD ]; then
 				builddir=/var/srcpac${pkgdir/${ABSROOT}//}
 
-				# remove files from previous builds
-				if [ -d ${builddir} ]; then
-					rm -r ${builddir}
-				fi
-
-				mkdir -p ${builddir}
-				cp ${pkgdir}/* ${builddir}
-
 				# apply configuration
 				apply_config ${pkg} ${builddir}
 
 				# seperate out our makepkg flags
 				MAKEPKGOPTS="-c -s -r -f"
-
+				
+				[[ -d ${builddir} ]] && rm -rf ${builddir}
+				mkdir -p ${builddir}
+				cp ${pkgdir}/* ${builddir}
 				cd ${builddir}
-
+				
 				if [ "${SUDO_USER}" = "" ]; then
 					chown -R nobody ${builddir}
 					sudo -u nobody makepkg ${MAKEPKGOPTS}
@@ -149,7 +144,7 @@ build_packages()
 					chown -R ${SUDO_USER} ${builddir}
 					su ${SUDO_USER} -m -c "makepkg ${MAKEPKGOPTS}"
 				fi
-
+				
 				ret=$?
 				if [ $ret -ne 0 ]; then
 					break
@@ -178,7 +173,7 @@ build_packages()
 			if [ ! -d /var/lib/srcpac ]; then
 				mkdir /var/lib/srcpac
 			fi
-
+			
 			touch /var/lib/srcpac/${pkg}
 		fi
 		shift
@@ -307,16 +302,20 @@ function main()
 	if [ "${MAJOR}" = "" ]; then
 		usage
 	fi
+	
+	if [ ${UID} -ne 0 -a "${SUDO_USER}" = "" ]; then
+		echo "Error: You need to use sudo or to be root"
+		exit 1
+	fi
 
 	if [ "${ABSROOT}" = "" ]; then
 		echo "Error: The ABSROOT environment variable is not defined."
-
 		exit 1
 	fi
 
 	if [ "${MAJOR}" = "remove" -o "${MAJOR}" = "upgrade" ]; then
 		pacman $ARGLIST
-
+		
 		if [ -d /var/lib/srcpac -a "${MAJOR}" = "remove" ]; then
 			for pkg in ${args[@]}; do
 				if [ -f /var/lib/srcpac/${pkg} ]; then
@@ -445,7 +444,7 @@ function main()
 					for pkgdir in ${candidates}; do
 						if [ -f ${pkgdir}/PKGBUILD ]; then
 							# Look for config options and apply them
-				apply_config $pkg $pkgdir noreplace
+							apply_config $pkg $pkgdir noreplace
 							success=1
 							break
 						fi
@@ -468,9 +467,8 @@ function main()
 					exit 0
 				fi
 			fi
-
+			
 			build_packages "install" ${packages[@]}
-
 		fi
 	fi
 }
