@@ -51,7 +51,7 @@ version()
 	echo
 	echo "                       This program may be freely redistributed under"
 	echo "                       the terms of the GNU General Public License"
-	pacman -V
+	$PACMAN -V
 
 	exit 0
 }
@@ -347,11 +347,6 @@ function main()
 					exit $ret
 				fi
 
-				# if output is empty, there is nothing to upgrade
-				if [ -z "${output}" ]; then
-					exit $ret
-				fi
-
 				declare -a packages
 				for line in $output; do
 					# ensure the string is a URL
@@ -359,6 +354,11 @@ function main()
 						packages[${#packages[@]}]=$(get_pkgname ${line})
 					fi
 				done
+
+				# if packages array is empty, there is nothing to upgrade
+				if [ ${#packages[@]} -eq 0 ]; then
+					exit 0
+				fi
 
 				declare -a sourcepac
 				declare -a regpac
