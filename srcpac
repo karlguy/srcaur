@@ -51,7 +51,7 @@ version()
 	echo
 	echo "                       This program may be freely redistributed under"
 	echo "                       the terms of the GNU General Public License"
-	$PACMAN -V
+	pacman -V
 
 	exit 0
 }
