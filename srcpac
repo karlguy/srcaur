@@ -31,14 +31,15 @@ usage()
 {
 	echo "usage:  srcpac {-h --help}"
 	echo "        srcpac {-V --version}"
-	echo "        srcpac {-R --remove}  [options] <package>"
-	echo "        srcpac {-U --upgrade} [options] <file>"
-	echo "        srcpac {-S --sync}    [options] [package]"
+	echo "        srcpac {-R --remove}  [options] <package(s)>"
+	echo "        srcpac {-S --sync}    [options] [package(s)]"
+	echo "        srcpac {-U --upgrade} [options] <file(s)>"
 	echo
 	echo "srcpac's options are based on pacman, so check the pacman man page"
-	echo "srcpac adds two options to -S: -b and -o"
-	echo "-b : builds the targets from source"
-	echo "-o : applies config changes and displays the PKGBUILD in your pager app without building"
+	echo "srcpac adds some option to -S:"
+	echo "-b, builds the targets from source"
+	echo "-e, edit PKGBUILD with your favorite editor"
+	echo "-o, applies config changes and displays the PKGBUILD in your pager app without building"
 	
 	exit 0
 }
@@ -137,6 +138,11 @@ build_packages()
 				cp ${pkgdir}/* ${builddir}
 				cd ${builddir}
 				
+				if [ ${EDIT} -eq 1 ]; then
+					[ -z "$EDITOR" ] && EDITOR=nano
+					$EDITOR PKGBUILD
+				fi
+
 				if [ "${SUDO_USER}" = "" ]; then
 					chown -R nobody ${builddir}
 					sudo -u nobody makepkg ${MAKEPKGOPTS}
@@ -196,6 +202,7 @@ function check_args()
 	IGNORE=0
 	IGNOREPKG=""
 	NOCONFIRM=0
+	EDIT=0
 
 	ARGLIST=$@
 	ARGSANS=""
@@ -259,6 +266,10 @@ function check_args()
 				NOCONFIRM=1
 				ARGSANS="$ARGSANS $1"
 				;;
+			--edit)
+				EDIT=1
+				ARGSANS="$ARGSANS $1"
+				;;
 			--*)
 				ARGSANS="$ARGSANS $1"
 				;;
@@ -268,7 +279,7 @@ function check_args()
 					OPTIONAL=$2
 				fi
 				OPTIND=1
-				while getopts ":VRUFSdfbyur:wo" opt $1 $OPTIONAL; do
+				while getopts ":VRUFSdfbyur:eow" opt $1 $OPTIONAL; do
 					case $opt in
 						V) version ;;
 						R) MAJOR="remove" ;;
@@ -283,6 +294,7 @@ function check_args()
 						y) REFRESH=1 ;;
 						u) SYSUPGRADE=1 ;;
 						w) DOWNLOAD=1 ;;
+						e) EDIT=1 ;;
 						o) ONLYCONF=1 ;;
 					esac
 				done
@@ -461,7 +473,7 @@ function main()
 			echo "Source Targets: ${packages[*]}"
 			echo
 			if [ ${NOCONFIRM} -eq 0 ]; then
-				echo -n "Proceed? [Y/n] "
+				echo -n "Proceed? [Y/n]"
 				read
 				if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
 					exit 0
