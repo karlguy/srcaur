@@ -94,9 +94,8 @@ get_pkgname()
 	local tmp
 
 	tmp=${1##*/}
-	tmp=${tmp%$PKGEXT}
-	tmp=${tmp%-$CARCH}
-	tmp=${tmp%-any}
+	tmp=${tmp%-$CARCH*}
+	tmp=${tmp%-any*}
 	echo ${tmp%-*-*}
 }
 
@@ -156,14 +155,14 @@ build_packages()
 					break
 				fi
 
-				cp ${builddir}/*.pkg.tar.gz /var/cache/pacman/pkg/
+				cp ${builddir}/*${PKGEXT} /var/cache/pacman/pkg/
 
 				if [ "${action}" = "install" ]; then
 					pacargs="-U"
 					[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
 					[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
 					[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
-					pacman $pacargs ${builddir}/*.pkg.tar.gz
+					pacman $pacargs ${builddir}/*${PKGEXT}
 				fi
 
 			fi
