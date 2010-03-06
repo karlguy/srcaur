@@ -126,17 +126,17 @@ build_packages()
 			if [ -f ${pkgdir}/PKGBUILD ]; then
 				builddir=/var/srcpac${pkgdir/${ABSROOT}//}
 
-				# apply configuration
-				apply_config ${pkg} ${builddir}
-
 				# seperate out our makepkg flags
 				MAKEPKGOPTS="-c -s -r -f"
 				
+				# create the build dir and apply configuration
 				[[ -d ${builddir} ]] && rm -rf ${builddir}
 				mkdir -p ${builddir}
 				cp ${pkgdir}/* ${builddir}
+				apply_config ${pkg} ${builddir}
+
 				cd ${builddir}
-				
+
 				if [ ${EDIT} -eq 1 ]; then
 					[ -z "$EDITOR" ] && EDITOR=nano
 					$EDITOR PKGBUILD
