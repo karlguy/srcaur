@@ -49,7 +49,7 @@ Applies the sed command to a PKGBUILD (see CONFIGURATION), then pipes the output
 .TP
 \fBExample\fI /etc/srcpac.d/less\fB:\fR
 
-#--prefix=/usr#--prefix=/usr/local#
+s#--prefix=/usr#--prefix=/usr/local#
 
 .TP
 The above example config is supplied to the PKGBUILD in a sed command like this:
@@ -64,4 +64,5 @@ Since writing these rules can be kind of tricky, it is best to use the \fB\-o\fR
 is the Arch Linux package manager.
 .SH "AUTHORS"
 Jason Chu <jason@archlinux.org>
+Andrea Scarpino <andrea@archlinux.org>
 
