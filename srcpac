@@ -144,7 +144,7 @@ build_packages()
 
 				if [ "${SUDO_USER}" = "" ]; then
 					chown -R nobody ${builddir}
-					sudo -u nobody makepkg ${MAKEPKGOPTS}
+					makepkg ${MAKEPKGOPTS} --asroot
 				else
 					chown -R ${SUDO_USER} ${builddir}
 					su ${SUDO_USER} -m -c "makepkg ${MAKEPKGOPTS}"
