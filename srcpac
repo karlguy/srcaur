@@ -435,9 +435,9 @@ function main()
 					local repopkgver=$(LC_ALL=C pacman -Si $pkg | grep Version | awk '{print $3}')
 					if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
 						if [ ${NOCONFIRM} -eq 0 ]; then
-							echo -n "$pkg is up to date, upgrade anyway? [y/N]"
+							echo -n "$pkg is up to date, upgrade anyway? [Y/n]"
 							read
-							if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" ]; then
+							if [ "${REPLY}" == "n" -o "${REPLY}" == "N" ]; then
 								continue
 							fi
 						else
