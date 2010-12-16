@@ -68,11 +68,8 @@ apply_config()
 	conf=/etc/srcpac.d/${1}
 	if [ -f ${conf} ]; then
 		if [ "${3}" == 'noreplace' ]; then
-			if [ "${PAGER}" != '' ]; then
-				sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
-			else
-				sed -f ${conf} ${2}/PKGBUILD | less
-			fi
+			[ -z ${PAGER} ] && PAGER=less
+			sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
 		else
 			sed -i -f ${conf} ${2}/PKGBUILD
 		fi
@@ -147,9 +144,9 @@ build_packages()
 					sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
 				fi
 				
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					break
+				if [ $? -ne 0 ]; then
+					echo "Error: Failed to build \"${pkg}\""
+					exit 1
 				fi
 
 				#Some package could set a different PKGEXT
@@ -161,21 +158,16 @@ build_packages()
 				cp ${builddir}/*${PKGEXT} /var/cache/pacman/pkg/
 
 				if [ "${action}" = "install" ]; then
-					pacargs="-U"
-					[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
-					[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
-					[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
-					pacman $pacargs ${builddir}/*${PKGEXT}
+					PACARGS="-U"
+					[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}d"
+					[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
+					[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+					pacman $PACARGS ${builddir}/*${PKGEXT}
 				fi
 
 			fi
 		done
 		unset MAKEPKGOPTS
-
-		if [ $ret -ne 0 ]; then
-			echo "Error: Failed to build \"${pkg}\""
-			exit 1
-		fi
 
 		if [ "${action}" = "install" ]; then
 			if [ ! -d /var/lib/srcpac ]; then
@@ -398,9 +390,9 @@ function main()
 				done
 
 				PACARGS="-S"
-				[ $NODEPS -eq 1 ] && PACARGS="${pacargs}d"
-				[ $FORCE -eq 1 ] && PACARGS="${pacargs}f"
-				[ $ROOT -eq 1 ] && PACARGS="${pacargs} -r $NEWROOT"
+				[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}d"
+				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
+				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 
 				pacman $PACARGS ${regpac[*]} $ignorestr
 			else
@@ -418,11 +410,11 @@ function main()
 				exit 0
 			fi
 
-			PACARGS=""
+			PACARGS="-S"
 			if [ $SYSUPGRADE -eq 1 ]; then
-				PACARGS="-Spu"
+				PACARGS="${PACARGS}pu"
 			else
-				PACARGS="-Sp ${args[*]}"
+				PACARGS="${PACARGS}p ${args[*]}"
 			fi
 
 			output=$(pacman ${PACARGS} --noconfirm)
