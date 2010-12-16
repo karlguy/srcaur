@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ver=0.7
+ver=0.8
 
 declare -a args
 
@@ -29,30 +29,32 @@ declare -a args
 
 usage()
 {
-	echo "usage:  srcpac {-h --help}"
-	echo "        srcpac {-V --version}"
-	echo "        srcpac {-R --remove}  [options] <package(s)>"
-	echo "        srcpac {-S --sync}    [options] [package(s)]"
-	echo "        srcpac {-U --upgrade} [options] <file(s)>"
-	echo
-	echo "srcpac's options are based on pacman, so check the pacman man page"
-	echo "srcpac adds some option to -S:"
-	echo "-b, builds the targets from source"
-	echo "-e, edit PKGBUILD with your favorite editor"
-	echo "-o, applies config changes and displays the PKGBUILD in your pager app without building"
+	echo "usage: $(basename $0) <operation> [...]"
+	echo "operations:"
+	echo "        $(basename $0) {-h --help}"
+	echo "        $(basename $0) {-V --version}"
+	echo "        $(basename $0) {-Q --query}   [options] [<package(s)>]"
+	echo "        $(basename $0) {-R --remove}  [options] <package(s)>"
+	echo "        $(basename $0) {-S --sync}    [options] [package(s)]"
+	echo "        $(basename $0) {-U --upgrade} [options] <file(s)>"
+	echo "$(basename $0) adds some option to -S:"
+	echo "options:"
+	echo "  -b, builds the targets from source"
+	echo "  -o, applies config changes and displays the PKGBUILD in your pager app without building"
 	
 	exit 0
 }
 
 version()
 {
-	echo "                       srcpac v${ver}"
+	echo ""
+	echo "                       $(basename $0) v${ver}"
 	echo "                       Copyright (C) 2004 Jason Chu <jason@archlinux.org>"
-	echo "                       Copyright (C) 2009 Andrea Scarpino <andrea@archlinux.org>"
+	echo "                       Copyright (C) 2010 Andrea Scarpino <andrea@archlinux.org>"
 	echo
 	echo "                       This program may be freely redistributed under"
-	echo "                       the terms of the GNU General Public License"
-	pacman -V
+	echo "                       the terms of the GNU General Public License."
+	echo ""
 
 	exit 0
 }
@@ -142,7 +144,7 @@ build_packages()
 					$EDITOR PKGBUILD
 				fi
 
-				if [ "${SUDO_USER}" = "" ]; then
+				if [ -z "${SUDO_USER}" ]; then
 					chown -R nobody ${builddir}
 					makepkg ${MAKEPKGOPTS} --asroot
 				else
@@ -189,6 +191,7 @@ function check_args()
 {
 	# Options
 	MAJOR=""
+	INFO=0
 	FORCE=0
 	ROOT=0
 	NEWROOT=""
@@ -201,7 +204,6 @@ function check_args()
 	IGNORE=0
 	IGNOREPKG=""
 	NOCONFIRM=0
-	EDIT=0
 
 	ARGLIST=$@
 	ARGSANS=""
@@ -218,10 +220,18 @@ function check_args()
 				MAJOR="upgrade"
 				ARGSANS="$ARGSANS $1"
 				;;
+			--query)
+			  MAJOR="query"
+			  ARGSANS="$ARGSANS $1"
+			  ;;
 			--sync)
-				MAJOR="sync"
-				ARGSANS="$ARGSANS $1"
-				;;
+			  MAJOR="sync"
+			  ARGSANS="$ARGSANS $1"
+			  ;;
+			--info)
+			  INFO=1
+			  ARGSANS="$ARGSANS $1"
+			  ;;
 			--force)
 				FORCE=1
 				ARGSANS="$ARGSANS $1"
@@ -265,10 +275,6 @@ function check_args()
 				NOCONFIRM=1
 				ARGSANS="$ARGSANS $1"
 				;;
-			--edit)
-				EDIT=1
-				ARGSANS="$ARGSANS $1"
-				;;
 			--*)
 				ARGSANS="$ARGSANS $1"
 				;;
@@ -278,12 +284,14 @@ function check_args()
 					OPTIONAL=$2
 				fi
 				OPTIND=1
-				while getopts ":VRUFSdfbyur:eow" opt $1 $OPTIONAL; do
+				while getopts ":VRUFQSidfbyur:ow" opt $1 $OPTIONAL; do
 					case $opt in
 						V) version ;;
 						R) MAJOR="remove" ;;
 						U) MAJOR="upgrade" ;;
+						Q) MAJOR="query" ;;
 						S) MAJOR="sync" ;;
+						i) INFO=1 ;;
 						f) FORCE=1 ;;
 						r) ROOT=1
 						   NEWROOT="${OPTARG}"
@@ -293,7 +301,6 @@ function check_args()
 						y) REFRESH=1 ;;
 						u) SYSUPGRADE=1 ;;
 						w) DOWNLOAD=1 ;;
-						e) EDIT=1 ;;
 						o) ONLYCONF=1 ;;
 					esac
 				done
@@ -314,7 +321,7 @@ function main()
 		usage
 	fi
 	
-	if [ ${UID} -ne 0 -a "${SUDO_USER}" = "" ]; then
+	if [ ${UID} -ne 0 -a "${SUDO_USER}" = "" -a ${MAJOR} != "query" ]; then
 		echo "Error: You need to use sudo or to be root"
 		exit 1
 	fi
@@ -333,6 +340,34 @@ function main()
 					echo -n "removing source reference ${pkg}... "
 					rm /var/lib/srcpac/${pkg}
 					echo "done"
+				fi
+			done
+		fi
+	fi
+
+	if [ "${MAJOR}" = "query" ]; then
+		if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
+			for arg in ${args[@]}; do
+				pacman $ARGSANS $arg | head -n -1
+
+				[ $? -ne 0 ] && exit $?
+
+				echo -n "Source         : "
+				if [ -f /var/lib/srcpac/${arg} ]; then
+					echo "Yes"
+				else
+					echo "No"
+				fi
+				echo
+			done
+		else
+			for arg in ${args[@]}; do
+				echo "$(pacman -Q $arg)"
+				echo -n "Source         : "
+				if [ -f /var/lib/srcpac/${arg} ]; then
+					echo "Yes"
+				else
+					echo "No"
 				fi
 			done
 		fi
