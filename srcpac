@@ -384,59 +384,31 @@ function main()
 				fi
 
 				declare -a packages
+				declare -a regpac
 				for line in $output; do
 					# ensure the string is a URL
 					if [ $( echo "${line}" | grep -F '://' ) ]; then
-						packages[${#packages[@]}]=$(get_pkgname ${line})
+						pkg=$(get_pkgname ${line})
+						if [ -f /etc/srcpac.d/${pkg} ]; then
+							packages[${#packages[@]}]=$pkg
+						else
+							regpac[${#regpac[@]}]=$pkg
+						fi
 					fi
 				done
 
-				# if packages array is empty, there is nothing to upgrade
-				if [ ${#packages[@]} -eq 0 ]; then
-					exit 0
-				fi
+				PACARGS="-S"
+				[ $NODEPS -eq 1 ] && PACARGS="${pacargs}d"
+				[ $FORCE -eq 1 ] && PACARGS="${pacargs}f"
+				[ $ROOT -eq 1 ] && PACARGS="${pacargs} -r $NEWROOT"
 
-				declare -a sourcepac
-				declare -a regpac
-
-				for pkg in ${packages[@]}; do
-					if [ -f /etc/srcpac.d/${pkg} ]; then
-						sourcepac[${#sourcepac[@]}]=$pkg
-					else
-						regpac[${#regpac[@]}]=$pkg
-					fi
-				done
-
-				pacargs="-S"
-				[ $NODEPS -eq 1 ] && pacargs="${pacargs}d"
-				[ $FORCE -eq 1 ] && pacargs="${pacargs}f"
-				[ $ROOT -eq 1 ] && pacargs="${pacargs} -r $NEWROOT"
-
-				pacman $pacargs ${regpac[*]} $ignorestr
-
-				# no packages to install from source, quit then
-				if [ ${#sourcepac[@]} -eq 0 ]; then
-					exit 0
-				fi
-
-				echo
-				echo "Source Targets: ${sourcepac[*]}"
-				echo
-				if [ ${NOCONFIRM} -eq 0 ]; then
-					echo -n "Proceed? [Y/n] "
-					read
-					if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
-						exit 0
-					fi
-				fi
-
-				build_packages "install" ${sourcepac[@]}
-
+				pacman $PACARGS ${regpac[*]} $ignorestr
 			else
 				if [ $REFRESH -eq 1 ]; then
 					refresh
 				fi
 				pacman $ARGLIST
+				exit 0
 			fi
 		else
 			[ $REFRESH -eq 1 ] && refresh
@@ -477,10 +449,6 @@ function main()
 				fi
 			done
 
-			if [ ${#packages[@]} -eq 0 ]; then
-				exit 0
-			fi
-
 			if [ $ONLYCONF -eq 1 ]; then
 				for pkg in ${packages[@]}; do
 					get_candidates $pkg
@@ -500,20 +468,24 @@ function main()
 				done
 				exit 0
 			fi
-
-			echo
-			echo "Source Targets: ${packages[*]}"
-			echo
-			if [ ${NOCONFIRM} -eq 0 ]; then
-				echo -n "Proceed? [Y/n]"
-				read
-				if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
-					exit 0
-				fi
-			fi
-			
-			build_packages "install" ${packages[@]}
 		fi
+
+		if [ ${#packages[@]} -eq 0 ]; then
+			exit 0
+		fi
+
+		echo
+		echo "Source Targets: ${packages[*]}"
+		echo
+		if [ ${NOCONFIRM} -eq 0 ]; then
+			echo -n "Proceed? [Y/n]"
+			read
+			if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
+				exit 0
+			fi
+		fi
+		
+		build_packages "install" ${packages[@]}
 	fi
 }
 
