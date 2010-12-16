@@ -143,7 +143,7 @@ build_packages()
 					chown -R ${SUDO_USER} ${builddir}
 					sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
 				fi
-				
+
 				ret=$?
 				if [ $ret -ne 0 ]; then
 					break
@@ -164,10 +164,8 @@ build_packages()
 					[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 					pacman $PACARGS ${builddir}/*${PKGEXT}
 				fi
-
 			fi
 		done
-		unset MAKEPKGOPTS
 
 		if [ $ret -ne 0 ]; then
 			echo "Error: Failed to build \"${pkg}\""
@@ -436,9 +434,13 @@ function main()
 					local pkgver=$(LC_ALL=C pacman -Qi $pkg | grep Version | awk '{print $3}')
 					local repopkgver=$(LC_ALL=C pacman -Si $pkg | grep Version | awk '{print $3}')
 					if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
-						echo -n "$pkg is up to date, upgrade anyway? [y/N]"
-						read
-						if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" ]; then
+						if [ ${NOCONFIRM} -eq 0 ]; then
+							echo -n "$pkg is up to date, upgrade anyway? [y/N]"
+							read
+							if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" ]; then
+								continue
+							fi
+						else
 							continue
 						fi
 					fi
