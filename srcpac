@@ -164,8 +164,10 @@ build_packages()
 					[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}d"
 					[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
 					[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-					pacman $PACARGS ${CACHEDIR}/*${PKGEXT}
+					pacman $PACARGS ${builddir}/*${PKGEXT}
 				fi
+
+				rm -rf ${builddir}
 			fi
 		done
 
