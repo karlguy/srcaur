@@ -152,8 +152,8 @@ build_packages()
 				#Some package could set a different PKGEXT
 				PKGEXT=$(grep PKGEXT PKGBUILD | awk -F"=" '{print $2}' | sed s/\'//g)
 				if [ -z ${PKGEXT} ]; then
-					PKGEXT=$(grep PKGEXT /etc/makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g)
-					PKGEXT=$(grep PKGEXT ~/.makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g)
+					[ -f /etc/makepkg.conf ] && PKGEXT=$(grep PKGEXT /etc/makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g) 
+					[ -f ~/.makepkg.conf ] && PKGEXT=$(grep PKGEXT ~/.makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g)
 				fi
 				cp ${builddir}/*${PKGEXT} /var/cache/pacman/pkg/
 
