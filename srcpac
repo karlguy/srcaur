@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ver=0.8
+ver=0.7
 
 declare -a args
 
@@ -138,11 +138,6 @@ build_packages()
 				apply_config ${pkg} ${builddir}
 
 				cd ${builddir}
-
-				if [ ${EDIT} -eq 1 ]; then
-					[ -z "$EDITOR" ] && EDITOR=nano
-					$EDITOR PKGBUILD
-				fi
 
 				if [ -z "${SUDO_USER}" ]; then
 					chown -R nobody ${builddir}
