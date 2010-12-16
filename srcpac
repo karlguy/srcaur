@@ -347,31 +347,23 @@ function main()
 	fi
 
 	if [ "${MAJOR}" = "query" ]; then
-		if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
-			for arg in ${args[@]}; do
+		for arg in ${args[@]}; do
+			if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
 				pacman $ARGSANS $arg | head -n -1
-
-				[ $? -ne 0 ] && exit $?
-
-				echo -n "Source         : "
-				if [ -f /var/lib/srcpac/${arg} ]; then
-					echo "Yes"
-				else
-					echo "No"
-				fi
-				echo
-			done
-		else
-			for arg in ${args[@]}; do
+			else
 				echo "$(pacman -Q $arg)"
-				echo -n "Source         : "
-				if [ -f /var/lib/srcpac/${arg} ]; then
-					echo "Yes"
-				else
-					echo "No"
-				fi
-			done
-		fi
+			fi
+
+			[ $? -ne 0 ] && exit $?
+
+			echo -n "Source         : "
+			if [ -f /var/lib/srcpac/${arg} ]; then
+				echo "Yes"
+			else
+				echo "No"
+			fi
+			[ $INFO -eq 1 ] && echo ""
+		done
 	fi
 
 	if [ "${MAJOR}" = "sync" ]; then
