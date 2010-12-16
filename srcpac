@@ -144,7 +144,7 @@ build_packages()
 					makepkg ${MAKEPKGOPTS} --asroot
 				else
 					chown -R ${SUDO_USER} ${builddir}
-					su ${SUDO_USER} -m -c "makepkg ${MAKEPKGOPTS}"
+					sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
 				fi
 				
 				ret=$?
@@ -152,6 +152,12 @@ build_packages()
 					break
 				fi
 
+				#Some package could set a different PKGEXT
+				PKGEXT=$(grep PKGEXT PKGBUILD | awk -F"=" '{print $2}' | sed s/\'//g)
+				if [ -z ${PKGEXT} ]; then
+					PKGEXT=$(grep PKGEXT /etc/makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g)
+					PKGEXT=$(grep PKGEXT ~/.makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g)
+				fi
 				cp ${builddir}/*${PKGEXT} /var/cache/pacman/pkg/
 
 				if [ "${action}" = "install" ]; then
@@ -316,7 +322,7 @@ function main()
 		usage
 	fi
 	
-	if [ ${UID} -ne 0 -a "${SUDO_USER}" = "" -a ${MAJOR} != "query" ]; then
+	if [ ${UID} -ne 0 -a -z "${SUDO_USER}" -a ${MAJOR} != "query" ]; then
 		echo "Error: You need to use sudo or to be root"
 		exit 1
 	fi
@@ -520,5 +526,3 @@ function main()
 }
 
 main $@
-
-# vim:ts=4:sw=4:noet:enc=utf-8:
