@@ -144,9 +144,9 @@ build_packages()
 					sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
 				fi
 				
-				if [ $? -ne 0 ]; then
-					echo "Error: Failed to build \"${pkg}\""
-					exit 1
+				ret=$?
+				if [ $ret -ne 0 ]; then
+					break
 				fi
 
 				#Some package could set a different PKGEXT
@@ -168,6 +168,11 @@ build_packages()
 			fi
 		done
 		unset MAKEPKGOPTS
+
+		if [ $ret -ne 0 ]; then
+			echo "Error: Failed to build \"${pkg}\""
+			exit 1
+		fi
 
 		if [ "${action}" = "install" ]; then
 			if [ ! -d /var/lib/srcpac ]; then
@@ -410,11 +415,11 @@ function main()
 				exit 0
 			fi
 
-			PACARGS="-S"
+			PACARGS="-Sp"
 			if [ $SYSUPGRADE -eq 1 ]; then
-				PACARGS="${PACARGS}pu"
+				PACARGS="${PACARGS}u"
 			else
-				PACARGS="${PACARGS}p ${args[*]}"
+				PACARGS="${PACARGS} ${args[*]}"
 			fi
 
 			output=$(pacman ${PACARGS} --noconfirm)
