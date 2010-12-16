@@ -216,17 +216,17 @@ function check_args()
 				ARGSANS="$ARGSANS $1"
 				;;
 			--query)
-			  MAJOR="query"
-			  ARGSANS="$ARGSANS $1"
-			  ;;
+				MAJOR="query"
+				ARGSANS="$ARGSANS $1"
+				;;
 			--sync)
-			  MAJOR="sync"
-			  ARGSANS="$ARGSANS $1"
-			  ;;
+				MAJOR="sync"
+				ARGSANS="$ARGSANS $1"
+				;;
 			--info)
-			  INFO=1
-			  ARGSANS="$ARGSANS $1"
-			  ;;
+				INFO=1
+				ARGSANS="$ARGSANS $1"
+				;;
 			--force)
 				FORCE=1
 				ARGSANS="$ARGSANS $1"
@@ -371,10 +371,7 @@ function main()
 	if [ "${MAJOR}" = "sync" ]; then
 		if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
 			if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
-				# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-				if [ $REFRESH -eq 1 ]; then
-					refresh
-				fi
+				[ $REFRESH -eq 1 ] && refresh
 
 				ignorestr=""
 				if [ $IGNORE -eq 1 ]; then
@@ -444,23 +441,21 @@ function main()
 				pacman $ARGLIST
 			fi
 		else
-			if [ $REFRESH -eq 1 ]; then
-				refresh
-			fi
+			[ $REFRESH -eq 1 ] && refresh
 
 			if [ $DOWNLOAD -eq 1 ]; then
 				build_packages "build" ${args[@]}
 				exit 0
 			fi
 
+			PACARGS=""
 			if [ $SYSUPGRADE -eq 1 ]; then
-				# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-				output=$(pacman -Spu --noconfirm)
+				PACARGS="-Spu"
 			else
-				# TODO: Needs support for "x is up to date.  Upgrade anyway?"
-				output=$(pacman -Sp ${args[*]} --noconfirm)
+				PACARGS="-Sp ${args[*]}"
 			fi
 
+			output=$(pacman ${PACARGS} --noconfirm)
 			if [ $? -ne 0 ]; then
 				echo $output
 				exit $?
@@ -470,7 +465,17 @@ function main()
 			for line in $output; do
 				# ensure the string is a URL
 				if [ $( echo "${line}" | grep -F '://' ) ]; then
-					packages[${#packages[@]}]=$(get_pkgname ${line})
+					pkg=$(get_pkgname ${line})
+					local pkgver=$(LC_ALL=C pacman -Qi $pkg | grep Version | awk '{print $3}')
+					local repopkgver=$(LC_ALL=C pacman -Si $pkg | grep Version | awk '{print $3}')
+					if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
+						echo -n "$pkg is up to date, upgrade anyway? [y/N]"
+						read
+						if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" ]; then
+							continue
+						fi
+					fi
+					packages[${#packages[@]}]=$pkg
 				fi
 			done
 
