@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ver=0.7
+ver=0.8
 
 declare -a args
 
