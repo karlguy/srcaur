@@ -165,6 +165,8 @@ build_packages()
 					[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}d"
 					[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
 					[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+					[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
+					[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
 					pacman $PACARGS ${builddir}/*${PKGEXT}
 				fi
 
@@ -192,19 +194,21 @@ function check_args()
 {
 	# Options
 	MAJOR=""
-	INFO=0
-	FORCE=0
-	ROOT=0
-	NEWROOT=""
+	ASDEPS=0
+	ASEXPLICIT=0
 	NODEPS=0
-	BUILD=0
-	REFRESH=0
+	FORCE=0
+	INFO=0
 	SYSUPGRADE=0
 	DOWNLOAD=0
-	ONLYCONF=0
+	REFRESH=0
 	IGNORE=0
 	IGNOREPKG=""
 	NOCONFIRM=0
+	ROOT=0
+	NEWROOT=""
+	BUILD=0
+	ONLYCONF=0
 
 	ARGLIST=$@
 	ARGSANS=""
@@ -227,6 +231,14 @@ function check_args()
 				;;
 			--upgrade)
 				MAJOR="upgrade"
+				ARGSANS="$ARGSANS $1"
+				;;
+			--asdeps)
+				ASDEPS=1
+				ARGSANS="$ARGSANS $1"
+				;;
+			--asexplicit)
+				ASEXPLICIT=1
 				ARGSANS="$ARGSANS $1"
 				;;
 			--nodeps)
