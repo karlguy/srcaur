@@ -1,5 +1,15 @@
 VERSION    DESCRIPTION                                            AUTHOR
--------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+0.9        - Fix a bug in vercmp usage                            Andrea Scarpino
+           - Better way to source PKGEXT and CacheDir             Andrea Scarpino
+           - Fix a bug when a package is not installed            Andrea Scarpino
+           - Add support to install packages asdeps or asexplicit Andrea Scarpino
+           - Sort options                                         Andrea Scarpino
+           - Add support for custom CacheDir                      Andrea Scarpino
+           - Make YES the default choice for 'upgrade anyway'     Andrea Scarpino
+           - Skip 'upgrade anyway' question with --noconfirm      Andrea Scarpino
+           - Minor fixes                                          Andrea Scarpino
+           - Remove duplicated code                               Andrea Scarpino
 0.8        - Some package could set a different PKGEXT (FS#21292) Andrea Scarpino
            - Implement 'package is up to date, update anyway'     Andrea Scarpino
            - Remove --edit option                                 Andrea Scarpino
