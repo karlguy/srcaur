@@ -37,6 +37,7 @@ usage()
 	echo "        $(basename $0) {-R --remove}  [options] <package(s)>"
 	echo "        $(basename $0) {-S --sync}    [options] [package(s)]"
 	echo "        $(basename $0) {-U --upgrade} [options] <file(s)>"
+    echo "$(basename $0) options are based on pacman, so check the pacman man page"
 	echo "$(basename $0) adds some option to -S:"
 	echo "options:"
 	echo "  -b, builds the targets from source"
@@ -212,46 +213,32 @@ function check_args()
 		case $1 in
 			--help) usage ;;
 			--version) version ;;
-			--remove)
-				MAJOR="remove"
-				ARGSANS="$ARGSANS $1"
-				;;
-			--upgrade)
-				MAJOR="upgrade"
-				ARGSANS="$ARGSANS $1"
-				;;
 			--query)
 				MAJOR="query"
+				ARGSANS="$ARGSANS $1"
+				;;
+			--remove)
+				MAJOR="remove"
 				ARGSANS="$ARGSANS $1"
 				;;
 			--sync)
 				MAJOR="sync"
 				ARGSANS="$ARGSANS $1"
 				;;
-			--info)
-				INFO=1
+			--upgrade)
+				MAJOR="upgrade"
+				ARGSANS="$ARGSANS $1"
+				;;
+			--nodeps)
+				NODEPS=1
 				ARGSANS="$ARGSANS $1"
 				;;
 			--force)
 				FORCE=1
 				ARGSANS="$ARGSANS $1"
 				;;
-			--root)
-				ROOT=1
-				NEWROOT="$2"
-				ARGSANS="$ARGSANS $1 $2"
-				shift
-				;;
-			--nodeps)
-				NODEPS=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--build)
-				BUILD=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--refresh)
-				REFRESH=1
+			--info)
+				INFO=1
 				ARGSANS="$ARGSANS $1"
 				;;
 			--sysupgrade)
@@ -262,8 +249,8 @@ function check_args()
 				DOWNLOAD=1
 				ARGSANS="$ARGSANS $1"
 				;;
-			--onlyconf)
-				ONLYCONF=1
+			--refresh)
+				REFRESH=1
 				ARGSANS="$ARGSANS $1"
 				;;
 			--ignore)
@@ -275,6 +262,20 @@ function check_args()
 				NOCONFIRM=1
 				ARGSANS="$ARGSANS $1"
 				;;
+			--root)
+				ROOT=1
+				NEWROOT="$2"
+				ARGSANS="$ARGSANS $1 $2"
+				shift
+				;;
+			--build)
+				BUILD=1
+				ARGSANS="$ARGSANS $1"
+				;;
+			--onlyconf)
+				ONLYCONF=1
+				ARGSANS="$ARGSANS $1"
+				;;
 			--*)
 				ARGSANS="$ARGSANS $1"
 				;;
@@ -284,24 +285,24 @@ function check_args()
 					OPTIONAL=$2
 				fi
 				OPTIND=1
-				while getopts ":VRUFQSidfbyur:ow" opt $1 $OPTIONAL; do
+				while getopts ":VQRSUdfiubyr:ow" opt $1 $OPTIONAL; do
 					case $opt in
 						V) version ;;
-						R) MAJOR="remove" ;;
-						U) MAJOR="upgrade" ;;
 						Q) MAJOR="query" ;;
+						R) MAJOR="remove" ;;
 						S) MAJOR="sync" ;;
-						i) INFO=1 ;;
+						U) MAJOR="upgrade" ;;
+						d) NODEPS=1 ;;
 						f) FORCE=1 ;;
+						i) INFO=1 ;;
+						u) SYSUPGRADE=1 ;;
+						w) DOWNLOAD=1 ;;
+						y) REFRESH=1 ;;
+						b) BUILD=1 ;;
+						o) ONLYCONF=1 ;;
 						r) ROOT=1
 						   NEWROOT="${OPTARG}"
 						   ;;
-						d) NODEPS=1 ;;
-						b) BUILD=1 ;;
-						y) REFRESH=1 ;;
-						u) SYSUPGRADE=1 ;;
-						w) DOWNLOAD=1 ;;
-						o) ONLYCONF=1 ;;
 					esac
 				done
 				;;
