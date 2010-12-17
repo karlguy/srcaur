@@ -448,8 +448,8 @@ function main()
 				# ensure the string is a URL
 				if [ $( echo "${line}" | grep -F '://' ) ]; then
 					pkg=$(get_pkgname ${line})
-					local pkgver=$(LC_ALL=C pacman -Qi $pkg | grep Version | awk '{print $3}')
-					local repopkgver=$(LC_ALL=C pacman -Si $pkg | grep Version | awk '{print $3}')
+					local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
+					local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}')
 					if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
 						if [ ${NOCONFIRM} -eq 0 ]; then
 							echo -n "$pkg is up to date, upgrade anyway? [Y/n]"
