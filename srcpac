@@ -151,13 +151,11 @@ build_packages()
 				fi
 
 				#Some package could set a different PKGEXT
-				PKGEXT=$(grep PKGEXT PKGBUILD | awk -F"=" '{print $2}' | sed s/\'//g)
-				if [ -z ${PKGEXT} ]; then
-					[ -f /etc/makepkg.conf ] && PKGEXT=$(grep PKGEXT /etc/makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g)
-					[ -f ~/.makepkg.conf ] && PKGEXT=$(grep PKGEXT ~/.makepkg.conf | awk -F"=" '{print $2}' | sed s/\'//g)
-				fi
+				PKGEXT=$(grep '^PKGEXT' PKGBUILD | cut -d= -f2 | sed s/\'//g)
+				[ -z ${PKGEXT} ] && PKGEXT=$(grep '^PKGEXT=' ~/.makepkg.conf | cut -d= -f2 | sed s/\'//g)
+				[ -z ${PKGEXT} ] && PKGEXT=$(grep '^PKGEXT=' /etc/makepkg.conf | cut -d= -f2 | sed s/\'//g)
 
-				CACHEDIR=$(grep CacheDir /etc/pacman.conf | awk -F"= " '{print $2}' | sed s/#//) 
+				CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
 				cp ${builddir}/*${PKGEXT} ${CACHEDIR}
 
 				if [ "${action}" = "install" ]; then
