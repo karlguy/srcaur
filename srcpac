@@ -3,7 +3,7 @@
 #   srcpac - A tool to rebuild official Arch Linux packages from source
 #
 #   Copyright (C) 2004-2009 Jason Chu <jason@archlinux.org>
-#   Copyright (C) 2009-2010 Andrea Scarpino <andrea@archlinux.org>
+#   Copyright (C) 2009-2011 Andrea Scarpino <andrea@archlinux.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -50,8 +50,8 @@ version()
 {
 	echo ""
 	echo "                       $(basename $0) v${ver}"
-	echo "                       Copyright (C) 2004 Jason Chu <jason@archlinux.org>"
-	echo "                       Copyright (C) 2010 Andrea Scarpino <andrea@archlinux.org>"
+	echo "                       Copyright (C) 2009-2011 Andrea Scarpino"
+	echo "                       Copyright (C) 2004-2009 Jason Chu"
 	echo
 	echo "                       This program may be freely redistributed under"
 	echo "                       the terms of the GNU General Public License."
@@ -448,7 +448,7 @@ function main()
 					pkg=$(get_pkgname ${line})
 					local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
 					[ -z ${pkgver} ] && pkgver=0
-					local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}')
+					local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}' | head -n 1)
 					[ -z ${repopkgver} ] && repopkgver=0
 					if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
 						if [ ${NOCONFIRM} -eq 0 ]; then
