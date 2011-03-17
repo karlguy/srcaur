@@ -160,7 +160,7 @@ build_packages()
 
 				if [ "${action}" = "install" ]; then
 					PACARGS="-U"
-					[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}d"
+					[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
 					[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
 					[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 					[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
@@ -408,7 +408,7 @@ function main()
 				done
 
 				PACARGS="-S"
-				[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}d"
+				[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
 				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
 				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 
