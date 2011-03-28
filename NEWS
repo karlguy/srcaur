@@ -1,5 +1,7 @@
 VERSION    DESCRIPTION                                            AUTHOR
 ---------------------------------------------------------------------------------
+0.9.1      - pacman 3.5 - Use -dd to skip dependencies check      Andrea Scarpino
+           - Fix in retrieving the package version                Andrea Scarpino
 0.9        - Fix a bug in vercmp usage                            Andrea Scarpino
            - Better way to source PKGEXT and CacheDir             Andrea Scarpino
            - Fix a bug when a package is not installed            Andrea Scarpino
