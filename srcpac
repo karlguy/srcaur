@@ -70,9 +70,9 @@ apply_config()
 	if [ -f ${conf} ]; then
 		if [ "${3}" == 'noreplace' ]; then
 			[ -z ${PAGER} ] && PAGER=less
-			sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
+			sed -f ${conf} ${2}%PKGBUILD | ${PAGER}
 		else
-			sed -i -f ${conf} ${2}/PKGBUILD
+			sed -i -f ${conf} ${2}%PKGBUILD
 		fi
 	fi
 }
@@ -87,11 +87,11 @@ get_candidates()
 		unset pkgname
 		source $pkgbuild &> /dev/null
 		if [ "${1}" == "${pkgbase}" ]; then
-			candidates="${pkgbuild/PKGBUILD/}"
+			candidates="${pkgbuild/\/PKGBUILD}"
 		else
 			for _package in "${pkgname[@]}"; do
 				if [ "${1}" == "${_package}" ]; then
-					candidates="${pkgbuild/PKGBUILD/}"
+					candidates="${pkgbuild/\/PKGBUILD}"
 					break
 				fi
 			done
@@ -137,48 +137,71 @@ build_packages()
 		success=0
 
 		for pkgdir in ${candidates}; do
-			if [ -f ${pkgdir}/PKGBUILD ]; then
-				builddir=/var/srcpac${pkgdir/${ABSROOT}//}
+			pkgbase=${pkgdir#/var/abs/*/}
+			builddir=/var/srcpac/${pkgbase}
 
-				# seperate out our makepkg flags
-				MAKEPKGOPTS="-c -s -r -f"
+			# seperate out our makepkg flags
+			MAKEPKGOPTS="-c -s -r -f"
 				
-				# create the build dir and apply configuration
-				[[ -d ${builddir} ]] && rm -rf ${builddir}
-				mkdir -p ${builddir}
-				cp ${pkgdir}/* ${builddir}
-				apply_config ${pkg} ${builddir}
+			# create the build dir and apply configuration
+			[[ -d ${builddir} ]] && rm -rf ${builddir}
+			mkdir -p ${builddir}
+			cp ${pkgdir}/* ${builddir}
+			apply_config ${pkgbase} ${builddir}
 
-				cd ${builddir}
+			cd ${builddir}
 
-				if [ -z "${SUDO_USER}" ]; then
-					chown -R nobody ${builddir}
-					makepkg ${MAKEPKGOPTS} --asroot
-				else
-					chown -R ${SUDO_USER} ${builddir}
-					sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
-				fi
-
-				ret=$?
-				if [ $ret -ne 0 ]; then
-					break
-				fi
-
-				CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
-				cp ${builddir}/${pkg}-*-*.pkg.tar.?z ${CACHEDIR}
-
-				if [ "${action}" = "install" ]; then
-					PACARGS="-U"
-					[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
-					[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
-					[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-					[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
-					[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
-					pacman $PACARGS ${builddir}/${pkg}-*-*.pkg.tar.?z
-				fi
-
-				rm -rf ${builddir}
+			if [ -z "${SUDO_USER}" ]; then
+				chown -R nobody ${builddir}
+				makepkg ${MAKEPKGOPTS} --asroot
+			else
+				chown -R ${SUDO_USER} ${builddir}
+				sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
 			fi
+
+			ret=$?
+			if [ $ret -ne 0 ]; then
+				break
+			fi
+
+			CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
+			cp ${builddir}/*-*-*.pkg.tar.?z ${CACHEDIR}
+
+			if [ "${action}" = "install" ]; then
+				PACARGS="-U"
+				[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
+				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
+				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+				[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
+				[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
+				if [ "${pkg}" -ne "${pkgbase}" ]; then
+					declare -a builtpkgs
+					local count=1
+					echo ":: More packages have been built:"
+					for builtpkg in ${builddir}/*-*-*.pkg.tar.?z; do
+						bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
+						builtpkgs[count]="${bname#${builddir}}"
+						echo "$count) ${builtpkgs[count]}"
+						let count=count+1
+					done
+
+					local pkglist
+					echo "Enter a selection (default=all):"
+					read
+					if [ -n ${REPLY} ]; then
+						for i in ${REPLY}; do
+							pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-*-*.pkg.tar.?z"
+						done
+						pacman $PACARGS "${pkglist}"
+					else
+						pacman $PACARGS "${builddir}/*.pkg.tar.?z"
+					fi
+				else
+					pacman $PACARGS "${builddir}/${pkg}-*-*.pkg.tar.?z"
+				fi
+			fi
+
+			rm -rf ${builddir}
 		done
 
 		if [ $ret -ne 0 ]; then
