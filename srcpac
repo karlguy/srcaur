@@ -150,13 +150,8 @@ build_packages()
 					break
 				fi
 
-				#Some package could set a different PKGEXT
-				PKGEXT=$(grep '^PKGEXT' PKGBUILD | cut -d= -f2 | sed s/\'//g)
-				[ -z ${PKGEXT} ] && PKGEXT=$(grep '^PKGEXT=' ~/.makepkg.conf 2>/dev/null | cut -d= -f2 | sed s/\'//g)
-				[ -z ${PKGEXT} ] && PKGEXT=$(grep '^PKGEXT=' /etc/makepkg.conf 2>/dev/null | cut -d= -f2 | sed s/\'//g)
-
 				CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
-				cp ${builddir}/*${PKGEXT} ${CACHEDIR}
+				cp ${builddir}/${pkg}-*-*.pkg.tar.?z ${CACHEDIR}
 
 				if [ "${action}" = "install" ]; then
 					PACARGS="-U"
@@ -165,7 +160,7 @@ build_packages()
 					[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 					[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
 					[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
-					pacman $PACARGS ${builddir}/*${PKGEXT}
+					pacman $PACARGS ${builddir}/${pkg}-*-*.pkg.tar.?z
 				fi
 
 				rm -rf ${builddir}
