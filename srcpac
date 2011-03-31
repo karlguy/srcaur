@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ver=0.10
+ver=0.10.1
 
 declare -a args
 
@@ -139,8 +139,6 @@ build_packages()
 
 	shift
 
-	success=0
-
 	pkgdir=${1/\/PKGBUILD}
 	pkg=${pkgdir#/var/abs/*/}
 	builddir=/var/srcpac/${pkg}
@@ -179,11 +177,11 @@ build_packages()
 		[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 		[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
 		[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
-		if [ "${pkg}" != "${pkgbase}" ]; then
+		if [ "${pkg}" == "${pkgbase}" ]; then
 			declare -a builtpkgs
 			local count=1
 			echo ":: More packages have been built:"
-			for builtpkg in ${builddir}/*-*-*.pkg.tar.?z; do
+			for builtpkg in ${builddir}/*.pkg.tar.?z; do
 				bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
 				builtpkgs[count]="${bname#${builddir}/}"
 				echo "$count) ${builtpkgs[count]}"
@@ -197,12 +195,12 @@ build_packages()
 				for i in ${REPLY}; do
 					pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-*-*.pkg.tar.?z"
 				done
-				pacman $PACARGS "${pkglist}"
+				pacman $PACARGS ${pkglist}
 			else
 				pacman $PACARGS ${builddir}/*.pkg.tar.?z
 			fi
 		else
-			pacman $PACARGS ${builddir}/${pkg}-*-*.pkg.tar.?z
+			pacman $PACARGS ${builddir}/${pkg}*.pkg.tar.?z
 		fi
 	fi
 
