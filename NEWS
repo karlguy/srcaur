@@ -1,5 +1,8 @@
 VERSION    DESCRIPTION                                          AUTHOR
 -------------------------------------------------------------------------------
+0.10.1   - Speed-up getting the pkgbase of a package            Andrea Scarpino
+         - Fix in not displaying splitted packages built        Andrea Scarpino
+         - Fix when passing the packages to install to pacman   Andrea Scarpino
 0.10     - Support for splitted packages                        Andrea Scarpino
          - Minor fix in the manpage                             Andrea Scarpino
 0.9.1    - pacman 3.5 - Use -dd to skip dependencies check      Andrea Scarpino
