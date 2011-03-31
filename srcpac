@@ -131,93 +131,87 @@ build_packages()
 
 	shift
 
-	while [ $# -ne 0 ]; do
-		pkg=$1
-		get_candidates $pkg
-		success=0
+	success=0
 
-		for pkgdir in ${candidates}; do
-			pkgbase=${pkgdir#/var/abs/*/}
-			builddir=/var/srcpac/${pkgbase}
+	pkgdir=${1/\/PKGBUILD}
+	pkg=${pkgdir#/var/abs/*/}
+	builddir=/var/srcpac/${pkg}
 
-			# seperate out our makepkg flags
-			MAKEPKGOPTS="-c -s -r -f"
+	# seperate out our makepkg flags
+	MAKEPKGOPTS="-c -s -r -f"
 				
-			# create the build dir and apply configuration
-			[[ -d ${builddir} ]] && rm -rf ${builddir}
-			mkdir -p ${builddir}
-			cp ${pkgdir}/* ${builddir}
-			apply_config ${pkgbase} ${builddir}
+	# create the build dir and apply configuration
+	[[ -d ${builddir} ]] && rm -rf ${builddir}
+	mkdir -p ${builddir}
+	cp ${pkgdir}/* ${builddir}
+	apply_config ${pkg} ${builddir}
 
-			cd ${builddir}
+	cd ${builddir}
 
-			if [ -z "${SUDO_USER}" ]; then
-				chown -R nobody ${builddir}
-				makepkg ${MAKEPKGOPTS} --asroot
+	if [ -z "${SUDO_USER}" ]; then
+		chown -R nobody ${builddir}
+		makepkg ${MAKEPKGOPTS} --asroot
+	else
+		chown -R ${SUDO_USER} ${builddir}
+		sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
+	fi
+
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		break
+	fi
+
+	CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
+	cp ${builddir}/*-*-*.pkg.tar.?z ${CACHEDIR}
+
+	if [ "${action}" = "install" ]; then
+		PACARGS="-U"
+		[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
+		[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
+		[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+		[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
+		[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
+		if [ "${pkg}" != "${pkgbase}" ]; then
+			declare -a builtpkgs
+			local count=1
+			echo ":: More packages have been built:"
+			for builtpkg in ${builddir}/*-*-*.pkg.tar.?z; do
+				bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
+				builtpkgs[count]="${bname#${builddir}/}"
+				echo "$count) ${builtpkgs[count]}"
+				let count=count+1
+			done
+
+			local pkglist
+			echo "Enter a selection (default=all):"
+			read
+			if [ -n "${REPLY}" ]; then
+				for i in ${REPLY}; do
+					pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-*-*.pkg.tar.?z"
+				done
+				pacman $PACARGS "${pkglist}"
 			else
-				chown -R ${SUDO_USER} ${builddir}
-				sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
+				pacman $PACARGS ${builddir}/*.pkg.tar.?z
 			fi
-
-			ret=$?
-			if [ $ret -ne 0 ]; then
-				break
-			fi
-
-			CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
-			cp ${builddir}/*-*-*.pkg.tar.?z ${CACHEDIR}
-
-			if [ "${action}" = "install" ]; then
-				PACARGS="-U"
-				[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
-				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
-				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-				[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
-				[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
-				if [ "${pkg}" -ne "${pkgbase}" ]; then
-					declare -a builtpkgs
-					local count=1
-					echo ":: More packages have been built:"
-					for builtpkg in ${builddir}/*-*-*.pkg.tar.?z; do
-						bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
-						builtpkgs[count]="${bname#${builddir}}"
-						echo "$count) ${builtpkgs[count]}"
-						let count=count+1
-					done
-
-					local pkglist
-					echo "Enter a selection (default=all):"
-					read
-					if [ -n ${REPLY} ]; then
-						for i in ${REPLY}; do
-							pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-*-*.pkg.tar.?z"
-						done
-						pacman $PACARGS "${pkglist}"
-					else
-						pacman $PACARGS "${builddir}/*.pkg.tar.?z"
-					fi
-				else
-					pacman $PACARGS "${builddir}/${pkg}-*-*.pkg.tar.?z"
-				fi
-			fi
-
-			rm -rf ${builddir}
-		done
-
-		if [ $ret -ne 0 ]; then
-			echo "Error: Failed to build \"${pkg}\""
-			exit 1
+		else
+			pacman $PACARGS ${builddir}/${pkg}-*-*.pkg.tar.?z
 		fi
+	fi
 
-		if [ "${action}" = "install" ]; then
-			if [ ! -d /var/lib/srcpac ]; then
-				mkdir /var/lib/srcpac
-			fi
+	rm -rf ${builddir}
+
+	if [ $ret -ne 0 ]; then
+		echo "Error: Failed to build \"${pkg}\""
+		exit 1
+	fi
+
+	if [ "${action}" = "install" ]; then
+		if [ ! -d /var/lib/srcpac ]; then
+			mkdir /var/lib/srcpac
+		fi
 			
-			touch /var/lib/srcpac/${pkg}
-		fi
-		shift
-	done
+		touch /var/lib/srcpac/${pkg}
+	fi
 }
 
 function check_args()
@@ -520,8 +514,12 @@ function main()
 			exit 0
 		fi
 
+		for pkg in ${packages[@]}; do
+			get_candidates $pkg
+		done
+
 		echo
-		echo "Source Targets: ${packages[*]}"
+		echo "Source Targets: ${candidates[*]#/var/abs/*/}"
 		echo
 		if [ ${NOCONFIRM} -eq 0 ]; then
 			echo -n "Proceed? [Y/n]"
@@ -531,7 +529,9 @@ function main()
 			fi
 		fi
 		
-		build_packages "install" ${packages[@]}
+		for pkg in ${candidates[@]}; do
+			build_packages "install" ${pkg}
+		done
 	fi
 }
 
