@@ -70,9 +70,9 @@ apply_config()
 	if [ -f ${conf} ]; then
 		if [ "${3}" == 'noreplace' ]; then
 			[ -z ${PAGER} ] && PAGER=less
-			sed -f ${conf} ${2}%PKGBUILD | ${PAGER}
+			sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
 		else
-			sed -i -f ${conf} ${2}%PKGBUILD
+			sed -i -f ${conf} ${2}/PKGBUILD
 		fi
 	fi
 }
@@ -82,24 +82,32 @@ apply_config()
 ##
 get_candidates()
 {
+	found=0
 	for pkgbuild in ${ABSROOT}*/*/PKGBUILD; do
 		unset pkgbase
 		unset pkgname
 		source $pkgbuild &> /dev/null
 		if [ "${1}" == "${pkgbase}" ]; then
-			candidates="${pkgbuild/\/PKGBUILD}"
+			found=1
+			break
 		else
 			for _package in "${pkgname[@]}"; do
-				if [ "${1}" == "${_package}" ]; then
-					candidates="${pkgbuild/\/PKGBUILD}"
+				if [ "${1}" == "${_package}" ]; then					
+					found=1
 					break
 				fi
 			done
 		fi
+
+		if [ ${found} -eq 1 ]; then
+			break
+		fi
 	done
-	if [ -z "${candidates}" ]; then
+
+	if [ ${found} -eq 1 ]; then
+		candidates="${pkgbuild/\/PKGBUILD}"
+	else
 		echo "Error: Could not find \"${1}\" under ${ABSROOT}"
-		exit 1
 	fi
 }
 
@@ -492,31 +500,24 @@ function main()
 			if [ $ONLYCONF -eq 1 ]; then
 				for pkg in ${packages[@]}; do
 					get_candidates $pkg
-					success=0
-					for pkgdir in ${candidates}; do
-						if [ -f ${pkgdir}/PKGBUILD ]; then
-							# Look for config options and apply them
-							apply_config $pkg $pkgdir noreplace
-							success=1
-							break
-						fi
-					done
-					if [ ${success} -eq 0 ]; then
-						echo "Error: Failed to find \"${pkg}\""
-						exit 1
-					fi
+				done
+
+				for pkgdir in ${candidates}; do
+					# Look for config options and apply them
+					pkg=${pkgdir#/var/abs/*/}
+					apply_config $pkg $pkgdir noreplace
 				done
 				exit 0
 			fi
 		fi
 
-		if [ ${#packages[@]} -eq 0 ]; then
-			exit 0
-		fi
-
 		for pkg in ${packages[@]}; do
 			get_candidates $pkg
 		done
+
+		if [ ${#candidates[@]} -eq 0 ]; then
+			exit 0
+		fi
 
 		echo
 		echo "Source Targets: ${candidates[*]#/var/abs/*/}"
