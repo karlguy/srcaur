@@ -1,67 +1,69 @@
-VERSION    DESCRIPTION                                            AUTHOR
----------------------------------------------------------------------------------
-0.9.1      - pacman 3.5 - Use -dd to skip dependencies check      Andrea Scarpino
-           - Fix in retrieving the package version                Andrea Scarpino
-0.9        - Fix a bug in vercmp usage                            Andrea Scarpino
-           - Better way to source PKGEXT and CacheDir             Andrea Scarpino
-           - Fix a bug when a package is not installed            Andrea Scarpino
-           - Add support to install packages asdeps or asexplicit Andrea Scarpino
-           - Sort options                                         Andrea Scarpino
-           - Add support for custom CacheDir                      Andrea Scarpino
-           - Make YES the default choice for 'upgrade anyway'     Andrea Scarpino
-           - Skip 'upgrade anyway' question with --noconfirm      Andrea Scarpino
-           - Minor fixes                                          Andrea Scarpino
-           - Remove duplicated code                               Andrea Scarpino
-0.8        - Some package could set a different PKGEXT (FS#21292) Andrea Scarpino
-           - Implement 'package is up to date, update anyway'     Andrea Scarpino
-           - Remove --edit option                                 Andrea Scarpino
-           - Minor fixes to Makefile                              Andrea Scarpino
-           - Re-added Query option                                Andrea Scarpino
-           - Operation -Q now prints source flag too              Andrea Scarpino
-           - Fix sudo usage                                       Andrea Scarpino
-0.7        - Minor typo in srcpac manual                          Andrea Scarpino
-           - Fix configuration not being applied (FS#17626)       Phillip Michael
-           - Implement PKGEXT support                             Andrea Scarpino
-           - Added --edit option                                  Andrea Scarpino
-           - Fixed check when there is nothing to upgrade         Andrea Scarpino
-           - sudo or root rights are needed                       Andrea Scarpino
-           - Implement --noconfirm option                         Andrea Scarpino
-           - Removed --query option                               Andrea Scarpino
-           - Change license to GPL3                               Andrea Scarpino
-           - Fix in manual page                                   Loui Chang
-           - Add Makefile                                         Loui Chang
-           - Copy every file to the build dir, not only PKGBUILD  Loui Chang
-           - Use makepkg -s instead of -b                         Loui Chang
-0.6        - Fix in manual page                                   Michael Klier
-           - Refresh ABS tree on -Sy                              Michael Klier
-           - Cosmetical changes                                   Michael Klier
-           - Delete obsolete srcpac.conf                          Michael Klier
-           - Use sudo -u nobody when invoked by root              Michael Klier
-           - Use $SUDO_USER if invoked via sudo                   Michael Klier
-           - Removed perl dependency                              Michael Klier
-           - Added support to install packages to another root    Michael Klier
-           - Fix makepkg privileges                               Michael Klier
-           - Use perl to sanitize packages names                  Michael Klier
-           - Use a dedicate funciont to look for candidates pkgs  Michael Klier
-           - Switched to one config per package                   Michael Klier
-           - Fix srcpac cannot find dir in ABS (FS#8434)          Michael Klier
-           - Fix path to abs.conf                                 Michael Klier
-0.5        - Fix make -o not modify the PKGBUILD                  Jason Chu
-           - Pass along force argument to pacman                  Jason Chu
-           - Support for pacman 3                                 Jason Chu
-           - Fix bug with getopts                                 Yongjian Xu
-0.4.1.     - Added support to people which use file:///           Jason Chu
-0.4        - Added --ignore option                                Jason Chu
-           - Fix manual page                                      Jason Chu
-           - Add manual page                                      Jason Chu
-           - Fix bug when a package name has more then one hypen  Jason Chu
-0.3        - Add more helpful info                                Jason Chu
-           - hypen replacement code                               Jason Chu
-           - Got rid of one of the build_functions                Jason Chu
-           - Fixed a missed enter case                            Jason Chu
-0.2.1      - Fix bug with getopts                                 Jason Chu
-0.2        - Add bash shebang                                     Jason Chu
-           - Support for custom configs                           Jason Chu
-           - Added config and persisten builds                    Jason Chu
-           - Add -r to makepkg options                            Jason Chu
-0.1        - First release                                        Jason Chu
+VERSION    DESCRIPTION                                          AUTHOR
+-------------------------------------------------------------------------------
+0.10     - Support for splitted packages                        Andrea Scarpino
+         - Minor fix in the manpage                             Andrea Scarpino
+0.9.1    - pacman 3.5 - Use -dd to skip dependencies check      Andrea Scarpino
+         - Fix in retrieving the package version                Andrea Scarpino
+0.9      - Fix a bug in vercmp usage                            Andrea Scarpino
+         - Better way to source PKGEXT and CacheDir             Andrea Scarpino
+         - Fix a bug when a package is not installed            Andrea Scarpino
+         - Add support to install packages asdeps or asexplicit Andrea Scarpino
+         - Sort options                                         Andrea Scarpino
+         - Add support for custom CacheDir                      Andrea Scarpino
+         - Make YES the default choice for 'upgrade anyway'     Andrea Scarpino
+         - Skip 'upgrade anyway' question with --noconfirm      Andrea Scarpino
+         - Minor fixes                                          Andrea Scarpino
+         - Remove duplicated code                               Andrea Scarpino
+0.8      - Some package could set a different PKGEXT (FS#21292) Andrea Scarpino
+         - Implement 'package is up to date, update anyway'     Andrea Scarpino
+         - Remove --edit option                                 Andrea Scarpino
+         - Minor fixes to Makefile                              Andrea Scarpino
+         - Re-added Query option                                Andrea Scarpino
+         - Operation -Q now prints source flag too              Andrea Scarpino
+         - Fix sudo usage                                       Andrea Scarpino
+0.7      - Minor typo in srcpac manual                          Andrea Scarpino
+         - Fix configuration not being applied (FS#17626)       Phillip Michael
+         - Implement PKGEXT support                             Andrea Scarpino
+         - Added --edit option                                  Andrea Scarpino
+         - Fixed check when there is nothing to upgrade         Andrea Scarpino
+         - sudo or root rights are needed                       Andrea Scarpino
+         - Implement --noconfirm option                         Andrea Scarpino
+         - Removed --query option                               Andrea Scarpino
+         - Change license to GPL3                               Andrea Scarpino
+         - Fix in manual page                                   Loui Chang
+         - Add Makefile                                         Loui Chang
+         - Copy every file to the build dir, not only PKGBUILD  Loui Chang
+         - Use makepkg -s instead of -b                         Loui Chang
+0.6      - Fix in manual page                                   Michael Klier
+         - Refresh ABS tree on -Sy                              Michael Klier
+         - Cosmetical changes                                   Michael Klier
+         - Delete obsolete srcpac.conf                          Michael Klier
+         - Use sudo -u nobody when invoked by root              Michael Klier
+         - Use $SUDO_USER if invoked via sudo                   Michael Klier
+         - Removed perl dependency                              Michael Klier
+         - Added support to install packages to another root    Michael Klier
+         - Fix makepkg privileges                               Michael Klier
+         - Use perl to sanitize packages names                  Michael Klier
+         - Use a dedicate funciont to look for candidates pkgs  Michael Klier
+         - Switched to one config per package                   Michael Klier
+         - Fix srcpac cannot find dir in ABS (FS#8434)          Michael Klier
+         - Fix path to abs.conf                                 Michael Klier
+0.5      - Fix make -o not modify the PKGBUILD                  Jason Chu
+         - Pass along force argument to pacman                  Jason Chu
+         - Support for pacman 3                                 Jason Chu
+         - Fix bug with getopts                                 Yongjian Xu
+0.4.1.   - Added support to people which use file:///           Jason Chu
+0.4      - Added --ignore option                                Jason Chu
+         - Fix manual page                                      Jason Chu
+         - Add manual page                                      Jason Chu
+         - Fix bug when a package name has more then one hypen  Jason Chu
+0.3      - Add more helpful info                                Jason Chu
+         - hypen replacement code                               Jason Chu
+         - Got rid of one of the build_functions                Jason Chu
+         - Fixed a missed enter case                            Jason Chu
+0.2.1    - Fix bug with getopts                                 Jason Chu
+0.2      - Add bash shebang                                     Jason Chu
+         - Support for custom configs                           Jason Chu
+         - Added config and persisten builds                    Jason Chu
+         - Add -r to makepkg options                            Jason Chu
+0.1      - First release                                        Jason Chu
