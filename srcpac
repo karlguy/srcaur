@@ -188,14 +188,16 @@ build_packages()
 				let count=count+1
 			done
 
-			local pkglist
-			echo "Enter a selection (default=all):"
-			read
-			if [ -n "${REPLY}" ]; then
-				for i in ${REPLY}; do
-					pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-*-*.pkg.tar.?z"
-				done
-				pacman $PACARGS ${pkglist}
+			if [ ${NOCONFIRM} -eq 0 ]; then
+				local pkglist
+				echo "Enter a selection (default=all):"
+				read
+				if [ -n "${REPLY}" ]; then
+					for i in ${REPLY}; do
+						pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-*-*.pkg.tar.?z"
+					done
+					pacman $PACARGS ${pkglist}
+				fi
 			else
 				pacman $PACARGS ${builddir}/*.pkg.tar.?z
 			fi
