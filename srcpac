@@ -168,7 +168,7 @@ build_packages()
 	fi
 
 	CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
-	cp ${builddir}/*-*-*.pkg.tar.?z ${CACHEDIR}
+	cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
 
 	if [ "${action}" = "install" ]; then
 		PACARGS="-U"
@@ -194,7 +194,7 @@ build_packages()
 				read
 				if [ -n "${REPLY}" ]; then
 					for i in ${REPLY}; do
-						pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-*-*.pkg.tar.?z"
+						pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
 					done
 					pacman $PACARGS ${pkglist}
 				fi
