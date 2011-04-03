@@ -123,7 +123,9 @@ get_pkgname()
 
 refresh()
 {
-	abs
+	echo -n "Starting ABS sync..."
+	abs &> /dev/null
+	echo "done"
 	pacman -Sy
 	if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
 		exit 0
@@ -177,7 +179,7 @@ build_packages()
 		[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 		[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
 		[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
-		if [ "${pkg}" == "${pkgbase}" ]; then
+		if [ "${pkg}" = "${pkgbase}" ]; then
 			declare -a builtpkgs
 			local count=1
 			echo ":: More packages have been built:"
