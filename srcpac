@@ -448,7 +448,11 @@ function main()
 				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
 				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 
-				pacman $PACARGS ${regpac[*]} $ignorestr
+				if [ -n "${regpac[*]}" ]; then
+					pacman $PACARGS ${regpac[*]} $ignorestr
+				else
+					echo " there is nothing to do"
+				fi
 			else
 				if [ $REFRESH -eq 1 ]; then
 					refresh
