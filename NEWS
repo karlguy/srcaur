@@ -1,5 +1,7 @@
 VERSION    DESCRIPTION                                          AUTHOR
 -------------------------------------------------------------------------------
+0.10.2   - Don't call pacman when there is nothing to upgrade   Andrea Scarpino
+         - Don't diplay ABS syncronization output               Andrea Scarpino
 0.10.1   - Speed-up getting the pkgbase of a package            Andrea Scarpino
          - Fix in not displaying splitted packages built        Andrea Scarpino
          - Fix when passing the packages to install to pacman   Andrea Scarpino
