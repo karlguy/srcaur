@@ -68,7 +68,7 @@ apply_config()
 {
 	conf=/etc/srcpac.d/${1}
 	if [ -f ${conf} ]; then
-		if [ "${3}" == 'noreplace' ]; then
+		if [ "${3}" = "noreplace" ]; then
 			[ -z ${PAGER} ] && PAGER=less
 			sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
 		else
@@ -87,12 +87,12 @@ get_candidates()
 		unset pkgbase
 		unset pkgname
 		source $pkgbuild &> /dev/null
-		if [ "${1}" == "${pkgbase}" ]; then
+		if [ "${1}" = "${pkgbase}" ]; then
 			found=1
 			break
 		else
 			for _package in "${pkgname[@]}"; do
-				if [ "${1}" == "${_package}" ]; then					
+				if [ "${1}" = "${_package}" ]; then					
 					found=1
 					break
 				fi
@@ -362,7 +362,7 @@ function main()
 {
 	check_args $@
 
-	if [ "${MAJOR}" = "" ]; then
+	if [ -z "${MAJOR}" ]; then
 		usage
 	fi
 	
@@ -371,7 +371,7 @@ function main()
 		exit 1
 	fi
 
-	if [ "${ABSROOT}" = "" ]; then
+	if [ -z "${ABSROOT}" ]; then
 		echo "Error: The ABSROOT environment variable is not defined."
 		exit 1
 	fi
@@ -488,7 +488,7 @@ function main()
 						if [ ${NOCONFIRM} -eq 0 ]; then
 							echo -n "$pkg is up to date, upgrade anyway? [Y/n]"
 							read
-							if [ "${REPLY}" == "n" -o "${REPLY}" == "N" ]; then
+							if [ "${REPLY}" = "n" -o "${REPLY}" = "N" ]; then
 								continue
 							fi
 						fi
