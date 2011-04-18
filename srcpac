@@ -441,29 +441,21 @@ main()
 			if [ $SYSUPGRADE -eq 1 ]; then
 				[ $REFRESH -eq 1 ] && refresh
 
-				ignorestr=""
 				if [ $IGNORE -eq 1 ]; then
-					ignorestr="--ignore $IGNOREPKG"
-				fi
-				output=$(pacman -Spu --noconfirm ${ignorestr})
-				ret=$?
-
-				if [ $ret -ne 0 ]; then
-					echo $output
-					exit $ret
+					local ignorestr=$(echo $IGNOREPKG | tr "," "|")
+					local output=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
+				else
+					local output=$(pacman -Qqu --noconfirm)
 				fi
 
 				declare -a packages
 				declare -a regpac
-				for line in $output; do
-					# ensure the string is a URL
-					if [ $( echo "${line}" | grep -F '://' ) ]; then
-						pkg=$(get_pkgname ${line})
-						if [ -f /etc/srcpac.d/${pkg} ]; then
-							packages[${#packages[@]}]=$pkg
-						else
-							regpac[${#regpac[@]}]=$pkg
-						fi
+				for pkg in $output; do
+					is_built $pkg
+					if [ $built -eq 1 ]; then
+						packages[${#packages[@]}]=$pkg
+					else
+						regpac[${#regpac[@]}]=$pkg
 					fi
 				done
 
@@ -471,11 +463,10 @@ main()
 				[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
 				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
 				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+				[ $IGNORE -eq 1 ] && PACARGS="${PACARGS} --ignore $IGNOREPKG"
 
 				if [ -n "${regpac[*]}" ]; then
-					pacman $PACARGS ${regpac[*]} $ignorestr
-				else
-					echo " there is nothing to do"
+					pacman $PACARGS ${regpac[*]}
 				fi
 			else
 				[ $REFRESH -eq 1 ] && refresh
