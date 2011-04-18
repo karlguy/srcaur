@@ -360,6 +360,15 @@ function check_args()
 	done
 }
 
+function remove()
+{
+	if [ -f /var/lib/srcpac/$1 ]; then
+		echo -n "removing source reference $1... "
+		rm /var/lib/srcpac/$1
+		echo "done"
+	fi
+}
+
 function main()
 {
 	check_args $@
@@ -383,11 +392,7 @@ function main()
 		
 		if [ -d /var/lib/srcpac -a "${MAJOR}" = "remove" ]; then
 			for pkg in ${args[@]}; do
-				if [ -f /var/lib/srcpac/${pkg} ]; then
-					echo -n "removing source reference ${pkg}... "
-					rm /var/lib/srcpac/${pkg}
-					echo "done"
-				fi
+				remove $pkg
 			done
 		fi
 	fi
