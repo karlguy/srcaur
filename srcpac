@@ -220,7 +220,7 @@ build_packages()
 	fi
 }
 
-function check_args()
+check_args()
 {
 	# Options
 	MAJOR=""
@@ -356,7 +356,7 @@ function check_args()
 	done
 }
 
-function remove()
+remove()
 {
 	if [ -f /var/lib/srcpac/$1 ]; then
 		echo -n "removing source reference $1... "
@@ -365,7 +365,7 @@ function remove()
 	fi
 }
 
-function is_built()
+is_built()
 {
 	built=0
 	if [ -f /var/lib/srcpac/$1 ]; then
@@ -375,7 +375,7 @@ function is_built()
 	fi
 }
 
-function main()
+main()
 {
 	check_args $@
 
@@ -478,9 +478,7 @@ function main()
 					echo " there is nothing to do"
 				fi
 			else
-				if [ $REFRESH -eq 1 ]; then
-					refresh
-				fi
+				[ $REFRESH -eq 1 ] && refresh
 				pacman $ARGLIST
 				exit 0
 			fi
