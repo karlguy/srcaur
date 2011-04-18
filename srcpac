@@ -216,10 +216,6 @@ build_packages()
 	fi
 
 	if [ "${action}" = "install" ]; then
-		if [ ! -d /var/lib/srcpac ]; then
-			mkdir /var/lib/srcpac
-		fi
-			
 		touch /var/lib/srcpac/${pkg}
 	fi
 }
@@ -387,10 +383,14 @@ function main()
 		exit 1
 	fi
 
+	if [ ! -d /var/lib/srcpac ]; then
+		mkdir /var/lib/srcpac
+	fi
+
 	if [ "${MAJOR}" = "remove" -o "${MAJOR}" = "upgrade" ]; then
 		pacman $ARGLIST
 		
-		if [ -d /var/lib/srcpac -a "${MAJOR}" = "remove" ]; then
+		if [ "${MAJOR}" = "remove" ]; then
 			for pkg in ${args[@]}; do
 				remove $pkg
 			done
@@ -399,7 +399,7 @@ function main()
 
 	if [ "${MAJOR}" = "query" ]; then
 		for arg in ${args[@]}; do
-			if [ $INFO -eq 1 -a -d /var/lib/srcpac ]; then
+			if [ $INFO -eq 1 ]; then
 				pacman $ARGSANS $arg | head -n -1
 			else
 				echo "$(pacman -Q $arg)"
@@ -419,7 +419,7 @@ function main()
 
 	if [ "${MAJOR}" = "sync" ]; then
 		if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
-			if [ $SYSUPGRADE -eq 1 -a -d /var/lib/srcpac ]; then
+			if [ $SYSUPGRADE -eq 1 ]; then
 				[ $REFRESH -eq 1 ] && refresh
 
 				ignorestr=""
