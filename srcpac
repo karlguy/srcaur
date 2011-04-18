@@ -36,7 +36,6 @@ usage()
 	echo "        $(basename $0) {-Q --query}   [options] [<package(s)>]"
 	echo "        $(basename $0) {-R --remove}  [options] <package(s)>"
 	echo "        $(basename $0) {-S --sync}    [options] [package(s)]"
-	echo "        $(basename $0) {-U --upgrade} [options] <file(s)>"
     echo "$(basename $0) options are based on pacman, so check the pacman man page"
 	echo "$(basename $0) adds some option to -S:"
 	echo "options:"
@@ -259,10 +258,6 @@ check_args()
 				MAJOR="sync"
 				ARGSANS="$ARGSANS $1"
 				;;
-			--upgrade)
-				MAJOR="upgrade"
-				ARGSANS="$ARGSANS $1"
-				;;
 			--asdeps)
 				ASDEPS=1
 				ARGSANS="$ARGSANS $1"
@@ -333,7 +328,6 @@ check_args()
 						Q) MAJOR="query" ;;
 						R) MAJOR="remove" ;;
 						S) MAJOR="sync" ;;
-						U) MAJOR="upgrade" ;;
 						d) NODEPS=1 ;;
 						f) FORCE=1 ;;
 						i) INFO=1 ;;
@@ -397,14 +391,12 @@ main()
 		mkdir /var/lib/srcpac
 	fi
 
-	if [ "${MAJOR}" = "remove" -o "${MAJOR}" = "upgrade" ]; then
+	if [ "${MAJOR}" = "remove" ]; then
 		pacman $ARGLIST
 		
-		if [ "${MAJOR}" = "remove" ]; then
-			for pkg in ${args[@]}; do
-				remove $pkg
-			done
-		fi
+		for pkg in ${args[@]}; do
+			remove $pkg
+		done
 	fi
 
 	if [ "${MAJOR}" = "query" ]; then
