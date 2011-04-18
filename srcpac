@@ -365,6 +365,16 @@ function remove()
 	fi
 }
 
+function is_built()
+{
+	built=0
+	if [ -f /var/lib/srcpac/$1 ]; then
+		built=1
+	else
+		built=0
+	fi
+}
+
 function main()
 {
 	check_args $@
@@ -398,22 +408,31 @@ function main()
 	fi
 
 	if [ "${MAJOR}" = "query" ]; then
-		for arg in ${args[@]}; do
+		for pkg in ${args[@]}; do
 			if [ $INFO -eq 1 ]; then
-				pacman $ARGSANS $arg | head -n -1
+				pacman -Qi $pkg | head -n -1
 			else
-				echo "$(pacman -Q $arg)"
+				echo -n $(pacman -Q $pkg)
 			fi
 
-			[ $? -ne 0 ] && exit $?
-
-			echo -n "Source         : "
-			if [ -f /var/lib/srcpac/${arg} ]; then
-				echo "Yes"
-			else
-				echo "No"
+			if [ $? -eq 0 ]; then
+				is_built $pkg
+				if [ $INFO -eq 1 ]; then
+					echo -n "Source         : "	
+					if [ $built -eq 1 ]; then
+						echo "Yes"
+					else
+						echo "No"
+					fi
+					echo
+				else
+					if [ $built -eq 1 ]; then
+						echo " [source]"
+					else
+						echo
+					fi
+				fi
 			fi
-			[ $INFO -eq 1 ] && echo ""
 		done
 	fi
 
