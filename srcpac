@@ -110,16 +110,6 @@ get_candidates()
 	fi
 }
 
-get_pkgname()
-{
-	local tmp
-
-	tmp=${1##*/}
-	tmp=${tmp%-$CARCH*}
-	tmp=${tmp%-any*}
-	echo ${tmp%-*-*}
-}
-
 refresh()
 {
 	echo -n "Starting ABS sync..."
@@ -456,6 +446,7 @@ main()
 				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
 				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 				[ $IGNORE -eq 1 ] && PACARGS="${PACARGS} --ignore $IGNOREPKG"
+				[ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
 				if [ -n "${regpac[*]}" ]; then
 					pacman $PACARGS ${regpac[*]}
@@ -473,39 +464,22 @@ main()
 				exit 0
 			fi
 
-			PACARGS="-Sp"
 			if [ $SYSUPGRADE -eq 1 ]; then
-				PACARGS="${PACARGS}u"
+				output=$(pacman -Qqu --noconfirm)
 			else
-				PACARGS="${PACARGS} ${args[*]}"
-			fi
-
-			output=$(pacman ${PACARGS} --noconfirm)
-			if [ $? -ne 0 ]; then
-				echo $output
-				exit $?
+				output="${args[*]}"
 			fi
 
 			declare -a packages
-			for line in $output; do
-				# ensure the string is a URL
-				if [ $( echo "${line}" | grep -F '://' ) ]; then
-					pkg=$(get_pkgname ${line})
-					local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
-					[ -z ${pkgver} ] && pkgver=0
-					local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}' | head -n 1)
-					[ -z ${repopkgver} ] && repopkgver=0
-					if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
-						if [ ${NOCONFIRM} -eq 0 ]; then
-							echo -n "$pkg is up to date, upgrade anyway? [Y/n]"
-							read
-							if [ "${REPLY}" = "n" -o "${REPLY}" = "N" ]; then
-								continue
-							fi
-						fi
-					fi
-					packages[${#packages[@]}]=$pkg
+			for pkg in $output; do
+				local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
+				[ -z ${pkgver} ] && pkgver=0
+				local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}' | head -n 1)
+				[ -z ${repopkgver} ] && repopkgver=0
+				if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
+					echo "warning: $pkg-$pkgver is up to date -- reinstalling"
 				fi
+				packages[${#packages[@]}]=$pkg
 			done
 
 			if [ $ONLYCONF -eq 1 ]; then
@@ -548,3 +522,5 @@ main()
 }
 
 main $@
+
+exit 0
