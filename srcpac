@@ -82,7 +82,8 @@ apply_config()
 ##
 get_candidates()
 {
-	found=0
+	local found=0
+
 	for pkgbuild in ${ABSROOT}*/*/PKGBUILD; do
 		unset pkgbase
 		unset pkgname
@@ -105,7 +106,8 @@ get_candidates()
 	done
 
 	if [ ${found} -eq 1 ]; then
-		candidates="${pkgbuild/\/PKGBUILD}"
+		local tmp=${pkgbuild#/var/abs/}
+		candidates="${candidates} ${tmp/\/PKGBUILD}"
 	else
 		echo "Error: Could not find \"${1}\" under ${ABSROOT}"
 	fi
@@ -137,8 +139,8 @@ build_packages()
 
 	shift
 
-	pkgdir=${1/\/PKGBUILD}
-	pkg=${pkgdir#/var/abs/*/}
+	pkg=${1#*/}
+	pkgdir="${ABSROOT}/${1}"
 	builddir=/var/srcpac/${pkg}
 
 	if [ $MAKEDEPS -eq 1 ]; then
@@ -513,10 +515,8 @@ main()
 					get_candidates $pkg
 				done
 
-				for pkgdir in ${candidates}; do
-					# Look for config options and apply them
-					pkg=${pkgdir#/var/abs/*/}
-					apply_config $pkg $pkgdir noreplace
+				for pkg in ${candidates}; do
+					apply_config "${pkg#*/}" "${ABSROOT}/$pkg" noreplace
 				done
 				exit 0
 			fi
@@ -526,24 +526,25 @@ main()
 			get_candidates $pkg
 		done
 
-		if [ ${#candidates[@]} -eq 0 ]; then
-			exit 0
-		fi
-
-		echo
-		echo "Source Targets: ${candidates[*]#/var/abs/*/}"
-		echo
-		if [ ${NOCONFIRM} -eq 0 ]; then
-			echo -n "Proceed? [Y/n]"
-			read
-			if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
-				exit 0
+		if [ -n "${candidates}" ]; then
+			echo
+			echo -n "Source Targets: "
+			for pkg in ${candidates}; do
+				echo -n "${pkg#*/} "
+			done
+			echo
+			if [ ${NOCONFIRM} -eq 0 ]; then
+				echo -n "Proceed? [Y/n]"
+				read
+				if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
+					exit 0
+				fi
 			fi
+
+			for pkg in ${candidates}; do
+				build_packages "install" ${pkg}
+			done
 		fi
-		
-		for pkg in ${candidates[@]}; do
-			build_packages "install" ${pkg}
-		done
 	fi
 }
 
