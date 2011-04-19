@@ -147,7 +147,7 @@ build_packages()
 		MAKEPKGOPTS="-c -s -r -f"
 	fi
 
-	[ ${NOCONFIRM} -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
+	[ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
 
 	# create the build dir and apply configuration
 	[[ -d ${builddir} ]] && rm -rf ${builddir}
@@ -180,6 +180,8 @@ build_packages()
 		[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
 		[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
 		[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
+		[ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
+
 		if [ "${pkg}" = "${pkgbase}" ]; then
 			declare -a builtpkgs
 			local count=1
