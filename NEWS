@@ -1,5 +1,12 @@
 VERSION    DESCRIPTION                                          AUTHOR
 -------------------------------------------------------------------------------
+0.10.3   - New option -m to remove makedepends after the build  Andrea Scarpino
+         - Avoid questions when --noconfirm is set              Andrea Scarpino
+         - Install an updated package without ask to confirm    Andrea Scarpino
+         - Remove upgrade operation from srcpac                 Andrea Scarpino
+         - Build packages previously built when updating system Andrea Scarpino
+         - Cosmetic change in query option                      Andrea Scarpino
+         - Display full text options in help                    Andrea Scarpino
 0.10.2   - Don't call pacman when there is nothing to upgrade   Andrea Scarpino
          - Don't diplay ABS syncronization output               Andrea Scarpino
 0.10.1   - Speed-up getting the pkgbase of a package            Andrea Scarpino
