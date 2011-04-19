@@ -322,7 +322,7 @@ check_args()
 					OPTIONAL=$2
 				fi
 				OPTIND=1
-				while getopts ":VQRSbdfimruy:ow" opt $1 $OPTIONAL; do
+				while getopts ":VQRSbdfimuyr:ow" opt $1 $OPTIONAL; do
 					case $opt in
 						V) version ;;
 						Q) MAJOR="query" ;;
