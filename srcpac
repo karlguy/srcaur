@@ -143,12 +143,9 @@ build_packages()
 	pkgdir="${ABSROOT}/${1}"
 	builddir=/var/srcpac/${pkg}
 
-	if [ $MAKEDEPS -eq 1 ]; then
-		MAKEPKGOPTS="-c -s -f"
-	else
-		MAKEPKGOPTS="-c -s -r -f"
-	fi
-
+	MAKEPKGOPTS="-c -s"
+	[ $NODEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -d"
+	[ $MAKEDEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -r"
 	[ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
 
 	# create the build dir and apply configuration
