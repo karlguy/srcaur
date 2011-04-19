@@ -47,14 +47,14 @@ usage()
 
 version()
 {
-	echo ""
+	echo
 	echo "                       $(basename $0) v${ver}"
 	echo "                       Copyright (C) 2009-2011 Andrea Scarpino"
 	echo "                       Copyright (C) 2004-2009 Jason Chu"
 	echo
 	echo "                       This program may be freely redistributed under"
 	echo "                       the terms of the GNU General Public License."
-	echo ""
+	echo
 
 	exit 0
 }
@@ -110,6 +110,9 @@ get_candidates()
 	fi
 }
 
+##
+# Updates the ABS tree and the pacman repositories
+##
 refresh()
 {
 	echo -n "Starting ABS sync..."
@@ -121,6 +124,9 @@ refresh()
 	fi
 }
 
+##
+# Build and/or install a package
+##
 build_packages()
 {
 	action="build"
@@ -340,6 +346,9 @@ check_args()
 	done
 }
 
+##
+# Remove the srcpac package file
+##
 remove()
 {
 	if [ -f /var/lib/srcpac/$1 ]; then
@@ -349,6 +358,9 @@ remove()
 	fi
 }
 
+##
+# Check if a package has been built using srcpac
+##
 is_built()
 {
 	built=0
@@ -465,9 +477,9 @@ main()
 			fi
 
 			if [ $SYSUPGRADE -eq 1 ]; then
-				output=$(pacman -Qqu --noconfirm)
+				local output=$(pacman -Qqu --noconfirm)
 			else
-				output="${args[*]}"
+				local output="${args[*]}"
 			fi
 
 			declare -a packages
