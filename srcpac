@@ -40,6 +40,7 @@ usage()
 	echo "$(basename $0) adds some option to -S:"
 	echo "options:"
 	echo "  -b, builds the targets from source"
+	echo "  -m, remove the makedepends after the build"
 	echo "  -o, applies config changes and displays the PKGBUILD in your pager app without building"
 	
 	exit 0
@@ -140,9 +141,12 @@ build_packages()
 	pkg=${pkgdir#/var/abs/*/}
 	builddir=/var/srcpac/${pkg}
 
-	# seperate out our makepkg flags
-	MAKEPKGOPTS="-c -s -r -f"
-				
+	if [ $MAKEDEPS -eq 1 ]; then
+		MAKEPKGOPTS="-c -s -f"
+	else
+		MAKEPKGOPTS="-c -s -r -f"
+	fi
+
 	# create the build dir and apply configuration
 	[[ -d ${builddir} ]] && rm -rf ${builddir}
 	mkdir -p ${builddir}
@@ -234,6 +238,7 @@ check_args()
 	NEWROOT=""
 	BUILD=0
 	ONLYCONF=0
+	MAKEDEPS=1
 
 	ARGLIST=$@
 	ARGSANS=""
@@ -309,6 +314,9 @@ check_args()
 				ONLYCONF=1
 				ARGSANS="$ARGSANS $1"
 				;;
+			--makedeps)
+				MAKEDEPS=0
+				ARGSANS="$ARGSANS $1"
 			--*)
 				ARGSANS="$ARGSANS $1"
 				;;
@@ -318,23 +326,24 @@ check_args()
 					OPTIONAL=$2
 				fi
 				OPTIND=1
-				while getopts ":VQRSUdfiubyr:ow" opt $1 $OPTIONAL; do
+				while getopts ":VQRSbdfimruy:ow" opt $1 $OPTIONAL; do
 					case $opt in
 						V) version ;;
 						Q) MAJOR="query" ;;
 						R) MAJOR="remove" ;;
 						S) MAJOR="sync" ;;
+						b) BUILD=1 ;;
 						d) NODEPS=1 ;;
 						f) FORCE=1 ;;
 						i) INFO=1 ;;
-						u) SYSUPGRADE=1 ;;
-						w) DOWNLOAD=1 ;;
-						y) REFRESH=1 ;;
-						b) BUILD=1 ;;
+						m) MAKEDEPS=0 ;;
 						o) ONLYCONF=1 ;;
 						r) ROOT=1
 						   NEWROOT="${OPTARG}"
 						   ;;
+						u) SYSUPGRADE=1 ;;
+						w) DOWNLOAD=1 ;;
+						y) REFRESH=1 ;;
 					esac
 				done
 				;;
