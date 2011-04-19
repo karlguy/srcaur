@@ -167,62 +167,54 @@ build_packages()
 		sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
 	fi
 
-	ret=$?
-	if [ $ret -ne 0 ]; then
-		break
-	fi
+	if [ $? -eq 0 ]; then
+		CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//)
+		cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
 
-	CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//) 
-	cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
+		if [ "${action}" = "install" ]; then
+			PACARGS="-U"
+			[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
+			[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
+			[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+			[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
+			[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
+			[ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-	if [ "${action}" = "install" ]; then
-		PACARGS="-U"
-		[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
-		[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
-		[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-		[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
-		[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
-		[ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
+			if [ "${pkg}" = "${pkgbase}" ]; then
+				declare -a builtpkgs
+				local count=1
+				echo ":: More packages have been built:"
+				for builtpkg in ${builddir}/*.pkg.tar.?z; do
+					bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
+					builtpkgs[count]="${bname#${builddir}/}"
+					echo "$count) ${builtpkgs[count]}"
+					let count=count+1
+				done
 
-		if [ "${pkg}" = "${pkgbase}" ]; then
-			declare -a builtpkgs
-			local count=1
-			echo ":: More packages have been built:"
-			for builtpkg in ${builddir}/*.pkg.tar.?z; do
-				bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
-				builtpkgs[count]="${bname#${builddir}/}"
-				echo "$count) ${builtpkgs[count]}"
-				let count=count+1
-			done
-
-			if [ ${NOCONFIRM} -eq 0 ]; then
-				local pkglist
-				echo "Enter a selection (default=all):"
-				read
-				if [ -n "${REPLY}" ]; then
-					for i in ${REPLY}; do
-						pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
-					done
-					pacman $PACARGS ${pkglist}
+				if [ ${NOCONFIRM} -eq 0 ]; then
+					local pkglist
+					echo "Enter a selection (default=all):"
+					read
+					if [ -n "${REPLY}" ]; then
+						for i in ${REPLY}; do
+							pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
+						done
+						pacman $PACARGS ${pkglist}
+					fi
+				else
+					pacman $PACARGS ${builddir}/*.pkg.tar.?z
 				fi
 			else
-				pacman $PACARGS ${builddir}/*.pkg.tar.?z
+				pacman $PACARGS ${builddir}/${pkg}*.pkg.tar.?z
 			fi
-		else
-			pacman $PACARGS ${builddir}/${pkg}*.pkg.tar.?z
+
+			touch /var/lib/srcpac/${pkg}
 		fi
+	else
+		echo "build failed, skipping ${pkg}"
 	fi
 
 	rm -rf ${builddir}
-
-	if [ $ret -ne 0 ]; then
-		echo "Error: Failed to build \"${pkg}\""
-		exit 1
-	fi
-
-	if [ "${action}" = "install" ]; then
-		touch /var/lib/srcpac/${pkg}
-	fi
 }
 
 check_args()
@@ -393,6 +385,7 @@ main()
 
 	if [ -z "${MAJOR}" ]; then
 		usage
+		exit 1
 	fi
 	
 	if [ ${UID} -ne 0 -a -z "${SUDO_USER}" -a ${MAJOR} != "query" ]; then
@@ -401,7 +394,7 @@ main()
 	fi
 
 	if [ -z "${ABSROOT}" ]; then
-		echo "Error: The ABSROOT environment variable is not defined."
+		echo "Error: The ABSROOT environment variable is not defined"
 		exit 1
 	fi
 
