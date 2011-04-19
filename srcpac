@@ -147,6 +147,8 @@ build_packages()
 		MAKEPKGOPTS="-c -s -r -f"
 	fi
 
+	[ ${NOCONFIRM} -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
+
 	# create the build dir and apply configuration
 	[[ -d ${builddir} ]] && rm -rf ${builddir}
 	mkdir -p ${builddir}
