@@ -211,7 +211,7 @@ build_packages()
 			touch /var/lib/srcpac/${pkg}
 		fi
 	else
-		echo "build failed, skipping ${pkg}"
+		broken="${broken} ${pkg}"
 	fi
 
 	rm -rf ${builddir}
@@ -537,6 +537,10 @@ main()
 			for pkg in ${candidates}; do
 				build_packages "install" ${pkg}
 			done
+		fi
+
+		if [ -n "${broken}" ]; then
+			echo "Build failed for:${broken}"
 		fi
 	fi
 }
