@@ -106,7 +106,7 @@ get_candidates()
 	done
 
 	if [ ${found} -eq 1 ]; then
-		local tmp=${pkgbuild#/var/abs/}
+		local tmp=${pkgbuild#${ABSROOT}}
 		candidates="${candidates} ${tmp/\/PKGBUILD}"
 	else
 		echo "Error: Could not find \"${1}\" under ${ABSROOT}"
