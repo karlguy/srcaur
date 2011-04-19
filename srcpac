@@ -106,8 +106,17 @@ get_candidates()
 	done
 
 	if [ ${found} -eq 1 ]; then
+		local already=0
 		local tmp=${pkgbuild#${ABSROOT}}
-		candidates="${candidates} ${tmp/\/PKGBUILD}"
+		for c in ${candidates}; do
+			if [ "${tmp/\/PKGBUILD}" = "$c" ]; then
+				already=1
+				break
+			fi
+		done
+		if [ ${already} -eq 0 ]; then
+			candidates="${candidates} ${tmp/\/PKGBUILD}"
+		fi
 	else
 		echo "Error: Could not find \"${1}\" under ${ABSROOT}"
 	fi
