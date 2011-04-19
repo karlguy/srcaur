@@ -39,9 +39,9 @@ usage()
     echo "$(basename $0) options are based on pacman, so check the pacman man page"
 	echo "$(basename $0) adds some option to -S:"
 	echo "options:"
-	echo "  -b, builds the targets from source"
-	echo "  -m, remove the makedepends after the build"
-	echo "  -o, applies config changes and displays the PKGBUILD in your pager app without building"
+	echo "  -b, --build    builds the targets from source"
+	echo "  -m, --makedeps remove the makedepends after the build"
+	echo "  -o, --onlyconf applies the changes and displays the PKGBUILD without building"
 	
 	exit 0
 }
