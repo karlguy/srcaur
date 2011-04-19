@@ -1,5 +1,11 @@
 VERSION    DESCRIPTION                                          AUTHOR
 -------------------------------------------------------------------------------
+0.10.4   - srcpac option --asdeps is used as makepkg option too Andrea Scarpino
+         - Remove force option from makepkg options             Andrea Scarpino
+         - Display the list of broken packages after the build  Andrea Scarpino
+         - Skip a package if build fails (FS#23766)             Andrea Scarpino
+         - Fix "source targets" output                          Andrea Scarpino
+         - Avoid makepkg questions when --noconfirm is set      Andrea Scarpino
 0.10.3   - New option -m to remove makedepends after the build  Andrea Scarpino
          - Avoid questions when --noconfirm is set              Andrea Scarpino
          - Install an updated package without ask to confirm    Andrea Scarpino
@@ -12,7 +18,7 @@ VERSION    DESCRIPTION                                          AUTHOR
 0.10.1   - Speed-up getting the pkgbase of a package            Andrea Scarpino
          - Fix in not displaying splitted packages built        Andrea Scarpino
          - Fix when passing the packages to install to pacman   Andrea Scarpino
-0.10     - Support for splitted packages                        Andrea Scarpino
+0.10     - Support for splitted packages (FS#23507)             Andrea Scarpino
          - Minor fix in the manpage                             Andrea Scarpino
 0.9.1    - pacman 3.5 - Use -dd to skip dependencies check      Andrea Scarpino
          - Fix in retrieving the package version                Andrea Scarpino
