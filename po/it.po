@@ -1,0 +1,147 @@
+# Copyright (C) 2011
+# This file is distributed under the same license as the srcpac package.
+#
+# Andrea Scarpino <andrea@archlinux.org>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: srcpac 0.10.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-04-20 13:25+0200\n"
+"PO-Revision-Date: 2011-04-20 13:40+0200\n"
+"Last-Translator: Andrea Scarpino <andrea@archlinux.org>\n"
+"Language-Team: Italian <andrea@archlinux.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 1.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: srcpac:36
+msgid "usage: %s <operation> [...]"
+msgstr "uso: %s <operazione> [...]"
+
+#: srcpac:37
+msgid "operations:"
+msgstr "operazioni:"
+
+#: srcpac:38
+msgid "        %s {-h --help}"
+msgstr "        %s {-h --help}"
+
+#: srcpac:39
+msgid "        %s {-V --version}"
+msgstr "        %s {-V --version}"
+
+#: srcpac:40
+msgid "        %s {-Q --query}   [options] [<package(s)>]"
+msgstr "        %s {-Q --query}   [opzioni] [<pacchetti>]"
+
+#: srcpac:41
+msgid "        %s {-R --remove}  [options] <package(s)>"
+msgstr "        %s {-R --remove}  [opzioni] <pacchetti>"
+
+#: srcpac:42
+msgid "        %s {-S --sync}    [options] [package(s)]"
+msgstr "        %s {-S --sync}    [opzioni] [pacchetti]"
+
+#: srcpac:43
+msgid "%s options are based on pacman, so check the pacman man page"
+msgstr "Le opzioni di %s sono basate su pacman, vedi il manuale di pacman"
+
+#: srcpac:44
+msgid "%s adds some option to -S:"
+msgstr "%s aggiunge qualche opzione a -S:"
+
+#: srcpac:45
+msgid "options:"
+msgstr "opzioni:"
+
+#: srcpac:46
+msgid "  -b, --build    builds the targets from source"
+msgstr "  -b, --build    compila i pacchetti da sorgenti"
+
+#: srcpac:47
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr "  -m, --makedeps rimuove le makedepends dopo la compilazione"
+
+#: srcpac:48
+msgid ""
+"  -o, --onlyconf applies the changes and displays the PKGBUILD without "
+"building"
+msgstr ""
+"  -o, --onlyconf applica i cambiamenti e visualizza il PKGBUILD senza "
+"compilare"
+
+#: srcpac:125
+msgid "Error: Could not find %s under %s"
+msgstr "Errore: Non trovo %s in %s"
+
+#: srcpac:134
+msgid "Starting ABS sync..."
+msgstr "Inizio la sincronizzazione di ABS..."
+
+#: srcpac:136 srcpac:375
+msgid "done"
+msgstr "fatto"
+
+#: srcpac:196
+msgid ":: More packages have been built:"
+msgstr ":: Più pacchetti sono stati compilati:"
+
+#: srcpac:206
+msgid "Enter a selection (default=all):"
+msgstr "Digita una selezione (default=tutti):"
+
+#: srcpac:373
+msgid "removing source reference %s..."
+msgstr "rimuovo il riferimento al pacchetto %s..."
+
+#: srcpac:402
+msgid "Error: You need to use sudo or to be root"
+msgstr "Errore: Devi usare sudo o essere root"
+
+#: srcpac:407
+msgid "Error: The ABSROOT environment variable is not defined"
+msgstr "Errore: La variabile ABSROOT non è definita"
+
+#: srcpac:434
+msgid "Source         : "
+msgstr "Sorgenti       : "
+
+#: srcpac:436
+msgid "Yes"
+msgstr "Si"
+
+#: srcpac:438
+msgid "No"
+msgstr "No"
+
+#: srcpac:443
+msgid " [source]"
+msgstr " [sorgenti]"
+
+#: srcpac:511
+msgid "warning: %s-%s is up to date -- reinstalling"
+msgstr "attenzione: %s-%s è aggiornato -- reinstallo"
+
+#: srcpac:534
+msgid "Source Targets:"
+msgstr "Pacchetti:"
+
+#: srcpac:540
+msgid "Proceed? [Y/n]"
+msgstr "Continuo [S/n]"
+
+#: srcpac:542
+msgid "y"
+msgstr "s"
+
+#: srcpac:542
+msgid "Y"
+msgstr "S"
+
+#: srcpac:553
+msgid "Build failed for:%s"
+msgstr "La compilazione è fallita per:%s"
+
