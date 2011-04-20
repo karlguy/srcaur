@@ -1,0 +1,144 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the srcpac package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: srcpac 0.10.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-04-20 13:25+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: srcpac:36
+msgid "usage: %s <operation> [...]"
+msgstr ""
+
+#: srcpac:37
+msgid "operations:"
+msgstr ""
+
+#: srcpac:38
+msgid "        %s {-h --help}"
+msgstr ""
+
+#: srcpac:39
+msgid "        %s {-V --version}"
+msgstr ""
+
+#: srcpac:40
+msgid "        %s {-Q --query}   [options] [<package(s)>]"
+msgstr ""
+
+#: srcpac:41
+msgid "        %s {-R --remove}  [options] <package(s)>"
+msgstr ""
+
+#: srcpac:42
+msgid "        %s {-S --sync}    [options] [package(s)]"
+msgstr ""
+
+#: srcpac:43
+msgid "%s options are based on pacman, so check the pacman man page"
+msgstr ""
+
+#: srcpac:44
+msgid "%s adds some option to -S:"
+msgstr ""
+
+#: srcpac:45
+msgid "options:"
+msgstr ""
+
+#: srcpac:46
+msgid "  -b, --build    builds the targets from source"
+msgstr ""
+
+#: srcpac:47
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr ""
+
+#: srcpac:48
+msgid ""
+"  -o, --onlyconf applies the changes and displays the PKGBUILD without "
+"building"
+msgstr ""
+
+#: srcpac:125
+msgid "Error: Could not find %s under %s"
+msgstr ""
+
+#: srcpac:134
+msgid "Starting ABS sync..."
+msgstr ""
+
+#: srcpac:136 srcpac:375
+msgid "done"
+msgstr ""
+
+#: srcpac:196
+msgid ":: More packages have been built:"
+msgstr ""
+
+#: srcpac:206
+msgid "Enter a selection (default=all):"
+msgstr ""
+
+#: srcpac:373
+msgid "removing source reference %s..."
+msgstr ""
+
+#: srcpac:402
+msgid "Error: You need to use sudo or to be root"
+msgstr ""
+
+#: srcpac:407
+msgid "Error: The ABSROOT environment variable is not defined"
+msgstr ""
+
+#: srcpac:434
+msgid "Source         : "
+msgstr ""
+
+#: srcpac:436
+msgid "Yes"
+msgstr ""
+
+#: srcpac:438
+msgid "No"
+msgstr ""
+
+#: srcpac:443
+msgid " [source]"
+msgstr ""
+
+#: srcpac:511
+msgid "warning: %s-%s is up to date -- reinstalling"
+msgstr ""
+
+#: srcpac:534
+msgid "Source Targets:"
+msgstr ""
+
+#: srcpac:540
+msgid "Proceed? [Y/n]"
+msgstr ""
+
+#: srcpac:542
+msgid "y"
+msgstr ""
+
+#: srcpac:542
+msgid "Y"
+msgstr ""
+
+#: srcpac:553
+msgid "Build failed for:%s"
+msgstr ""

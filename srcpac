@@ -21,6 +21,10 @@
 
 ver=0.10.4
 
+# gettext initialization
+export TEXTDOMAIN='srcpac'
+export TEXTDOMAINDIR='/usr/share/locale'
+
 declare -a args
 
 [ -f /etc/abs.conf ] && source /etc/abs.conf
@@ -29,19 +33,19 @@ declare -a args
 
 usage()
 {
-	echo "usage: $(basename $0) <operation> [...]"
-	echo "operations:"
-	echo "        $(basename $0) {-h --help}"
-	echo "        $(basename $0) {-V --version}"
-	echo "        $(basename $0) {-Q --query}   [options] [<package(s)>]"
-	echo "        $(basename $0) {-R --remove}  [options] <package(s)>"
-	echo "        $(basename $0) {-S --sync}    [options] [package(s)]"
-    echo "$(basename $0) options are based on pacman, so check the pacman man page"
-	echo "$(basename $0) adds some option to -S:"
-	echo "options:"
-	echo "  -b, --build    builds the targets from source"
-	echo "  -m, --makedeps remove the makedepends after the build"
-	echo "  -o, --onlyconf applies the changes and displays the PKGBUILD without building"
+	printf "$(gettext "usage: %s <operation> [...]")\n" "$(basename $0)"
+	printf "$(gettext "operations:")\n"
+	printf "$(gettext "        %s {-h --help}")\n" "$(basename $0)"
+	printf "$(gettext "        %s {-V --version}")\n" "$(basename $0)"
+	printf "$(gettext "        %s {-Q --query}   [options] [<package(s)>]")\n" "$(basename $0)"
+	printf "$(gettext "        %s {-R --remove}  [options] <package(s)>")\n" "$(basename $0)"
+	printf "$(gettext "        %s {-S --sync}    [options] [package(s)]")\n" "$(basename $0)"
+    printf "$(gettext "%s options are based on pacman, so check the pacman man page")\n" "$(basename $0)"
+	printf "$(gettext "%s adds some option to -S:")\n" "$(basename $0)"
+	printf "$(gettext "options:")\n"
+	printf "$(gettext "  -b, --build    builds the targets from source")\n"
+	printf "$(gettext "  -m, --makedeps remove the makedepends after the build")\n"
+	printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
 	
 	exit 0
 }
@@ -118,7 +122,7 @@ get_candidates()
 			candidates="${candidates} ${tmp/\/PKGBUILD}"
 		fi
 	else
-		echo "Error: Could not find \"${1}\" under ${ABSROOT}"
+		printf "$(gettext "Error: Could not find %s under %s")\n" "${1}" "${ABSROOT}"
 	fi
 }
 
@@ -127,9 +131,9 @@ get_candidates()
 ##
 refresh()
 {
-	echo -n "Starting ABS sync..."
+	printf "$(gettext "Starting ABS sync...")"
 	abs &> /dev/null
-	echo "done"
+	printf "$(gettext "done")\n"
 	pacman -Sy
 	if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
 		exit 0
@@ -189,7 +193,7 @@ build_packages()
 			if [ "${pkg}" = "${pkgbase}" ]; then
 				declare -a builtpkgs
 				local count=1
-				echo ":: More packages have been built:"
+				printf "$(gettext ":: More packages have been built:")\n"
 				for builtpkg in ${builddir}/*.pkg.tar.?z; do
 					bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
 					builtpkgs[count]="${bname#${builddir}/}"
@@ -199,7 +203,7 @@ build_packages()
 
 				if [ ${NOCONFIRM} -eq 0 ]; then
 					local pkglist
-					echo "Enter a selection (default=all):"
+					printf "$(gettext "Enter a selection (default=all):") "
 					read
 					if [ -n "${REPLY}" ]; then
 						for i in ${REPLY}; do
@@ -366,9 +370,9 @@ check_args()
 remove()
 {
 	if [ -f /var/lib/srcpac/$1 ]; then
-		echo -n "removing source reference $1... "
+		printf "$(gettext "removing source reference %s...")" "${1}"
 		rm /var/lib/srcpac/$1
-		echo "done"
+		printf "$(gettext "done")\n"
 	fi
 }
 
@@ -395,12 +399,12 @@ main()
 	fi
 	
 	if [ ${UID} -ne 0 -a -z "${SUDO_USER}" -a ${MAJOR} != "query" ]; then
-		echo "Error: You need to use sudo or to be root"
+		printf "$(gettext "Error: You need to use sudo or to be root")\n"
 		exit 1
 	fi
 
 	if [ -z "${ABSROOT}" ]; then
-		echo "Error: The ABSROOT environment variable is not defined"
+		printf "$(gettext "Error: The ABSROOT environment variable is not defined")\n"
 		exit 1
 	fi
 
@@ -427,16 +431,16 @@ main()
 			if [ $? -eq 0 ]; then
 				is_built $pkg
 				if [ $INFO -eq 1 ]; then
-					echo -n "Source         : "	
+					printf "$(gettext "Source         : ")"
 					if [ $built -eq 1 ]; then
-						echo "Yes"
+						printf "$(gettext "Yes")\n"
 					else
-						echo "No"
+						printf "$(gettext "No")\n"
 					fi
 					echo
 				else
 					if [ $built -eq 1 ]; then
-						echo " [source]"
+						printf "$(gettext " [source]")\n"
 					else
 						echo
 					fi
@@ -504,7 +508,7 @@ main()
 				local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}' | head -n 1)
 				[ -z ${repopkgver} ] && repopkgver=0
 				if [ $(vercmp $repopkgver $pkgver) -eq 0 ]; then
-					echo "warning: $pkg-$pkgver is up to date -- reinstalling"
+					printf "$(gettext "warning: %s-%s is up to date -- reinstalling")\n" "${pkg}" "${pkgver}"
 				fi
 				packages[${#packages[@]}]=$pkg
 			done
@@ -527,15 +531,15 @@ main()
 
 		if [ -n "${candidates}" ]; then
 			echo
-			echo -n "Source Targets: "
+			printf "$(gettext "Source Targets:") "
 			for pkg in ${candidates}; do
 				echo -n "${pkg#*/} "
 			done
 			echo
 			if [ ${NOCONFIRM} -eq 0 ]; then
-				echo -n "Proceed? [Y/n]"
+				printf "$(gettext "Proceed? [Y/n]") "
 				read
-				if [ "${REPLY}" != "y" -a "${REPLY}" != "Y" -a "${REPLY}" != "" ]; then
+				if [ "${REPLY}" != "$(gettext "y")" -a "${REPLY}" != "$(gettext "Y")" -a "${REPLY}" != "" ]; then
 					exit 0
 				fi
 			fi
@@ -546,7 +550,7 @@ main()
 		fi
 
 		if [ -n "${broken}" ]; then
-			echo "Build failed for:${broken}"
+			printf "$(gettext "Build failed for:%s")\n" "${broken}"
 		fi
 	fi
 }
