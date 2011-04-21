@@ -40,13 +40,14 @@ usage()
 	printf "$(gettext "        %s {-Q --query}   [options] [<package(s)>]")\n" "$(basename $0)"
 	printf "$(gettext "        %s {-R --remove}  [options] <package(s)>")\n" "$(basename $0)"
 	printf "$(gettext "        %s {-S --sync}    [options] [package(s)]")\n" "$(basename $0)"
-    printf "$(gettext "%s options are based on pacman, so check the pacman man page")\n" "$(basename $0)"
+	printf "$(gettext "%s options are based on pacman, so check the pacman man page")\n" "$(basename $0)"
 	printf "$(gettext "%s adds some option to -S:")\n" "$(basename $0)"
-	printf "$(gettext "options:")\n"
 	printf "$(gettext "  -b, --build    builds the targets from source")\n"
 	printf "$(gettext "  -m, --makedeps remove the makedepends after the build")\n"
 	printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
-	
+	printf "$(gettext "%s adds some option to -Q:")\n" "$(basename $0)"
+	printf "$(gettext "  -b, --build    show all packages built from source")\n"
+
 	exit 0
 }
 
@@ -423,32 +424,38 @@ main()
 	fi
 
 	if [ "${MAJOR}" = "query" ]; then
-		for pkg in ${args[@]}; do
-			if [ $INFO -eq 1 ]; then
-				pacman -Qi $pkg | head -n -1
-			else
-				echo -n $(pacman -Q $pkg)
-			fi
-
-			if [ $? -eq 0 ]; then
-				is_built $pkg
+		if [ $BUILD -eq 1 ]; then
+			for pkg in /var/lib/srcpac/*; do
+				pacman -Q $pkg
+			done
+		else
+			for pkg in ${args[@]}; do
 				if [ $INFO -eq 1 ]; then
-					printf "$(gettext "Source         : ")"
-					if [ $built -eq 1 ]; then
-						printf "$(gettext "Yes")\n"
-					else
-						printf "$(gettext "No")\n"
-					fi
-					echo
+					pacman -Qi $pkg | head -n -1
 				else
-					if [ $built -eq 1 ]; then
-						printf "$(gettext " [source]")\n"
-					else
+					echo -n $(pacman -Q $pkg)
+				fi
+
+				if [ $? -eq 0 ]; then
+					is_built $pkg
+					if [ $INFO -eq 1 ]; then
+						printf "$(gettext "Source         : ")"
+						if [ $built -eq 1 ]; then
+							printf "$(gettext "Yes")\n"
+						else
+							printf "$(gettext "No")\n"
+						fi
 						echo
+					else
+						if [ $built -eq 1 ]; then
+							printf "$(gettext " [source]")\n"
+						else
+							echo
+						fi
 					fi
 				fi
-			fi
-		done
+			done
+		fi
 	fi
 
 	if [ "${MAJOR}" = "sync" ]; then
