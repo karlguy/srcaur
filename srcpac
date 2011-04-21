@@ -210,6 +210,8 @@ build_packages()
 							pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
 						done
 						pacman $PACARGS ${pkglist}
+					else
+						pacman $PACARGS ${builddir}/*.pkg.tar.?z
 					fi
 				else
 					pacman $PACARGS ${builddir}/*.pkg.tar.?z
