@@ -452,6 +452,12 @@ main()
 						else
 							printf "$(gettext "No")\n"
 						fi
+						printf "$(gettext "Patchfile      : ")"
+						if [ -f /etc/srcpac.d/$pkg ]; then
+							printf "$(gettext "Yes")\n"
+						else
+							printf "$(gettext "No")\n"
+						fi
 						echo
 					else
 						if [ $built -eq 1 ]; then
