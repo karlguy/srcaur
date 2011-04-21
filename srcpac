@@ -47,6 +47,9 @@ usage()
 	printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
 	printf "$(gettext "%s adds some option to -Q:")\n" "$(basename $0)"
 	printf "$(gettext "  -b, --build    show all packages built from source")\n"
+	printf "$(gettext "%s adds some option to -R:")\n" "$(basename $0)"
+	printf "$(gettext "  -b, --build    remove build-flag only, not the package")\n"
+	printf "$(gettext "  -o, --onlyconf remove the patchfile only")\n"
 
 	exit 0
 }
@@ -379,10 +382,14 @@ check_args()
 ##
 remove()
 {
-	if [ -f /var/lib/srcpac/$1 ]; then
-		printf "$(gettext "removing source reference %s...")" "${1}"
-		rm /var/lib/srcpac/$1
-		printf "$(gettext "done")\n"
+	if [ $ONLYCONF -eq 1 ]; then
+		[ -f /etc/srcpac.d/$1 ] && rm /etc/srcpac.d/$1
+	else
+		if [ -f /var/lib/srcpac/$1 ]; then
+			printf "$(gettext "removing source reference %s...")" "${1}"
+			rm /var/lib/srcpac/$1
+			printf "$(gettext "done")\n"
+		fi
 	fi
 }
 
@@ -407,7 +414,7 @@ main()
 		usage
 		exit 1
 	fi
-	
+
 	if [ ${UID} -ne 0 -a -z "${SUDO_USER}" -a ${MAJOR} != "query" ]; then
 		printf "$(gettext "Error: You need to use sudo or to be root")\n"
 		exit 1
@@ -423,8 +430,10 @@ main()
 	fi
 
 	if [ "${MAJOR}" = "remove" ]; then
-		pacman $ARGLIST
-		
+		if [ $BUILD -eq 0 -a $ONLYCONF -eq 0 ]; then
+			pacman $ARGLIST
+		fi
+
 		for pkg in ${args[@]}; do
 			remove $pkg
 		done
