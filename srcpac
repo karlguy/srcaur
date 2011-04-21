@@ -209,19 +209,26 @@ build_packages()
 					if [ -n "${REPLY}" ]; then
 						for i in ${REPLY}; do
 							pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
+							touch /var/lib/srcpac/${builtpkgs[$i]}
 						done
 						pacman $PACARGS ${pkglist}
 					else
 						pacman $PACARGS ${builddir}/*.pkg.tar.?z
+						for pkg in ${builtpkgs[@]}; do
+							touch /var/lib/srcpac/${pkg}
+						done
 					fi
 				else
 					pacman $PACARGS ${builddir}/*.pkg.tar.?z
+					for pkg in ${builtpkgs[@]}; do
+						touch /var/lib/srcpac/${pkg}
+					done
 				fi
 			else
 				pacman $PACARGS ${builddir}/${pkg}*.pkg.tar.?z
+				touch /var/lib/srcpac/${pkg}
 			fi
 
-			touch /var/lib/srcpac/${pkg}
 		fi
 	else
 		broken="${broken} ${pkg}"
