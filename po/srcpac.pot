@@ -1,5 +1,5 @@
 # SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# Copyright (C) 2011
 # This file is distributed under the same license as the srcpac package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: srcpac 0.10.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-20 13:25+0200\n"
+"POT-Creation-Date: 2011-04-21 13:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,91 +54,111 @@ msgid "%s adds some option to -S:"
 msgstr ""
 
 #: srcpac:45
-msgid "options:"
-msgstr ""
-
-#: srcpac:46
 msgid "  -b, --build    builds the targets from source"
 msgstr ""
 
-#: srcpac:47
+#: srcpac:46
 msgid "  -m, --makedeps remove the makedepends after the build"
 msgstr ""
 
-#: srcpac:48
+#: srcpac:47
 msgid ""
 "  -o, --onlyconf applies the changes and displays the PKGBUILD without "
 "building"
 msgstr ""
 
-#: srcpac:125
+#: srcpac:48
+msgid "%s adds some option to -Q:"
+msgstr ""
+
+#: srcpac:49
+msgid "  -b, --build    show all packages built from source"
+msgstr ""
+
+#: srcpac:50
+msgid "%s adds some option to -R:"
+msgstr ""
+
+#: srcpac:51
+msgid "  -b, --build    remove build-flag only, not the package"
+msgstr ""
+
+#: srcpac:52
+msgid "  -o, --onlyconf remove the patchfile only"
+msgstr ""
+
+#: srcpac:129
 msgid "Error: Could not find %s under %s"
 msgstr ""
 
-#: srcpac:134
+#: srcpac:138
 msgid "Starting ABS sync..."
 msgstr ""
 
-#: srcpac:136 srcpac:375
+#: srcpac:140 srcpac:391
 msgid "done"
 msgstr ""
 
-#: srcpac:196
+#: srcpac:200
 msgid ":: More packages have been built:"
 msgstr ""
 
-#: srcpac:206
+#: srcpac:210
 msgid "Enter a selection (default=all):"
 msgstr ""
 
-#: srcpac:373
+#: srcpac:389
 msgid "removing source reference %s..."
 msgstr ""
 
-#: srcpac:402
+#: srcpac:419
 msgid "Error: You need to use sudo or to be root"
 msgstr ""
 
-#: srcpac:407
+#: srcpac:424
 msgid "Error: The ABSROOT environment variable is not defined"
 msgstr ""
 
-#: srcpac:434
+#: srcpac:458
 msgid "Source         : "
 msgstr ""
 
-#: srcpac:436
+#: srcpac:460 srcpac:466
 msgid "Yes"
 msgstr ""
 
-#: srcpac:438
+#: srcpac:462 srcpac:468
 msgid "No"
 msgstr ""
 
-#: srcpac:443
+#: srcpac:464
+msgid "Patchfile      : "
+msgstr ""
+
+#: srcpac:473
 msgid " [source]"
 msgstr ""
 
-#: srcpac:511
+#: srcpac:542
 msgid "warning: %s-%s is up to date -- reinstalling"
 msgstr ""
 
-#: srcpac:534
+#: srcpac:565
 msgid "Source Targets:"
 msgstr ""
 
-#: srcpac:540
+#: srcpac:571
 msgid "Proceed? [Y/n]"
 msgstr ""
 
-#: srcpac:542
+#: srcpac:573
 msgid "y"
 msgstr ""
 
-#: srcpac:542
+#: srcpac:573
 msgid "Y"
 msgstr ""
 
-#: srcpac:553
+#: srcpac:584
 msgid "Build failed for:%s"
 msgstr ""
