@@ -160,7 +160,7 @@ build_packages()
 	pkgdir="${ABSROOT}/${1}"
 	builddir=/var/srcpac/${pkg}
 
-	MAKEPKGOPTS="-c -s"
+	MAKEPKGOPTS="-c -s -f"
 	[ $NODEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -d"
 	[ $MAKEDEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -r"
 	[ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
