@@ -182,7 +182,7 @@ build_packages()
 	fi
 
 	if [ $? -eq 0 ]; then
-		CACHEDIR=$(grep '^#CacheDir' /etc/pacman.conf | cut -d= -f2 | sed s/#//)
+		CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
 		cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
 
 		if [ "${action}" = "install" ]; then
