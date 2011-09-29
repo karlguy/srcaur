@@ -92,7 +92,7 @@ get_candidates()
 {
   local found=0
 
-  for pkgbuild in ${ABSROOT}*/*/PKGBUILD; do
+  for pkgbuild in `find ${ABSROOT} -name PKGBUILD`; do
     unset pkgbase
     unset pkgname
     source $pkgbuild &> /dev/null
