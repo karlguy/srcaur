@@ -58,8 +58,8 @@ version()
 {
   echo
   echo "                       $(basename $0) v${ver}"
-  echo "                       Copyright (C) 2009-2011 Andrea Scarpino"
   echo "                       Copyright (C) 2004-2009 Jason Chu"
+  echo "                       Copyright (C) 2009-2011 Andrea Scarpino"
   echo
   echo "                       This program may be freely redistributed under"
   echo "                       the terms of the GNU General Public License."
@@ -182,7 +182,7 @@ build_packages()
   fi
 
   if [ $? -eq 0 ]; then
-    CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
+    CACHEDIR=$(grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
     cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
 
     if [ "${action}" = "install" ]; then
