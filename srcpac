@@ -33,39 +33,39 @@ declare -a args
 
 usage()
 {
-	printf "$(gettext "usage: %s <operation> [...]")\n" "$(basename $0)"
-	printf "$(gettext "operations:")\n"
-	printf "$(gettext "        %s {-h --help}")\n" "$(basename $0)"
-	printf "$(gettext "        %s {-V --version}")\n" "$(basename $0)"
-	printf "$(gettext "        %s {-Q --query}   [options] [<package(s)>]")\n" "$(basename $0)"
-	printf "$(gettext "        %s {-R --remove}  [options] <package(s)>")\n" "$(basename $0)"
-	printf "$(gettext "        %s {-S --sync}    [options] [package(s)]")\n" "$(basename $0)"
-	printf "$(gettext "%s options are based on pacman, so check the pacman man page")\n" "$(basename $0)"
-	printf "$(gettext "%s adds some option to -S:")\n" "$(basename $0)"
-	printf "$(gettext "  -b, --build    builds the targets from source")\n"
-	printf "$(gettext "  -m, --makedeps remove the makedepends after the build")\n"
-	printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
-	printf "$(gettext "%s adds some option to -Q:")\n" "$(basename $0)"
-	printf "$(gettext "  -b, --build    show all packages built from source")\n"
-	printf "$(gettext "%s adds some option to -R:")\n" "$(basename $0)"
-	printf "$(gettext "  -b, --build    remove build-flag only, not the package")\n"
-	printf "$(gettext "  -o, --onlyconf remove the patchfile only")\n"
+  printf "$(gettext "usage: %s <operation> [...]")\n" "$(basename $0)"
+  printf "$(gettext "operations:")\n"
+  printf "$(gettext "        %s {-h --help}")\n" "$(basename $0)"
+  printf "$(gettext "        %s {-V --version}")\n" "$(basename $0)"
+  printf "$(gettext "        %s {-Q --query}   [options] [<package(s)>]")\n" "$(basename $0)"
+  printf "$(gettext "        %s {-R --remove}  [options] <package(s)>")\n" "$(basename $0)"
+  printf "$(gettext "        %s {-S --sync}    [options] [package(s)]")\n" "$(basename $0)"
+  printf "$(gettext "%s options are based on pacman, so check the pacman man page")\n" "$(basename $0)"
+  printf "$(gettext "%s adds some option to -S:")\n" "$(basename $0)"
+  printf "$(gettext "  -b, --build    builds the targets from source")\n"
+  printf "$(gettext "  -m, --makedeps remove the makedepends after the build")\n"
+  printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
+  printf "$(gettext "%s adds some option to -Q:")\n" "$(basename $0)"
+  printf "$(gettext "  -b, --build    show all packages built from source")\n"
+  printf "$(gettext "%s adds some option to -R:")\n" "$(basename $0)"
+  printf "$(gettext "  -b, --build    remove build-flag only, not the package")\n"
+  printf "$(gettext "  -o, --onlyconf remove the patchfile only")\n"
 
-	exit 0
+  exit 0
 }
 
 version()
 {
-	echo
-	echo "                       $(basename $0) v${ver}"
-	echo "                       Copyright (C) 2009-2011 Andrea Scarpino"
-	echo "                       Copyright (C) 2004-2009 Jason Chu"
-	echo
-	echo "                       This program may be freely redistributed under"
-	echo "                       the terms of the GNU General Public License."
-	echo
+  echo
+  echo "                       $(basename $0) v${ver}"
+  echo "                       Copyright (C) 2009-2011 Andrea Scarpino"
+  echo "                       Copyright (C) 2004-2009 Jason Chu"
+  echo
+  echo "                       This program may be freely redistributed under"
+  echo "                       the terms of the GNU General Public License."
+  echo
 
-	exit 0
+  exit 0
 }
 
 ##
@@ -74,15 +74,15 @@ version()
 ##
 apply_config()
 {
-	conf=/etc/srcpac.d/${1}
-	if [ -f ${conf} ]; then
-		if [ "${3}" = "noreplace" ]; then
-			[ -z ${PAGER} ] && PAGER=less
-			sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
-		else
-			sed -i -f ${conf} ${2}/PKGBUILD
-		fi
-	fi
+  conf=/etc/srcpac.d/${1}
+  if [ -f ${conf} ]; then
+    if [ "${3}" = "noreplace" ]; then
+      [ -z ${PAGER} ] && PAGER=less
+      sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
+    else
+      sed -i -f ${conf} ${2}/PKGBUILD
+    fi
+  fi
 }
 
 ##
@@ -90,44 +90,44 @@ apply_config()
 ##
 get_candidates()
 {
-	local found=0
+  local found=0
 
-	for pkgbuild in ${ABSROOT}*/*/PKGBUILD; do
-		unset pkgbase
-		unset pkgname
-		source $pkgbuild &> /dev/null
-		if [ "${1}" = "${pkgbase}" ]; then
-			found=1
-			break
-		else
-			for _package in "${pkgname[@]}"; do
-				if [ "${1}" = "${_package}" ]; then					
-					found=1
-					break
-				fi
-			done
-		fi
+  for pkgbuild in ${ABSROOT}*/*/PKGBUILD; do
+    unset pkgbase
+    unset pkgname
+    source $pkgbuild &> /dev/null
+    if [ "${1}" = "${pkgbase}" ]; then
+      found=1
+      break
+    else
+      for _package in "${pkgname[@]}"; do
+        if [ "${1}" = "${_package}" ]; then
+          found=1
+          break
+        fi
+      done
+    fi
 
-		if [ ${found} -eq 1 ]; then
-			break
-		fi
-	done
+    if [ ${found} -eq 1 ]; then
+      break
+    fi
+  done
 
-	if [ ${found} -eq 1 ]; then
-		local already=0
-		local tmp=${pkgbuild#${ABSROOT}}
-		for c in ${candidates}; do
-			if [ "${tmp/\/PKGBUILD}" = "$c" ]; then
-				already=1
-				break
-			fi
-		done
-		if [ ${already} -eq 0 ]; then
-			candidates="${candidates} ${tmp/\/PKGBUILD}"
-		fi
-	else
-		printf "$(gettext "Error: Could not find %s under %s")\n" "${1}" "${ABSROOT}"
-	fi
+  if [ ${found} -eq 1 ]; then
+    local already=0
+    local tmp=${pkgbuild#${ABSROOT}}
+    for c in ${candidates}; do
+      if [ "${tmp/\/PKGBUILD}" = "$c" ]; then
+        already=1
+        break
+      fi
+    done
+    if [ ${already} -eq 0 ]; then
+      candidates="${candidates} ${tmp/\/PKGBUILD}"
+    fi
+  else
+    printf "$(gettext "Error: Could not find %s under %s")\n" "${1}" "${ABSROOT}"
+  fi
 }
 
 ##
@@ -135,13 +135,13 @@ get_candidates()
 ##
 refresh()
 {
-	printf "$(gettext "Starting ABS sync...")"
-	abs &> /dev/null
-	printf "$(gettext "done")\n"
-	pacman -Sy
-	if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
-		exit 0
-	fi
+  printf "$(gettext "Starting ABS sync...")"
+  abs &> /dev/null
+  printf "$(gettext "done")\n"
+  pacman -Sy
+  if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
+    exit 0
+  fi
 }
 
 ##
@@ -149,232 +149,232 @@ refresh()
 ##
 build_packages()
 {
-	action="build"
-	if [ "$1" = "install" ]; then
-		action="install"
-	fi
+  action="build"
+  if [ "$1" = "install" ]; then
+    action="install"
+  fi
 
-	shift
+  shift
 
-	pkg=${1#*/}
-	pkgdir="${ABSROOT}/${1}"
-	builddir=/var/srcpac/${pkg}
+  pkg=${1#*/}
+  pkgdir="${ABSROOT}/${1}"
+  builddir=/var/srcpac/${pkg}
 
-	MAKEPKGOPTS="-c -s -f"
-	[ $NODEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -d"
-	[ $MAKEDEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -r"
-	[ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
+  MAKEPKGOPTS="-c -s -f"
+  [ $NODEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -d"
+  [ $MAKEDEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -r"
+  [ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
 
-	# create the build dir and apply configuration
-	[[ -d ${builddir} ]] && rm -rf ${builddir}
-	mkdir -p ${builddir}
-	cp ${pkgdir}/* ${builddir}
-	apply_config ${pkg} ${builddir}
+  # create the build dir and apply configuration
+  [[ -d ${builddir} ]] && rm -rf ${builddir}
+  mkdir -p ${builddir}
+  cp ${pkgdir}/* ${builddir}
+  apply_config ${pkg} ${builddir}
 
-	cd ${builddir}
+  cd ${builddir}
 
-	if [ -z "${SUDO_USER}" ]; then
-		chown -R nobody ${builddir}
-		makepkg ${MAKEPKGOPTS} --asroot
-	else
-		chown -R ${SUDO_USER} ${builddir}
-		sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
-	fi
+  if [ -z "${SUDO_USER}" ]; then
+    chown -R nobody ${builddir}
+    makepkg ${MAKEPKGOPTS} --asroot
+  else
+    chown -R ${SUDO_USER} ${builddir}
+    sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
+  fi
 
-	if [ $? -eq 0 ]; then
-		CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
-		cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
+  if [ $? -eq 0 ]; then
+    CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
+    cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
 
-		if [ "${action}" = "install" ]; then
-			PACARGS="-U"
-			[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
-			[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
-			[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-			[ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
-			[ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
-			[ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
+    if [ "${action}" = "install" ]; then
+      PACARGS="-U"
+      [ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
+      [ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
+      [ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+      [ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
+      [ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
+      [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-			if [ "${pkg}" = "${pkgbase}" ]; then
-				declare -a builtpkgs
-				local count=1
-				printf "$(gettext ":: More packages have been built:")\n"
-				for builtpkg in ${builddir}/*.pkg.tar.?z; do
-					bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
-					builtpkgs[count]="${bname#${builddir}/}"
-					echo "$count) ${builtpkgs[count]}"
-					let count=count+1
-				done
+      if [ "${pkg}" = "${pkgbase}" ]; then
+        declare -a builtpkgs
+        local count=1
+        printf "$(gettext ":: More packages have been built:")\n"
+        for builtpkg in ${builddir}/*.pkg.tar.?z; do
+          bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
+          builtpkgs[count]="${bname#${builddir}/}"
+          echo "$count) ${builtpkgs[count]}"
+          let count=count+1
+        done
 
-				if [ ${NOCONFIRM} -eq 0 ]; then
-					local pkglist
-					printf "$(gettext "Enter a selection (default=all):") "
-					read
-					if [ -n "${REPLY}" ]; then
-						for i in ${REPLY}; do
-							pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
-							touch /var/lib/srcpac/${builtpkgs[$i]}
-						done
-						pacman $PACARGS ${pkglist}
-					else
-						pacman $PACARGS ${builddir}/*.pkg.tar.?z
-						for pkg in ${builtpkgs[@]}; do
-							touch /var/lib/srcpac/${pkg}
-						done
-					fi
-				else
-					pacman $PACARGS ${builddir}/*.pkg.tar.?z
-					for pkg in ${builtpkgs[@]}; do
-						touch /var/lib/srcpac/${pkg}
-					done
-				fi
-			else
-				pacman $PACARGS ${builddir}/${pkg}*.pkg.tar.?z
-				touch /var/lib/srcpac/${pkg}
-			fi
+        if [ ${NOCONFIRM} -eq 0 ]; then
+          local pkglist
+          printf "$(gettext "Enter a selection (default=all):") "
+          read
+          if [ -n "${REPLY}" ]; then
+            for i in ${REPLY}; do
+              pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
+              touch /var/lib/srcpac/${builtpkgs[$i]}
+            done
+            pacman $PACARGS ${pkglist}
+          else
+            pacman $PACARGS ${builddir}/*.pkg.tar.?z
+            for pkg in ${builtpkgs[@]}; do
+              touch /var/lib/srcpac/${pkg}
+            done
+          fi
+        else
+          pacman $PACARGS ${builddir}/*.pkg.tar.?z
+          for pkg in ${builtpkgs[@]}; do
+            touch /var/lib/srcpac/${pkg}
+          done
+        fi
+      else
+        pacman $PACARGS ${builddir}/${pkg}*.pkg.tar.?z
+        touch /var/lib/srcpac/${pkg}
+      fi
 
-		fi
-	else
-		broken="${broken} ${pkg}"
-	fi
+    fi
+  else
+    broken="${broken} ${pkg}"
+  fi
 
-	rm -rf ${builddir}
+  rm -rf ${builddir}
 }
 
 check_args()
 {
-	# Options
-	MAJOR=""
-	ASDEPS=0
-	ASEXPLICIT=0
-	NODEPS=0
-	FORCE=0
-	INFO=0
-	SYSUPGRADE=0
-	DOWNLOAD=0
-	REFRESH=0
-	IGNORE=0
-	IGNOREPKG=""
-	NOCONFIRM=0
-	ROOT=0
-	NEWROOT=""
-	BUILD=0
-	ONLYCONF=0
-	MAKEDEPS=1
+  # Options
+  MAJOR=""
+  ASDEPS=0
+  ASEXPLICIT=0
+  NODEPS=0
+  FORCE=0
+  INFO=0
+  SYSUPGRADE=0
+  DOWNLOAD=0
+  REFRESH=0
+  IGNORE=0
+  IGNOREPKG=""
+  NOCONFIRM=0
+  ROOT=0
+  NEWROOT=""
+  BUILD=0
+  ONLYCONF=0
+  MAKEDEPS=1
 
-	ARGLIST=$@
-	ARGSANS=""
+  ARGLIST=$@
+  ARGSANS=""
 
-	while [ "$#" -ne "0" ]; do
-		case $1 in
-			--help) usage ;;
-			--version) version ;;
-			--query)
-				MAJOR="query"
-				ARGSANS="$ARGSANS $1"
-				;;
-			--remove)
-				MAJOR="remove"
-				ARGSANS="$ARGSANS $1"
-				;;
-			--sync)
-				MAJOR="sync"
-				ARGSANS="$ARGSANS $1"
-				;;
-			--asdeps)
-				ASDEPS=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--asexplicit)
-				ASEXPLICIT=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--nodeps)
-				NODEPS=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--force)
-				FORCE=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--info)
-				INFO=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--sysupgrade)
-				SYSUPGRADE=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--downloadonly)
-				DOWNLOAD=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--refresh)
-				REFRESH=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--ignore)
-				IGNORE=1
-				IGNOREPKG="$IGNOREPKG $2"
-				ARGSANS="$ARGSANS $1 $2"
-				;;
-			--noconfirm)
-				NOCONFIRM=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--root)
-				ROOT=1
-				NEWROOT="$2"
-				ARGSANS="$ARGSANS $1 $2"
-				shift
-				;;
-			--build)
-				BUILD=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--onlyconf)
-				ONLYCONF=1
-				ARGSANS="$ARGSANS $1"
-				;;
-			--makedeps)
-				MAKEDEPS=0
-				ARGSANS="$ARGSANS $1"
-				;;
-			--*)
-				ARGSANS="$ARGSANS $1"
-				;;
-			-*)
-				ARGSANS="$ARGSANS $1"
-				if [ $(echo $1 | grep r) ]; then
-					OPTIONAL=$2
-				fi
-				OPTIND=1
-				while getopts ":VQRSbdfimuyr:ow" opt $1 $OPTIONAL; do
-					case $opt in
-						V) version ;;
-						Q) MAJOR="query" ;;
-						R) MAJOR="remove" ;;
-						S) MAJOR="sync" ;;
-						b) BUILD=1 ;;
-						d) NODEPS=1 ;;
-						f) FORCE=1 ;;
-						i) INFO=1 ;;
-						m) MAKEDEPS=0 ;;
-						o) ONLYCONF=1 ;;
-						r) ROOT=1
-						   NEWROOT="${OPTARG}"
-						   ;;
-						u) SYSUPGRADE=1 ;;
-						w) DOWNLOAD=1 ;;
-						y) REFRESH=1 ;;
-					esac
-				done
-				;;
-			*)
-				args[${#args[@]}]=$1
-				;;
-		esac
-		shift
-	done
+  while [ "$#" -ne "0" ]; do
+    case $1 in
+      --help) usage ;;
+      --version) version ;;
+      --query)
+        MAJOR="query"
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --remove)
+        MAJOR="remove"
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --sync)
+        MAJOR="sync"
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --asdeps)
+        ASDEPS=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --asexplicit)
+        ASEXPLICIT=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --nodeps)
+        NODEPS=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --force)
+        FORCE=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --info)
+        INFO=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --sysupgrade)
+        SYSUPGRADE=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --downloadonly)
+        DOWNLOAD=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --refresh)
+        REFRESH=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --ignore)
+        IGNORE=1
+        IGNOREPKG="$IGNOREPKG $2"
+        ARGSANS="$ARGSANS $1 $2"
+        ;;
+      --noconfirm)
+        NOCONFIRM=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --root)
+        ROOT=1
+        NEWROOT="$2"
+        ARGSANS="$ARGSANS $1 $2"
+        shift
+        ;;
+      --build)
+        BUILD=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --onlyconf)
+        ONLYCONF=1
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --makedeps)
+        MAKEDEPS=0
+        ARGSANS="$ARGSANS $1"
+        ;;
+      --*)
+        ARGSANS="$ARGSANS $1"
+        ;;
+      -*)
+        ARGSANS="$ARGSANS $1"
+        if [ $(echo $1 | grep r) ]; then
+          OPTIONAL=$2
+        fi
+        OPTIND=1
+        while getopts ":VQRSbdfimuyr:ow" opt $1 $OPTIONAL; do
+          case $opt in
+            V) version ;;
+            Q) MAJOR="query" ;;
+            R) MAJOR="remove" ;;
+            S) MAJOR="sync" ;;
+            b) BUILD=1 ;;
+            d) NODEPS=1 ;;
+            f) FORCE=1 ;;
+            i) INFO=1 ;;
+            m) MAKEDEPS=0 ;;
+            o) ONLYCONF=1 ;;
+            r) ROOT=1
+               NEWROOT="${OPTARG}"
+               ;;
+            u) SYSUPGRADE=1 ;;
+            w) DOWNLOAD=1 ;;
+            y) REFRESH=1 ;;
+          esac
+        done
+        ;;
+      *)
+        args[${#args[@]}]=$1
+        ;;
+    esac
+    shift
+  done
 }
 
 ##
@@ -382,15 +382,15 @@ check_args()
 ##
 remove()
 {
-	if [ $ONLYCONF -eq 1 ]; then
-		[ -f /etc/srcpac.d/$1 ] && rm /etc/srcpac.d/$1
-	else
-		if [ -f /var/lib/srcpac/$1 ]; then
-			printf "$(gettext "removing source reference %s...")" "${1}"
-			rm /var/lib/srcpac/$1
-			printf "$(gettext "done")\n"
-		fi
-	fi
+  if [ $ONLYCONF -eq 1 ]; then
+    [ -f /etc/srcpac.d/$1 ] && rm /etc/srcpac.d/$1
+  else
+    if [ -f /var/lib/srcpac/$1 ]; then
+      printf "$(gettext "removing source reference %s...")" "${1}"
+      rm /var/lib/srcpac/$1
+      printf "$(gettext "done")\n"
+    fi
+  fi
 }
 
 ##
@@ -398,192 +398,192 @@ remove()
 ##
 is_built()
 {
-	built=0
-	if [ -f /var/lib/srcpac/$1 ]; then
-		built=1
-	else
-		built=0
-	fi
+  built=0
+  if [ -f /var/lib/srcpac/$1 ]; then
+    built=1
+  else
+    built=0
+  fi
 }
 
 main()
 {
-	check_args $@
+  check_args $@
 
-	if [ -z "${MAJOR}" ]; then
-		usage
-		exit 1
-	fi
+  if [ -z "${MAJOR}" ]; then
+    usage
+    exit 1
+  fi
 
-	if [ ${UID} -ne 0 -a -z "${SUDO_USER}" -a ${MAJOR} != "query" ]; then
-		printf "$(gettext "Error: You need to use sudo or to be root")\n"
-		exit 1
-	fi
+  if [ ${UID} -ne 0 -a -z "${SUDO_USER}" -a ${MAJOR} != "query" ]; then
+    printf "$(gettext "Error: You need to use sudo or to be root")\n"
+    exit 1
+  fi
 
-	if [ -z "${ABSROOT}" ]; then
-		printf "$(gettext "Error: The ABSROOT environment variable is not defined")\n"
-		exit 1
-	fi
+  if [ -z "${ABSROOT}" ]; then
+    printf "$(gettext "Error: The ABSROOT environment variable is not defined")\n"
+    exit 1
+  fi
 
-	if [ ! -d /var/lib/srcpac ]; then
-		mkdir /var/lib/srcpac
-	fi
+  if [ ! -d /var/lib/srcpac ]; then
+    mkdir /var/lib/srcpac
+  fi
 
-	if [ "${MAJOR}" = "remove" ]; then
-		if [ $BUILD -eq 0 -a $ONLYCONF -eq 0 ]; then
-			pacman $ARGLIST
-		fi
+  if [ "${MAJOR}" = "remove" ]; then
+    if [ $BUILD -eq 0 -a $ONLYCONF -eq 0 ]; then
+      pacman $ARGLIST
+    fi
 
-		for pkg in ${args[@]}; do
-			remove $pkg
-		done
-	fi
+    for pkg in ${args[@]}; do
+      remove $pkg
+    done
+  fi
 
-	if [ "${MAJOR}" = "query" ]; then
-		if [ $BUILD -eq 1 ]; then
-			for pkg in /var/lib/srcpac/*; do
-				pacman -Q $(basename $pkg)
-			done
-		else
-			for pkg in ${args[@]}; do
-				if [ $INFO -eq 1 ]; then
-					pacman -Qi $pkg | head -n -1
-				else
-					echo -n $(pacman -Q $pkg)
-				fi
+  if [ "${MAJOR}" = "query" ]; then
+    if [ $BUILD -eq 1 ]; then
+      for pkg in /var/lib/srcpac/*; do
+        pacman -Q $(basename $pkg)
+      done
+    else
+      for pkg in ${args[@]}; do
+        if [ $INFO -eq 1 ]; then
+          pacman -Qi $pkg | head -n -1
+        else
+          echo -n $(pacman -Q $pkg)
+        fi
 
-				if [ $? -eq 0 ]; then
-					is_built $pkg
-					if [ $INFO -eq 1 ]; then
-						printf "$(gettext "Source         : ")"
-						if [ $built -eq 1 ]; then
-							printf "$(gettext "Yes")\n"
-						else
-							printf "$(gettext "No")\n"
-						fi
-						printf "$(gettext "Patchfile      : ")"
-						if [ -f /etc/srcpac.d/$pkg ]; then
-							printf "$(gettext "Yes")\n"
-						else
-							printf "$(gettext "No")\n"
-						fi
-						echo
-					else
-						if [ $built -eq 1 ]; then
-							printf "$(gettext " [source]")\n"
-						else
-							echo
-						fi
-					fi
-				fi
-			done
-		fi
-	fi
+        if [ $? -eq 0 ]; then
+          is_built $pkg
+          if [ $INFO -eq 1 ]; then
+            printf "$(gettext "Source         : ")"
+            if [ $built -eq 1 ]; then
+              printf "$(gettext "Yes")\n"
+            else
+              printf "$(gettext "No")\n"
+            fi
+            printf "$(gettext "Patchfile      : ")"
+            if [ -f /etc/srcpac.d/$pkg ]; then
+              printf "$(gettext "Yes")\n"
+            else
+              printf "$(gettext "No")\n"
+            fi
+            echo
+          else
+            if [ $built -eq 1 ]; then
+              printf "$(gettext " [source]")\n"
+            else
+              echo
+            fi
+          fi
+        fi
+      done
+    fi
+  fi
 
-	if [ "${MAJOR}" = "sync" ]; then
-		if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
-			if [ $SYSUPGRADE -eq 1 ]; then
-				[ $REFRESH -eq 1 ] && refresh
+  if [ "${MAJOR}" = "sync" ]; then
+    if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
+      if [ $SYSUPGRADE -eq 1 ]; then
+        [ $REFRESH -eq 1 ] && refresh
 
-				if [ $IGNORE -eq 1 ]; then
-					local ignorestr=$(echo $IGNOREPKG | tr "," "|")
-					local output=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
-				else
-					local output=$(pacman -Qqu --noconfirm)
-				fi
+        if [ $IGNORE -eq 1 ]; then
+          local ignorestr=$(echo $IGNOREPKG | tr "," "|")
+          local output=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
+        else
+          local output=$(pacman -Qqu --noconfirm)
+        fi
 
-				declare -a packages
-				declare -a regpac
-				for pkg in $output; do
-					is_built $pkg
-					if [ $built -eq 1 ]; then
-						packages[${#packages[@]}]=$pkg
-					else
-						regpac[${#regpac[@]}]=$pkg
-					fi
-				done
+        declare -a packages
+        declare -a regpac
+        for pkg in $output; do
+          is_built $pkg
+          if [ $built -eq 1 ]; then
+            packages[${#packages[@]}]=$pkg
+          else
+            regpac[${#regpac[@]}]=$pkg
+          fi
+        done
 
-				PACARGS="-S"
-				[ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
-				[ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
-				[ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-				[ $IGNORE -eq 1 ] && PACARGS="${PACARGS} --ignore $IGNOREPKG"
-				[ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
+        PACARGS="-S"
+        [ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
+        [ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
+        [ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
+        [ $IGNORE -eq 1 ] && PACARGS="${PACARGS} --ignore $IGNOREPKG"
+        [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-				if [ -n "${regpac[*]}" ]; then
-					pacman $PACARGS ${regpac[*]}
-				fi
-			else
-				[ $REFRESH -eq 1 ] && refresh
-				pacman $ARGLIST
-				exit 0
-			fi
-		else
-			[ $REFRESH -eq 1 ] && refresh
+        if [ -n "${regpac[*]}" ]; then
+          pacman $PACARGS ${regpac[*]}
+        fi
+      else
+        [ $REFRESH -eq 1 ] && refresh
+        pacman $ARGLIST
+        exit 0
+      fi
+    else
+      [ $REFRESH -eq 1 ] && refresh
 
-			if [ $DOWNLOAD -eq 1 ]; then
-				build_packages "build" ${args[@]}
-				exit 0
-			fi
+      if [ $DOWNLOAD -eq 1 ]; then
+        build_packages "build" ${args[@]}
+        exit 0
+      fi
 
-			if [ $SYSUPGRADE -eq 1 ]; then
-				local output=$(pacman -Qqu --noconfirm)
-			else
-				local output="${args[*]}"
-			fi
+      if [ $SYSUPGRADE -eq 1 ]; then
+        local output=$(pacman -Qqu --noconfirm)
+      else
+        local output="${args[*]}"
+      fi
 
-			declare -a packages
-			for pkg in $output; do
-				local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
-				[ -z ${pkgver} ] && pkgver=0
-				local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}' | head -n 1)
-				[ -z ${repopkgver} ] && repopkgver=0
-				if [ $(vercmp $repopkgver $pkgver) -eq 0 -a "$pkgver" != "0" ]; then
-					printf "$(gettext "warning: %s-%s is up to date -- reinstalling")\n" "${pkg}" "${pkgver}"
-				fi
-				packages[${#packages[@]}]=$pkg
-			done
+      declare -a packages
+      for pkg in $output; do
+        local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
+        [ -z ${pkgver} ] && pkgver=0
+        local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}' | head -n 1)
+        [ -z ${repopkgver} ] && repopkgver=0
+        if [ $(vercmp $repopkgver $pkgver) -eq 0 -a "$pkgver" != "0" ]; then
+          printf "$(gettext "warning: %s-%s is up to date -- reinstalling")\n" "${pkg}" "${pkgver}"
+        fi
+        packages[${#packages[@]}]=$pkg
+      done
 
-			if [ $ONLYCONF -eq 1 ]; then
-				for pkg in ${packages[@]}; do
-					get_candidates $pkg
-				done
+      if [ $ONLYCONF -eq 1 ]; then
+        for pkg in ${packages[@]}; do
+          get_candidates $pkg
+        done
 
-				for pkg in ${candidates}; do
-					apply_config "${pkg#*/}" "${ABSROOT}/$pkg" noreplace
-				done
-				exit 0
-			fi
-		fi
+        for pkg in ${candidates}; do
+          apply_config "${pkg#*/}" "${ABSROOT}/$pkg" noreplace
+        done
+        exit 0
+      fi
+    fi
 
-		for pkg in ${packages[@]}; do
-			get_candidates $pkg
-		done
+    for pkg in ${packages[@]}; do
+      get_candidates $pkg
+    done
 
-		if [ -n "${candidates}" ]; then
-			echo
-			printf "$(gettext "Source Targets:") "
-			for pkg in ${candidates}; do
-				echo -n "${pkg#*/} "
-			done
-			echo
-			if [ ${NOCONFIRM} -eq 0 ]; then
-				printf "$(gettext "Proceed? [Y/n]") "
-				read
-				if [ "${REPLY}" != "$(gettext "y")" -a "${REPLY}" != "$(gettext "Y")" -a "${REPLY}" != "" ]; then
-					exit 0
-				fi
-			fi
+    if [ -n "${candidates}" ]; then
+      echo
+      printf "$(gettext "Source Targets:") "
+      for pkg in ${candidates}; do
+        echo -n "${pkg#*/} "
+      done
+      echo
+      if [ ${NOCONFIRM} -eq 0 ]; then
+        printf "$(gettext "Proceed? [Y/n]") "
+        read
+        if [ "${REPLY}" != "$(gettext "y")" -a "${REPLY}" != "$(gettext "Y")" -a "${REPLY}" != "" ]; then
+          exit 0
+        fi
+      fi
 
-			for pkg in ${candidates}; do
-				build_packages "install" ${pkg}
-			done
-		fi
+      for pkg in ${candidates}; do
+        build_packages "install" ${pkg}
+      done
+    fi
 
-		if [ -n "${broken}" ]; then
-			printf "$(gettext "Build failed for:%s")\n" "${broken}"
-		fi
-	fi
+    if [ -n "${broken}" ]; then
+      printf "$(gettext "Build failed for:%s")\n" "${broken}"
+    fi
+  fi
 }
 
 main $@
