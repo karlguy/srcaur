@@ -419,6 +419,11 @@ main()
     [ $? -eq 0 ] && exit 1
   fi
 
+  if [ ! -d /etc/srcpac.d ]; then
+    mkdir /etc/srcpac.d
+    [ $? -eq 0 ] && exit 1
+  fi
+
   if [ "${MAJOR}" = "remove" ]; then
     if [ $BUILD -eq 0 -a $ONLYCONF -eq 0 ]; then
       pacman $ARGLIST
