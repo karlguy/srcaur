@@ -100,31 +100,20 @@ get_candidates()
       found=1
       break
     else
-      for _package in "${pkgname[@]}"; do
-        if [ "${1}" = "${_package}" ]; then
+      for _pkgname in "${pkgname[@]}"; do
+        if [ "${1}" = "${_pkgname}" ]; then
           found=1
           break
         fi
       done
     fi
 
-    if [ ${found} -eq 1 ]; then
-      break
-    fi
+    [ ${found} -eq 1 ] && break
   done
 
   if [ ${found} -eq 1 ]; then
-    local already=0
-    local tmp=${pkgbuild#${ABSROOT}}
-    for c in ${candidates}; do
-      if [ "${tmp/\/PKGBUILD}" = "$c" ]; then
-        already=1
-        break
-      fi
-    done
-    if [ ${already} -eq 0 ]; then
-      candidates="${candidates} ${tmp/\/PKGBUILD}"
-    fi
+    candidate="${pkgbuild##${ABSROOT}}"
+    candidates[${#candidates[@]}]="${candidate%%/PKGBUILD}"
   else
     printf "$(gettext "Error: Could not find %s under %s")\n" "${1}" "${ABSROOT}"
   fi
@@ -551,7 +540,7 @@ main()
           get_candidates $pkg
         done
 
-        for pkg in ${candidates}; do
+        for pkg in ${candidates[@]}; do
           apply_config "${pkg#*/}" "${ABSROOT}/$pkg" noreplace
         done
         exit 0
@@ -562,10 +551,10 @@ main()
       get_candidates $pkg
     done
 
-    if [ -n "${candidates}" ]; then
+    if [ -n "${candidates[@]}" ]; then
       echo
       printf "$(gettext "Source Targets:") "
-      for pkg in ${candidates}; do
+      for pkg in ${candidates[@]}; do
         echo -n "${pkg#*/} "
       done
       echo
@@ -577,7 +566,7 @@ main()
         fi
       fi
 
-      for pkg in ${candidates}; do
+      for pkg in ${candidates[@]}; do
         build_packages "install" ${pkg}
       done
     fi
