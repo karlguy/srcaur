@@ -475,7 +475,6 @@ main()
 
   if [ "${MAJOR}" = "sync" ]; then
     if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
-      declare -a packages
       if [ $SYSUPGRADE -eq 1 ]; then
         [ $REFRESH -eq 1 ] && refresh
 
@@ -486,14 +485,14 @@ main()
           local output=$(pacman -Qqu --noconfirm)
         fi
 
-        # regular packages, these have not been built by srcpac
-        declare -a regpac
-        for pkg in $output; do
+        # regular packages, these have not been built with srcpac
+        declare -a regpkg
+        for pkg in ${output}; do
           is_built $pkg
           if [ $built -eq 1 ]; then
-            packages[${#packages[@]}]=$pkg
+            packages="${packages} $pkg"
           else
-            regpac[${#regpac[@]}]=$pkg
+            regpkg[${#regpkg[@]}]=$pkg
           fi
         done
 
@@ -504,8 +503,8 @@ main()
         [ $IGNORE -eq 1 ] && PACARGS="${PACARGS} --ignore $IGNOREPKG"
         [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-        if [ -n "${regpac[@]}" ]; then
-          pacman $PACARGS ${regpac[@]}
+        if [ -n "${regpkg[*]}" ]; then
+          pacman $PACARGS ${regpkg[@]}
         fi
       else
         [ $REFRESH -eq 1 ] && refresh
@@ -515,31 +514,29 @@ main()
     else
       [ $REFRESH -eq 1 ] && refresh
 
-      if [ $DOWNLOAD -eq 1 ]; then
-        build_packages "build" ${args[@]}
-        exit 0
-      fi
-
       if [ $SYSUPGRADE -eq 1 ]; then
         if [ $IGNORE -eq 1 ]; then
           local ignorestr=$(echo $IGNOREPKG | tr "," "|")
-          local output=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
+          local packages=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
         else
-          local output=$(pacman -Qqu --noconfirm)
+          local packages=$(pacman -Qqu --noconfirm)
         fi
       else
-        local output="${args[@]}"
+        local packages="${args[@]}"
       fi
 
-      for pkg in $output; do
-        packages[${#packages[@]}]=$pkg
+      for pkg in $packages; do
+        get_candidates $pkg
       done
 
-      if [ $ONLYCONF -eq 1 ]; then
-        for pkg in ${packages[@]}; do
-          get_candidates $pkg
+      if [ $DOWNLOAD -eq 1 ]; then
+        for pkg in ${candidates[@]}; do
+          build_packages "build" $pkg
         done
+        exit 0
+      fi
 
+      if [ $ONLYCONF -eq 1 ]; then
         for pkg in ${candidates[@]}; do
           apply_config "${pkg#*/}" "${ABSROOT}/$pkg" noreplace
         done
@@ -547,11 +544,7 @@ main()
       fi
     fi
 
-    for pkg in ${packages[@]}; do
-      get_candidates $pkg
-    done
-
-    if [ -n "${candidates[@]}" ]; then
+    if [ -n "${candidates[*]}" ]; then
       echo
       printf "$(gettext "Source Targets:") "
       for pkg in ${candidates[@]}; do
