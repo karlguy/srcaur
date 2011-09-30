@@ -95,7 +95,7 @@ get_candidates()
   for pkgbuild in `find ${ABSROOT} -name PKGBUILD`; do
     unset pkgbase
     unset pkgname
-    source $pkgbuild &> /dev/null
+    source "$pkgbuild" &> /dev/null
     if [ "${1}" = "${pkgbase}" ]; then
       found=1
       break
@@ -113,7 +113,7 @@ get_candidates()
 
   if [ ${found} -eq 1 ]; then
     candidate="${pkgbuild##${ABSROOT}}"
-    candidates[${#candidates[@]}]="${candidate%%/PKGBUILD}"
+    candidates[${#candidates[@]}]="${candidate%%/PKGBUILD}/${1}"
   else
     printf "$(gettext "Error: Could not find %s under %s")\n" "${1}" "${ABSROOT}"
   fi
@@ -158,16 +158,16 @@ get_arch() {
 # Build a package
 ##
 build_package() {
-  action="build"
+  local action="build"
   if [ "$1" = "install" ]; then
     action="install"
   fi
 
   shift
 
-  local pkg=${1#*/}
-  local pkgdir="${ABSROOT}/${1}"
-  local builddir=/var/srcpac/${pkg}
+  local pkg=${1##*/}
+  local pkgdir="${ABSROOT}/${1%/*}"
+  local builddir="/var/srcpac/${pkg}"
 
   local succeed=0
 
@@ -175,6 +175,10 @@ build_package() {
   [ $NODEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -d"
   [ $MAKEDEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -r"
   [ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
+
+  local SPLITPKG=0
+  [ "${pkg}" != "${pkgdir##*/}" ] && SPLITPKG=1
+  [ $SPLITPKG -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --pkg ${pkg}"
 
   # create the build dir and apply configuration
   [[ -d ${builddir} ]] && rm -rf ${builddir}
@@ -207,7 +211,7 @@ build_package() {
   else
     local CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
     local filename="${pkg}-$(get_full_version ${epoch:-0} ${pkgver} ${pkgrel})-$(get_arch ${arch}).pkg.tar.?z"
-    cp -f ${builddir}/${filename} ${CACHEDIR}
+    cp -f ${builddir}/${filename} "${CACHEDIR}"
     rm -rf ${builddir}
 
     if [ "${action}" = "install" ]; then
@@ -215,12 +219,12 @@ build_package() {
       [ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
       [ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
       [ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-      [ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
+     [ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
       [ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
       [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-      pacman $PACARGS ${CACHEDIR}/${filename}
-      [ $? -eq 0 ] && touch /var/lib/srcpac/${pkg}
+      pacman $PACARGS "${CACHEDIR}"/${filename}
+      [ $? -eq 0 ] && touch "/var/lib/srcpac/${pkg}"
     fi
   fi
 }
@@ -534,7 +538,7 @@ main()
 
       if [ $ONLYCONF -eq 1 ]; then
         for pkg in ${candidates[@]}; do
-          apply_config "${pkg#*/}" "${ABSROOT}/$pkg" noreplace
+          apply_config "${pkg#*/*/}" "${ABSROOT}/${pkg#*/}" noreplace
         done
         exit 0
       fi
@@ -544,7 +548,7 @@ main()
       echo
       printf "$(gettext "Source Targets:") "
       for pkg in ${candidates[@]}; do
-        echo -n "${pkg#*/} "
+        echo -n "${pkg##*/} "
       done
       echo
       if [ ${NOCONFIRM} -eq 0 ]; then
