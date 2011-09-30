@@ -448,13 +448,14 @@ main()
       done
     else
       for pkg in ${args[@]}; do
+        local valid=1
         if [ $INFO -eq 1 ]; then
-          pacman -Qi $pkg | head -n -1
+          $(pacman -Qi $pkg && valid=0) | head -n -1
         else
-          echo -n $(pacman -Q $pkg)
+          echo -n $(pacman -Q $pkg) && valid=0
         fi
 
-        if [ $? -eq 0 ]; then
+        if [ $valid -eq 0 ]; then
           is_built $pkg
           if [ $INFO -eq 1 ]; then
             printf "$(gettext "Source         : ")"
