@@ -443,7 +443,7 @@ main()
 
   if [ "${MAJOR}" = "query" ]; then
     if [ $BUILD -eq 1 ]; then
-      for pkg in /var/lib/srcpac/*; do
+      for pkg in `find /var/lib/srcpac/ -type f`; do
         pacman -Q $(basename $pkg)
       done
     else
