@@ -134,10 +134,30 @@ refresh()
 }
 
 ##
-# Build and/or install a package
+#  usage : get_full_version( $epoch, $pkgver, $pkgrel )
+# return : full version spec, including epoch (if necessary), pkgver, pkgrel
 ##
-build_packages()
-{
+get_full_version() {
+  if [[ $1 -eq 0 ]]; then
+    # zero epoch case, don't include it in version
+    echo $2-$3
+  else
+    echo $1:$2-$3
+  fi
+}
+
+get_arch() {
+  if [[ "$1" = "any" ]]; then
+    echo "any"
+  else
+    echo "${CARCH}"
+  fi
+}
+
+##
+# Build a package
+##
+build_package() {
   action="build"
   if [ "$1" = "install" ]; then
     action="install"
@@ -145,11 +165,13 @@ build_packages()
 
   shift
 
-  pkg=${1#*/}
-  pkgdir="${ABSROOT}/${1}"
-  builddir=/var/srcpac/${pkg}
+  local pkg=${1#*/}
+  local pkgdir="${ABSROOT}/${1}"
+  local builddir=/var/srcpac/${pkg}
 
-  MAKEPKGOPTS="-c -s -f"
+  local succeed=0
+
+  local MAKEPKGOPTS="-c -s -f"
   [ $NODEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -d"
   [ $MAKEDEPS -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} -r"
   [ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
@@ -160,22 +182,36 @@ build_packages()
   cp ${pkgdir}/* ${builddir}
   apply_config ${pkg} ${builddir}
 
-  cd ${builddir}
+  pushd ${builddir}
+
+  unset epoch
+  unset pkgver
+  unset pkgrel
+  unset arch
+  source PKGBUILD &> /dev/null
 
   if [ -z "${SUDO_USER}" ]; then
     chown -R nobody ${builddir}
     makepkg ${MAKEPKGOPTS} --asroot
+    [ $? -eq 0 ] && succeed=1
   else
     chown -R ${SUDO_USER} ${builddir}
     sudo -u ${SUDO_USER} makepkg ${MAKEPKGOPTS}
+    [ $? -eq 0 ] && succeed=1
   fi
 
-  if [ $? -eq 0 ]; then
-    CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
-    cp ${builddir}/*.pkg.tar.?z ${CACHEDIR}
+  popd
+
+  if [ $succeed -ne 1 ]; then
+    broken="${broken} ${pkg}"
+  else
+    local CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
+    local filename="${pkg}-$(get_full_version ${epoch:-0} ${pkgver} ${pkgrel})-$(get_arch ${arch}).pkg.tar.?z"
+    cp -f ${builddir}/${filename} ${CACHEDIR}
+    rm -rf ${builddir}
 
     if [ "${action}" = "install" ]; then
-      PACARGS="-U"
+      local PACARGS="-U"
       [ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
       [ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
       [ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
@@ -183,50 +219,10 @@ build_packages()
       [ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
       [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-      if [ "${pkg}" = "${pkgbase}" ]; then
-        declare -a builtpkgs
-        local count=1
-        printf "$(gettext ":: More packages have been built:")\n"
-        for builtpkg in ${builddir}/*.pkg.tar.?z; do
-          bname="${builtpkg%*-*-*-*.pkg.tar.?z}"
-          builtpkgs[count]="${bname#${builddir}/}"
-          echo "$count) ${builtpkgs[count]}"
-          let count=count+1
-        done
-
-        if [ ${NOCONFIRM} -eq 0 ]; then
-          local pkglist
-          printf "$(gettext "Enter a selection (default=all):") "
-          read
-          if [ -n "${REPLY}" ]; then
-            for i in ${REPLY}; do
-              pkglist="${pkglist} ${builddir}/${builtpkgs[$i]}-${pkgver}-*.pkg.tar.?z"
-              touch /var/lib/srcpac/${builtpkgs[$i]}
-            done
-            pacman $PACARGS ${pkglist}
-          else
-            pacman $PACARGS ${builddir}/*.pkg.tar.?z
-            for pkg in ${builtpkgs[@]}; do
-              touch /var/lib/srcpac/${pkg}
-            done
-          fi
-        else
-          pacman $PACARGS ${builddir}/*.pkg.tar.?z
-          for pkg in ${builtpkgs[@]}; do
-            touch /var/lib/srcpac/${pkg}
-          done
-        fi
-      else
-        pacman $PACARGS ${builddir}/${pkg}*.pkg.tar.?z
-        touch /var/lib/srcpac/${pkg}
-      fi
-
+      pacman $PACARGS ${CACHEDIR}/${filename}
+      [ $? -eq 0 ] && touch /var/lib/srcpac/${pkg}
     fi
-  else
-    broken="${broken} ${pkg}"
   fi
-
-  rm -rf ${builddir}
 }
 
 check_args()
@@ -496,7 +492,7 @@ main()
           fi
         done
 
-        PACARGS="-S"
+        local PACARGS="-S"
         [ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
         [ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
         [ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
@@ -531,7 +527,7 @@ main()
 
       if [ $DOWNLOAD -eq 1 ]; then
         for pkg in ${candidates[@]}; do
-          build_packages "build" $pkg
+          build_package "build" $pkg
         done
         exit 0
       fi
@@ -560,7 +556,7 @@ main()
       fi
 
       for pkg in ${candidates[@]}; do
-        build_packages "install" ${pkg}
+        build_package "install" ${pkg}
       done
     fi
 
