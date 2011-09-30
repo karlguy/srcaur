@@ -486,6 +486,7 @@ main()
 
   if [ "${MAJOR}" = "sync" ]; then
     if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
+      declare -a packages
       if [ $SYSUPGRADE -eq 1 ]; then
         [ $REFRESH -eq 1 ] && refresh
 
@@ -496,7 +497,7 @@ main()
           local output=$(pacman -Qqu --noconfirm)
         fi
 
-        declare -a packages
+        # regular packages, these have not been built by srcpac
         declare -a regpac
         for pkg in $output; do
           is_built $pkg
@@ -514,8 +515,8 @@ main()
         [ $IGNORE -eq 1 ] && PACARGS="${PACARGS} --ignore $IGNOREPKG"
         [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-        if [ -n "${regpac[*]}" ]; then
-          pacman $PACARGS ${regpac[*]}
+        if [ -n "${regpac[@]}" ]; then
+          pacman $PACARGS ${regpac[@]}
         fi
       else
         [ $REFRESH -eq 1 ] && refresh
@@ -531,12 +532,16 @@ main()
       fi
 
       if [ $SYSUPGRADE -eq 1 ]; then
-        local output=$(pacman -Qqu --noconfirm)
+        if [ $IGNORE -eq 1 ]; then
+          local ignorestr=$(echo $IGNOREPKG | tr "," "|")
+          local output=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
+        else
+          local output=$(pacman -Qqu --noconfirm)
+        fi
       else
-        local output="${args[*]}"
+        local output="${args[@]}"
       fi
 
-      declare -a packages
       for pkg in $output; do
         local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
         [ -z ${pkgver} ] && pkgver=0
