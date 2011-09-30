@@ -427,6 +427,7 @@ main()
 
   if [ ! -d /var/lib/srcpac ]; then
     mkdir /var/lib/srcpac
+    [ $? -eq 0 ] && exit 1
   fi
 
   if [ "${MAJOR}" = "remove" ]; then
