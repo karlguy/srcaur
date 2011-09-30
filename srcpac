@@ -437,6 +437,7 @@ main()
     for pkg in ${args[@]}; do
       remove $pkg
     done
+    exit 0
   fi
 
   if [ "${MAJOR}" = "query" ]; then
@@ -478,6 +479,7 @@ main()
         fi
       done
     fi
+    exit 0
   fi
 
   if [ "${MAJOR}" = "sync" ]; then
