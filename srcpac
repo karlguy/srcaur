@@ -543,13 +543,6 @@ main()
       fi
 
       for pkg in $output; do
-        local pkgver=$(LC_ALL=C pacman -Qi $pkg 2>/dev/null | grep Version | awk '{print $3}')
-        [ -z ${pkgver} ] && pkgver=0
-        local repopkgver=$(LC_ALL=C pacman -Si $pkg 2>/dev/null | grep Version | awk '{print $3}' | head -n 1)
-        [ -z ${repopkgver} ] && repopkgver=0
-        if [ $(vercmp $repopkgver $pkgver) -eq 0 -a "$pkgver" != "0" ]; then
-          printf "$(gettext "warning: %s-%s is up to date -- reinstalling")\n" "${pkg}" "${pkgver}"
-        fi
         packages[${#packages[@]}]=$pkg
       done
 
