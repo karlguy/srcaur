@@ -186,7 +186,7 @@ build_package() {
   cp ${pkgdir}/* ${builddir}
   apply_config ${pkg} ${builddir}
 
-  pushd ${builddir}
+  pushd ${builddir} &> /dev/null
 
   unset epoch
   unset pkgver
@@ -219,7 +219,7 @@ build_package() {
       [ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
       [ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
       [ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
-     [ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
+      [ $ASDEPS -eq 1 ] && PACARGS="${PACARGS} --asdeps"
       [ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
       [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
