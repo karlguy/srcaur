@@ -1,4 +1,3 @@
-# SOME DESCRIPTIVE TITLE.
 # Copyright (C) 2011
 # This file is distributed under the same license as the srcpac package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -8,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: srcpac 0.10.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-04-21 13:26+0200\n"
+"POT-Creation-Date: 2011-10-01 19:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,78 +86,66 @@ msgstr ""
 msgid "  -o, --onlyconf remove the patchfile only"
 msgstr ""
 
-#: srcpac:129
+#: srcpac:118
 msgid "Error: Could not find %s under %s"
 msgstr ""
 
-#: srcpac:138
+#: srcpac:127
 msgid "Starting ABS sync..."
 msgstr ""
 
-#: srcpac:140 srcpac:391
+#: srcpac:129 srcpac:380
 msgid "done"
 msgstr ""
 
-#: srcpac:200
-msgid ":: More packages have been built:"
-msgstr ""
-
-#: srcpac:210
-msgid "Enter a selection (default=all):"
-msgstr ""
-
-#: srcpac:389
+#: srcpac:378
 msgid "removing source reference %s..."
 msgstr ""
 
-#: srcpac:419
+#: srcpac:408
 msgid "Error: You need to use sudo or to be root"
 msgstr ""
 
-#: srcpac:424
+#: srcpac:413
 msgid "Error: The ABSROOT environment variable is not defined"
 msgstr ""
 
-#: srcpac:458
+#: srcpac:455
 msgid "Source         : "
 msgstr ""
 
-#: srcpac:460 srcpac:466
+#: srcpac:457 srcpac:463
 msgid "Yes"
 msgstr ""
 
-#: srcpac:462 srcpac:468
+#: srcpac:459 srcpac:465
 msgid "No"
 msgstr ""
 
-#: srcpac:464
+#: srcpac:461
 msgid "Patchfile      : "
 msgstr ""
 
-#: srcpac:473
+#: srcpac:470
 msgid " [source]"
 msgstr ""
 
-#: srcpac:542
-msgid "warning: %s-%s is up to date -- reinstalling"
-msgstr ""
-
-#: srcpac:565
+#: srcpac:554
 msgid "Source Targets:"
 msgstr ""
 
-#: srcpac:571
+#: srcpac:560
 msgid "Proceed? [Y/n]"
 msgstr ""
 
-#: srcpac:573
+#: srcpac:562
 msgid "y"
 msgstr ""
 
-#: srcpac:573
+#: srcpac:562
 msgid "Y"
 msgstr ""
 
-#: srcpac:584
+#: srcpac:573
 msgid "Build failed for:%s"
 msgstr ""
