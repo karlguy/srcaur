@@ -204,7 +204,7 @@ build_package() {
     [ $? -eq 0 ] && succeed=1
   fi
 
-  popd
+  popd &> /dev/null
 
   if [ $succeed -ne 1 ]; then
     broken="${broken} ${pkg}"
@@ -543,7 +543,7 @@ main()
 
       if [ $ONLYCONF -eq 1 ]; then
         for pkg in ${candidates[@]}; do
-          apply_config "${pkg#*/*/}" "${ABSROOT}/${pkg#*/}" noreplace
+          apply_config "${pkg##*/}" "${ABSROOT}/${pkg#*/}" noreplace
         done
         exit 0
       fi
