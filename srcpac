@@ -43,6 +43,8 @@ usage()
   printf "$(gettext "%s options are based on pacman, so check the pacman man page")\n" "$(basename $0)"
   printf "$(gettext "%s adds some option to -S:")\n" "$(basename $0)"
   printf "$(gettext "  -b, --build    builds the targets from source")\n"
+  printf "$(gettext "  -bb            builds targets and their dependencies from source")\n"
+  printf "$(gettext "  -bbb           builds targets, dependencies and their makedeps from source")\n"
   printf "$(gettext "  -m, --makedeps remove the makedepends after the build")\n"
   printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
   printf "$(gettext "%s adds some option to -Q:")\n" "$(basename $0)"
@@ -87,10 +89,12 @@ apply_config()
 
 ##
 # Searches the ABS tree for a possible package candidates
+# usage: get_candidates($pkgname, $is_target)
 ##
 get_candidates()
 {
   local found=0
+  is_target=$2
 
   for pkgbuild in `find ${ABSROOT} -name PKGBUILD`; do
     unset pkgbase
@@ -108,7 +112,19 @@ get_candidates()
       done
     fi
 
-    [ ${found} -eq 1 ] && break
+    if [ ${found} -eq 1 ]; then
+      if [ ${BUILDDEPS} -eq 1 -a $is_target -eq 1 ]; then
+        for _dep in ${depends[@]}; do
+          get_candidates $_dep 0
+        done
+      fi
+      if [ ${BUILDMAKEDEPS} -eq 1 -a $is_target -eq 1 ]; then
+        for _makedep in ${makedepends[@]}; do
+          get_candidates $_makedep 0
+        done
+      fi
+      break
+    fi
   done
 
   if [ ${found} -eq 1 ]; then
@@ -249,6 +265,8 @@ check_args()
   BUILD=0
   ONLYCONF=0
   MAKEDEPS=1
+  BUILDDEPS=0
+  BUILDMAKEDEPS=0
 
   ARGLIST=$@
   ARGSANS=""
@@ -343,7 +361,7 @@ check_args()
             Q) MAJOR="query" ;;
             R) MAJOR="remove" ;;
             S) MAJOR="sync" ;;
-            b) BUILD=1 ;;
+            b) BUILD=1;;
             d) NODEPS=1 ;;
             f) FORCE=1 ;;
             i) INFO=1 ;;
@@ -531,7 +549,7 @@ main()
       fi
 
       for pkg in $packages; do
-        get_candidates $pkg
+        get_candidates $pkg 1
       done
 
       if [ $DOWNLOAD -eq 1 ]; then
