@@ -361,7 +361,9 @@ check_args()
             Q) MAJOR="query" ;;
             R) MAJOR="remove" ;;
             S) MAJOR="sync" ;;
-            b) BUILD=1;;
+            b) [ $BUILD -eq 1 ] && BUILDDEPS=1
+               [ $BUILDDEPS -eq 1 ] && BUILDMAKEDEPS=1
+                BUILD=1;;
             d) NODEPS=1 ;;
             f) FORCE=1 ;;
             i) INFO=1 ;;
