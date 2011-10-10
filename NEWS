@@ -1,5 +1,28 @@
 VERSION    DESCRIPTION                                          AUTHOR
 -------------------------------------------------------------------------------
+0.10.8   - Support to build targets' {make,}dependencies        Andrea Scarpino
+         - The build of a splitted package use the makepkg      Andrea Scarpino
+           --pkg option
+         - Removed duplicated code                              Andrea Scarpino
+         - Rewritten build_package method                       Andrea Scarpino
+         - Removed double candidates check                      Andrea Scarpino
+         - Removed installed version check                      Andrea Scarpino
+         - Add support to ignore packages when updating         Andrea Scarpino
+         - Minor bugs and cosmetic changes                      Andrea Scarpino
+         - Use 'find' to improve performances                   Andrea Scarpino
+         - Proper way to get the pacman CacheDir                Andrea Scarpino
+         - When PKGDEST is set makepkg force option is needed   Andrea Scarpino
+           (FS#23859)
+         - Add options -Rb and -Ro to remove package patchfile  Andrea Scarpino
+           and configuration file (FS#23860)
+         - Show patchfile information in -Qi (FS#23860)         Andrea Scarpino
+         - Does not display the warning message when a package  Andrea Scarpino
+           is not installed
+         - Create the srcpac patchfile only after the package   Andrea Scarpino
+           installation
+         - Add -Qb option to display all packages built         Andrea Scarpino
+         - Add Italian translation                              Andrea Scarpino
+         - Add translations support with gettext                Andrea Scarpino
 0.10.4   - srcpac option --asdeps is used as makepkg option too Andrea Scarpino
          - Remove force option from makepkg options             Andrea Scarpino
          - Display the list of broken packages after the build  Andrea Scarpino
