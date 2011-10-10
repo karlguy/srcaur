@@ -1,6 +1,7 @@
 VERSION    DESCRIPTION                                          AUTHOR
 -------------------------------------------------------------------------------
 0.10.8   - Support to build targets' {make,}dependencies        Andrea Scarpino
+           (FS#22253)
          - The build of a splitted package use the makepkg      Andrea Scarpino
            --pkg option
          - Removed duplicated code                              Andrea Scarpino
