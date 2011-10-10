@@ -369,6 +369,7 @@ check_args()
             o) ONLYCONF=1 ;;
             r) ROOT=1
                NEWROOT="${OPTARG}"
+               shift
                ;;
             u) SYSUPGRADE=1 ;;
             w) DOWNLOAD=1 ;;
