@@ -113,15 +113,20 @@ get_candidates()
     fi
 
     if [ ${found} -eq 1 ]; then
-      if [ ${BUILDDEPS} -eq 1 -a $is_target -eq 1 ]; then
-        for _dep in ${depends[@]}; do
-          get_candidates $_dep 0
-        done
-      fi
-      if [ ${BUILDMAKEDEPS} -eq 1 -a $is_target -eq 1 ]; then
-        for _makedep in ${makedepends[@]}; do
-          get_candidates $_makedep 0
-        done
+      if [ $is_target -eq 1 ]; then
+        # Backup target's makedepends array
+       local _makedepends=${makedepends[@]}
+
+        if [ ${BUILDDEPS} -eq 1 ]; then
+          for _dep in ${depends[@]}; do
+            get_candidates $_dep 0
+          done
+        fi
+        if [ ${BUILDMAKEDEPS} -eq 1 ]; then
+          for _makedep in ${_makedepends[@]}; do
+            get_candidates $_makedep 0
+          done
+        fi
       fi
       break
     fi
@@ -361,8 +366,8 @@ check_args()
             Q) MAJOR="query" ;;
             R) MAJOR="remove" ;;
             S) MAJOR="sync" ;;
-            b) [ $BUILD -eq 1 ] && BUILDDEPS=1
-               [ $BUILDDEPS -eq 1 ] && BUILDMAKEDEPS=1
+            b) [ $BUILDDEPS -eq 1 ] && BUILDMAKEDEPS=1
+               [ $BUILD -eq 1 ] && BUILDDEPS=1
                 BUILD=1;;
             d) NODEPS=1 ;;
             f) FORCE=1 ;;
