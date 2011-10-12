@@ -1,20 +1,21 @@
-# Copyright (C) 2011
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2011
 # This file is distributed under the same license as the srcpac package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: srcpac 0.10.4\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-01 19:08+0200\n"
+"Project-Id-Version: srcpac\n"
+"Report-Msgid-Bugs-To: https://bugs.archlinux.org/\n"
+"POT-Creation-Date: 2011-10-12 01:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
 
 #: srcpac:36
 msgid "usage: %s <operation> [...]"
@@ -57,95 +58,105 @@ msgid "  -b, --build    builds the targets from source"
 msgstr ""
 
 #: srcpac:46
-msgid "  -m, --makedeps remove the makedepends after the build"
+msgid "  -bb            builds targets and their dependencies from source"
 msgstr ""
 
 #: srcpac:47
+msgid ""
+"  -bbb           builds targets, dependencies and their makedeps from source"
+msgstr ""
+
+#: srcpac:48
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr ""
+
+#: srcpac:49
 msgid ""
 "  -o, --onlyconf applies the changes and displays the PKGBUILD without "
 "building"
 msgstr ""
 
-#: srcpac:48
+#: srcpac:50
 msgid "%s adds some option to -Q:"
 msgstr ""
 
-#: srcpac:49
+#: srcpac:51
 msgid "  -b, --build    show all packages built from source"
 msgstr ""
 
-#: srcpac:50
+#: srcpac:52
 msgid "%s adds some option to -R:"
 msgstr ""
 
-#: srcpac:51
+#: srcpac:53
 msgid "  -b, --build    remove build-flag only, not the package"
 msgstr ""
 
-#: srcpac:52
+#: srcpac:54
 msgid "  -o, --onlyconf remove the patchfile only"
 msgstr ""
 
-#: srcpac:118
+#: srcpac:139
 msgid "Error: Could not find %s under %s"
 msgstr ""
 
-#: srcpac:127
+#: srcpac:148
 msgid "Starting ABS sync..."
 msgstr ""
 
-#: srcpac:129 srcpac:380
+#: srcpac:150 srcpac:406
 msgid "done"
 msgstr ""
 
-#: srcpac:378
+#: srcpac:404
 msgid "removing source reference %s..."
 msgstr ""
 
-#: srcpac:408
+#: srcpac:434
 msgid "Error: You need to use sudo or to be root"
 msgstr ""
 
-#: srcpac:413
+#: srcpac:439
 msgid "Error: The ABSROOT environment variable is not defined"
 msgstr ""
 
-#: srcpac:455
+#: srcpac:481
 msgid "Source         : "
 msgstr ""
 
-#: srcpac:457 srcpac:463
+#: srcpac:483 srcpac:489
 msgid "Yes"
 msgstr ""
 
-#: srcpac:459 srcpac:465
+#: srcpac:485 srcpac:491
 msgid "No"
 msgstr ""
 
-#: srcpac:461
+#: srcpac:487
 msgid "Patchfile      : "
 msgstr ""
 
-#: srcpac:470
+#: srcpac:496
 msgid " [source]"
 msgstr ""
 
-#: srcpac:554
+#: srcpac:580
 msgid "Source Targets:"
 msgstr ""
 
-#: srcpac:560
+#: srcpac:586
 msgid "Proceed? [Y/n]"
 msgstr ""
 
-#: srcpac:562
+#: srcpac:588
 msgid "y"
 msgstr ""
 
-#: srcpac:562
+#: srcpac:588
 msgid "Y"
 msgstr ""
 
-#: srcpac:573
+#: srcpac:599
 msgid "Build failed for:%s"
 msgstr ""
+
