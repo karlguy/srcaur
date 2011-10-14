@@ -16,6 +16,7 @@ install: all
 	${INSTALL} -d ${DESTDIR}/${mandir}
 	${INSTALL} -m 755 srcpac ${DESTDIR}/${bindir}
 	${INSTALL} -m 644 srcpac.1 ${DESTDIR}/${mandir}
+	${INSTALL} -m 644 srcpac.conf ${DESTDIR}/${sysconfdir}
 	for file in po/*.po; \
 	do \
 	  lang=$$(echo $$file | $(SED) -e 's#.*/\([^/]\+\).po#\1#'); \

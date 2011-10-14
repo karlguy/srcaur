@@ -25,11 +25,19 @@ ver=0.10.8
 export TEXTDOMAIN='srcpac'
 export TEXTDOMAINDIR='/usr/share/locale'
 
+PACMAN="/usr/bin/pacman"
+
 declare -a args
 
-[ -f /etc/abs.conf ] && source /etc/abs.conf
-[ -f /etc/makepkg.conf ] && source /etc/makepkg.conf
-[ -f ~/.makepkg.conf ] && source ~/.makepkg.conf
+source_file "/etc/abs.conf"
+source_file "/etc/makepkg.conf"
+source_file "~/.makepkg.conf"
+source_file "/etc/srcpac.conf"
+source_file "~/.srcpac.conf"
+
+source_file() {
+  [ -f "${1}" ] && source "${1}"
+}
 
 usage()
 {
@@ -148,7 +156,7 @@ refresh()
   printf "$(gettext "Starting ABS sync...")"
   abs &> /dev/null
   printf "$(gettext "done")\n"
-  pacman -Sy
+  $PACMAN -Sy
   if [ ${#args[@]} -eq 0 -a $SYSUPGRADE -eq 0 ]; then
     exit 0
   fi
@@ -244,7 +252,7 @@ build_package() {
       [ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
       [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-      pacman $PACARGS "${CACHEDIR}"/${filename}
+      $PACMAN $PACARGS "${CACHEDIR}"/${filename}
       [ $? -eq 0 ] && touch "/var/lib/srcpac/${pkg}"
     fi
   fi
@@ -452,7 +460,7 @@ main()
 
   if [ "${MAJOR}" = "remove" ]; then
     if [ $BUILD -eq 0 -a $ONLYCONF -eq 0 ]; then
-      pacman $ARGLIST
+      $PACMAN $ARGLIST
     fi
 
     for pkg in ${args[@]}; do
@@ -464,15 +472,15 @@ main()
   if [ "${MAJOR}" = "query" ]; then
     if [ $BUILD -eq 1 ]; then
       for pkg in `find /var/lib/srcpac/ -type f`; do
-        pacman -Q $(basename $pkg)
+        $PACMAN -Q $(basename $pkg)
       done
     else
       for pkg in ${args[@]}; do
         local valid=1
         if [ $INFO -eq 1 ]; then
-          pacman -Qi $pkg && valid=0 | head -n -1
+          $PACMAN -Qi $pkg && valid=0 | head -n -1
         else
-          echo -n $(pacman -Q $pkg) && valid=0
+          echo -n $($PACMAN -Q $pkg) && valid=0
         fi
 
         if [ $valid -eq 0 ]; then
@@ -511,9 +519,9 @@ main()
 
         if [ $IGNORE -eq 1 ]; then
           local ignorestr=$(echo $IGNOREPKG | tr "," "|")
-          local output=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
+          local output=$($PACMAN -Qqu --noconfirm | grep -Ev ${ignorestr})
         else
-          local output=$(pacman -Qqu --noconfirm)
+          local output=$($PACMAN -Qqu --noconfirm)
         fi
 
         # regular packages, these have not been built with srcpac
@@ -535,11 +543,11 @@ main()
         [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
         if [ -n "${regpkg[*]}" ]; then
-          pacman $PACARGS ${regpkg[@]}
+          $PACMAN $PACARGS ${regpkg[@]}
         fi
       else
         [ $REFRESH -eq 1 ] && refresh
-        pacman $ARGLIST
+        $PACMAN $ARGLIST
         exit 0
       fi
     else
@@ -548,9 +556,9 @@ main()
       if [ $SYSUPGRADE -eq 1 ]; then
         if [ $IGNORE -eq 1 ]; then
           local ignorestr=$(echo $IGNOREPKG | tr "," "|")
-          local packages=$(pacman -Qqu --noconfirm | grep -Ev ${ignorestr})
+          local packages=$($PACMAN -Qqu --noconfirm | grep -Ev ${ignorestr})
         else
-          local packages=$(pacman -Qqu --noconfirm)
+          local packages=$($PACMAN -Qqu --noconfirm)
         fi
       else
         local packages="${args[@]}"
