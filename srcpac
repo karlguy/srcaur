@@ -29,15 +29,15 @@ PACMAN="/usr/bin/pacman"
 
 declare -a args
 
+source_file() {
+  [ -f "${1}" ] && source "${1}"
+}
+
 source_file "/etc/abs.conf"
 source_file "/etc/makepkg.conf"
 source_file "~/.makepkg.conf"
 source_file "/etc/srcpac.conf"
 source_file "~/.srcpac.conf"
-
-source_file() {
-  [ -f "${1}" ] && source "${1}"
-}
 
 usage()
 {
@@ -49,15 +49,15 @@ usage()
   printf "$(gettext "        %s {-R --remove}  [options] <package(s)>")\n" "$(basename $0)"
   printf "$(gettext "        %s {-S --sync}    [options] [package(s)]")\n" "$(basename $0)"
   printf "$(gettext "%s options are based on pacman, so check the pacman man page")\n" "$(basename $0)"
-  printf "$(gettext "%s adds some option to -S:")\n" "$(basename $0)"
+  printf "$(gettext "%s adds some option to %s:")\n" "$(basename $0)" "-S"
   printf "$(gettext "  -b, --build    builds the targets from source")\n"
   printf "$(gettext "  -bb            builds targets and their dependencies from source")\n"
   printf "$(gettext "  -bbb           builds targets, dependencies and their makedeps from source")\n"
   printf "$(gettext "  -m, --makedeps remove the makedepends after the build")\n"
   printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
-  printf "$(gettext "%s adds some option to -Q:")\n" "$(basename $0)"
+  printf "$(gettext "%s adds some option to %s:")\n" "$(basename $0)" "-Q"
   printf "$(gettext "  -b, --build    show all packages built from source")\n"
-  printf "$(gettext "%s adds some option to -R:")\n" "$(basename $0)"
+  printf "$(gettext "%s adds some option to %s:")\n" "$(basename $0)" "-R"
   printf "$(gettext "  -b, --build    remove build-flag only, not the package")\n"
   printf "$(gettext "  -o, --onlyconf remove the patchfile only")\n"
 
