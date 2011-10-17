@@ -132,20 +132,20 @@ get_candidates()
 
         if [ ${BUILDDEPS} -eq 1 ]; then
           for _dep in ${depends[@]}; do
-            is_installed $_dep
+            is_installed ${_dep%%[<>=]*}
             installed=$?
             [ "${installed}" -eq 0 ] && continue
 
-            get_candidates $_dep 0
+            get_candidates ${_dep%%[<>=]*} 0
           done
         fi
         if [ ${BUILDMAKEDEPS} -eq 1 ]; then
           for _makedep in ${_makedepends[@]}; do
-            is_installed $_makedep
+            is_installed ${_makedep%%[<>=]*}
             installed=$?
             [ "${installed}" -eq 0 ] && continue
 
-            get_candidates $_makedep 0
+            get_candidates ${_makedep%%[<>=]*} 0
           done
         fi
       fi
