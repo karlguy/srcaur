@@ -81,7 +81,7 @@ version()
 ##
 # Applies changes of source build packages to PKGUILDs,
 # if -o option is set we only display the PKGBUILD in a pager
-##
+##ost
 apply_config()
 {
   conf=/etc/srcpac.d/${1}
@@ -93,6 +93,11 @@ apply_config()
       sed -i -f ${conf} ${2}/PKGBUILD
     fi
   fi
+}
+
+is_installed() {
+  $PACMAN -Q $1 &> /dev/null
+  return $?
 }
 
 ##
@@ -127,11 +132,19 @@ get_candidates()
 
         if [ ${BUILDDEPS} -eq 1 ]; then
           for _dep in ${depends[@]}; do
+            is_installed $_dep
+            installed=$?
+            [ "${installed}" -eq 0 ] && continue
+
             get_candidates $_dep 0
           done
         fi
         if [ ${BUILDMAKEDEPS} -eq 1 ]; then
           for _makedep in ${_makedepends[@]}; do
+            is_installed $_makedep
+            installed=$?
+            [ "${installed}" -eq 0 ] && continue
+
             get_candidates $_makedep 0
           done
         fi
