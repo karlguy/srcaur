@@ -1,0 +1,172 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2011
+# This file is distributed under the same license as the srcpac package.
+# 
+# Translators:
+# Анатолий Щербина <nobus1967@yandex.ru>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: srcpac\n"
+"Report-Msgid-Bugs-To: https://bugs.archlinux.org/\n"
+"POT-Creation-Date: 2011-10-12 01:45+0200\n"
+"PO-Revision-Date: 2011-10-17 12:54+0000\n"
+"Last-Translator: nobus1967 <nobus1967@yandex.ru>\n"
+"Language-Team: Russian (http://www.transifex.net/projects/p/srcpac/team/ru/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: srcpac:36
+msgid "usage: %s <operation> [...]"
+msgstr "использование: %s <операция> [...]"
+
+#: srcpac:37
+msgid "operations:"
+msgstr "операции:"
+
+#: srcpac:38
+msgid "        %s {-h --help}"
+msgstr "        %s {-h --help}"
+
+#: srcpac:39
+msgid "        %s {-V --version}"
+msgstr "        %s {-V --version}"
+
+#: srcpac:40
+msgid "        %s {-Q --query}   [options] [<package(s)>]"
+msgstr "        %s {-Q --query}   [опции] [<пакет(ы)>]"
+
+#: srcpac:41
+msgid "        %s {-R --remove}  [options] <package(s)>"
+msgstr "        %s {-R --remove}  [опции] <пакет(ы)>"
+
+#: srcpac:42
+msgid "        %s {-S --sync}    [options] [package(s)]"
+msgstr "        %s {-S --sync}    [опции] [пакет(ы)]"
+
+#: srcpac:43
+msgid "%s options are based on pacman, so check the pacman man page"
+msgstr ""
+"%s опции соответствуют опциям pacman, поэтому обратитесь к  man-странице "
+"pacman"
+
+#: srcpac:44
+msgid "%s adds some option to -S:"
+msgstr "%s добавляет некоторые опции к -S:"
+
+#: srcpac:45
+msgid "  -b, --build    builds the targets from source"
+msgstr "  -b, --build    создает целевые пакеты из исходного кода"
+
+#: srcpac:46
+msgid "  -bb            builds targets and their dependencies from source"
+msgstr ""
+"  -bb            создает целевые пакеты и их зависимости из исходного кода"
+
+#: srcpac:47
+msgid ""
+"  -bbb           builds targets, dependencies and their makedeps from source"
+msgstr ""
+"  -bbb           создает целевые пакеты, зависимости и необходимые для "
+"сборки зависимости из исходного кода"
+
+#: srcpac:48
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr ""
+"  -m, --makedeps удаляет зависимости, необходимые для сборки, после ее "
+"завершения"
+
+#: srcpac:49
+msgid ""
+"  -o, --onlyconf applies the changes and displays the PKGBUILD without "
+"building"
+msgstr "  -o, --onlyconf применяет изменения и показывает PKGBUILD без сборки"
+
+#: srcpac:50
+msgid "%s adds some option to -Q:"
+msgstr "%s добавляет некоторые опции к -Q:"
+
+#: srcpac:51
+msgid "  -b, --build    show all packages built from source"
+msgstr "  -b, --build    показывает все пакеты, собранные из исходного кода"
+
+#: srcpac:52
+msgid "%s adds some option to -R:"
+msgstr "%s добавляет некотрые опции к -R:"
+
+#: srcpac:53
+msgid "  -b, --build    remove build-flag only, not the package"
+msgstr "  -b, --build    удаляет только флаг сборки, а не пакет"
+
+#: srcpac:54
+msgid "  -o, --onlyconf remove the patchfile only"
+msgstr "  -o, --onlyconf удаляет только patchfile"
+
+#: srcpac:139
+msgid "Error: Could not find %s under %s"
+msgstr "Ошибка: Не  найден %s в %s"
+
+#: srcpac:148
+msgid "Starting ABS sync..."
+msgstr "Синхронизация ABS..."
+
+#: srcpac:150 srcpac:406
+msgid "done"
+msgstr "готово"
+
+#: srcpac:404
+msgid "removing source reference %s..."
+msgstr "удаление ссылки на исходник %s..."
+
+#: srcpac:434
+msgid "Error: You need to use sudo or to be root"
+msgstr ""
+"Ошибка: Вам необходимо использовать команду sudo или выполнить из-под root"
+
+#: srcpac:439
+msgid "Error: The ABSROOT environment variable is not defined"
+msgstr "Ошибка: Переменная среды ABSROOT не определена"
+
+#: srcpac:481
+msgid "Source         : "
+msgstr "Источник         : "
+
+#: srcpac:483 srcpac:489
+msgid "Yes"
+msgstr "Да"
+
+#: srcpac:485 srcpac:491
+msgid "No"
+msgstr "Нет"
+
+#: srcpac:487
+msgid "Patchfile      : "
+msgstr "Патч      : "
+
+#: srcpac:496
+msgid " [source]"
+msgstr "[источник]"
+
+#: srcpac:580
+msgid "Source Targets:"
+msgstr "Исходники для пакетов:"
+
+#: srcpac:586
+msgid "Proceed? [Y/n]"
+msgstr "Продолжить? [Д/н]"
+
+#: srcpac:588
+msgid "y"
+msgstr "д"
+
+#: srcpac:588
+msgid "Y"
+msgstr "Д"
+
+#: srcpac:599
+msgid "Build failed for:%s"
+msgstr "Сборка не удалась для:%s"
+
+

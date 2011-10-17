@@ -1,0 +1,167 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2011
+# This file is distributed under the same license as the srcpac package.
+# 
+# Translators:
+# Axilleas P <markeleas@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: srcpac\n"
+"Report-Msgid-Bugs-To: https://bugs.archlinux.org/\n"
+"POT-Creation-Date: 2011-10-12 01:45+0200\n"
+"PO-Revision-Date: 2011-10-17 12:54+0000\n"
+"Last-Translator: kissmyarch <markeleas@gmail.com>\n"
+"Language-Team: Greek (http://www.transifex.net/projects/p/srcpac/team/el/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: srcpac:36
+msgid "usage: %s <operation> [...]"
+msgstr "χρήση:%s <λειτουργία> [...]"
+
+#: srcpac:37
+msgid "operations:"
+msgstr "λειτουργίες:"
+
+#: srcpac:38
+msgid "        %s {-h --help}"
+msgstr "%s {-h --help}"
+
+#: srcpac:39
+msgid "        %s {-V --version}"
+msgstr " %s {-V --version}"
+
+#: srcpac:40
+msgid "        %s {-Q --query}   [options] [<package(s)>]"
+msgstr "%s {-Q --query}   [επιλογές] [<πακέτο(α)>]"
+
+#: srcpac:41
+msgid "        %s {-R --remove}  [options] <package(s)>"
+msgstr "%s {-R --remove}  [επιλογές] <πακέτο(α)>"
+
+#: srcpac:42
+msgid "        %s {-S --sync}    [options] [package(s)]"
+msgstr "%s {-S --sync}    [επιλογές] <πακέτο(α)>"
+
+#: srcpac:43
+msgid "%s options are based on pacman, so check the pacman man page"
+msgstr "%s επιλογές βασίζονται στον pacman, δες τη man σελίδα του pacman"
+
+#: srcpac:44
+msgid "%s adds some option to -S:"
+msgstr "%s προσθέτει κάποια επιλογή στο -S:"
+
+#: srcpac:45
+msgid "  -b, --build    builds the targets from source"
+msgstr "-b, --build χτίζει τους στόχους από την πηγή"
+
+#: srcpac:46
+msgid "  -bb            builds targets and their dependencies from source"
+msgstr "-bb χτίζει τους στόχους και τις εξαρτήσεις τους από την πηγή"
+
+#: srcpac:47
+msgid ""
+"  -bbb           builds targets, dependencies and their makedeps from source"
+msgstr ""
+"-bbb χτίζει τους στόχους, τις εξαρτήσεις τους και τις εξαρτήσεις χτισίματος,"
+" από την πηγή"
+
+#: srcpac:48
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr "  -m, --makedeps αφαιρεί τα makedepends μετά το χτίσιμο"
+
+#: srcpac:49
+msgid ""
+"  -o, --onlyconf applies the changes and displays the PKGBUILD without "
+"building"
+msgstr ""
+"-ο, - onlyconf εφαρμόζει τις αλλαγές και εμφανίζει το PKGBUILD χωρίς χτίσιμο"
+
+#: srcpac:50
+msgid "%s adds some option to -Q:"
+msgstr "%s προσθέτει κάποια επιλογή στο -Q:"
+
+#: srcpac:51
+msgid "  -b, --build    show all packages built from source"
+msgstr "-b, --build δείχνει όλα τα πακέτα που χτίστηκαν από την πηγή"
+
+#: srcpac:52
+msgid "%s adds some option to -R:"
+msgstr "%s προσθέτει κάποια επιλογή στο -R:"
+
+#: srcpac:53
+msgid "  -b, --build    remove build-flag only, not the package"
+msgstr "  -b, --build    αφαιρεί μόνο το build-flag, όχι το πακέτο"
+
+#: srcpac:54
+msgid "  -o, --onlyconf remove the patchfile only"
+msgstr "  -o, --onlyconf αφαιρεί μόνο το patchfile"
+
+#: srcpac:139
+msgid "Error: Could not find %s under %s"
+msgstr "Σφάλμα: Δεν ήταν δυνατή η εύρεση του %s κάτω από %s"
+
+#: srcpac:148
+msgid "Starting ABS sync..."
+msgstr "Ξεκινάει ο συγχρονισμός του ABS..."
+
+#: srcpac:150 srcpac:406
+msgid "done"
+msgstr "έτοιμο"
+
+#: srcpac:404
+msgid "removing source reference %s..."
+msgstr "αφαιρώ την πηγή αναφοράς %s..."
+
+#: srcpac:434
+msgid "Error: You need to use sudo or to be root"
+msgstr "Σφάλμα: Πρέπει να χρησιμοποιήσεις sudo ή να είσαι root"
+
+#: srcpac:439
+msgid "Error: The ABSROOT environment variable is not defined"
+msgstr "Σφάλμα: Η μεταβλητή περιβάλλοντος ABSROOT δεν έχει οριστεί"
+
+#: srcpac:481
+msgid "Source         : "
+msgstr "Πηγή: "
+
+#: srcpac:483 srcpac:489
+msgid "Yes"
+msgstr "Ναι"
+
+#: srcpac:485 srcpac:491
+msgid "No"
+msgstr "Όχι"
+
+#: srcpac:487
+msgid "Patchfile      : "
+msgstr "Patchfile: "
+
+#: srcpac:496
+msgid " [source]"
+msgstr "[πηγή]"
+
+#: srcpac:580
+msgid "Source Targets:"
+msgstr "Στόχοι Πηγής:"
+
+#: srcpac:586
+msgid "Proceed? [Y/n]"
+msgstr "Συνέχεια; [Ν/ο]"
+
+#: srcpac:588
+msgid "y"
+msgstr "ν"
+
+#: srcpac:588
+msgid "Y"
+msgstr "Ν"
+
+#: srcpac:599
+msgid "Build failed for:%s"
+msgstr "Το χτίσμο απέτυχε για:%s"
+
+

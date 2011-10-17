@@ -1,0 +1,170 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2011
+# This file is distributed under the same license as the srcpac package.
+# 
+# Translators:
+# Никола Вукосављевић <alokinpwn@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: srcpac\n"
+"Report-Msgid-Bugs-To: https://bugs.archlinux.org/\n"
+"POT-Creation-Date: 2011-10-12 01:45+0200\n"
+"PO-Revision-Date: 2011-10-17 12:54+0000\n"
+"Last-Translator: hauzer <alokinpwn@gmail.com>\n"
+"Language-Team: Serbian (Serbia) (http://www.transifex.net/projects/p/srcpac/team/sr_RS/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: sr_RS\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: srcpac:36
+msgid "usage: %s <operation> [...]"
+msgstr "употреба: %s <операција> [...]"
+
+#: srcpac:37
+msgid "operations:"
+msgstr "операције:"
+
+#: srcpac:38
+msgid "        %s {-h --help}"
+msgstr "        %s {-h --help}"
+
+#: srcpac:39
+msgid "        %s {-V --version}"
+msgstr "        %s {-V --version}"
+
+#: srcpac:40
+msgid "        %s {-Q --query}   [options] [<package(s)>]"
+msgstr "%s {-Q --query} [опције] [<пакет(и)>]"
+
+#: srcpac:41
+msgid "        %s {-R --remove}  [options] <package(s)>"
+msgstr "%s {-R --remove} [опције] <пакет(и)>"
+
+#: srcpac:42
+msgid "        %s {-S --sync}    [options] [package(s)]"
+msgstr "%s {-S --sync} [опције] [пакет(и)]"
+
+#: srcpac:43
+msgid "%s options are based on pacman, so check the pacman man page"
+msgstr ""
+"опције %s-а су засноване на pacman-у, зато провери pacman-ову man страницу"
+
+#: srcpac:44
+msgid "%s adds some option to -S:"
+msgstr "%s додаје неке опције на -S:"
+
+#: srcpac:45
+msgid "  -b, --build    builds the targets from source"
+msgstr "  -b, --build    изграђује пакете из изворног кода"
+
+#: srcpac:46
+msgid "  -bb            builds targets and their dependencies from source"
+msgstr ""
+"  -bb            изграђује пакете и њихове пратеће пакете из изворног кода"
+
+#: srcpac:47
+msgid ""
+"  -bbb           builds targets, dependencies and their makedeps from source"
+msgstr ""
+"  -bbb           изграђује пакете и њихове пратеће и градеће пакете из "
+"изворног кода"
+
+#: srcpac:48
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr "  -m, --makedeps уклони градеће пакете после изградње"
+
+#: srcpac:49
+msgid ""
+"  -o, --onlyconf applies the changes and displays the PKGBUILD without "
+"building"
+msgstr ""
+"  -o, --onlyconf примењује промене и приказује PKGBUILD без самог "
+"изграђивања"
+
+#: srcpac:50
+msgid "%s adds some option to -Q:"
+msgstr "%s додаје неке опције на -Q:"
+
+#: srcpac:51
+msgid "  -b, --build    show all packages built from source"
+msgstr "  -b, --build    прикажи све пакете изграђене из изворног кода"
+
+#: srcpac:52
+msgid "%s adds some option to -R:"
+msgstr "%s додаје неке опције на -R:"
+
+#: srcpac:53
+msgid "  -b, --build    remove build-flag only, not the package"
+msgstr "  -b, --build    само уклони обележје изградње, не и пакет"
+
+#: srcpac:54
+msgid "  -o, --onlyconf remove the patchfile only"
+msgstr "  -o, --onlyconf уклони само закрпни фајл"
+
+#: srcpac:139
+msgid "Error: Could not find %s under %s"
+msgstr "Грешка: Не могу да пронађем %s под %s"
+
+#: srcpac:148
+msgid "Starting ABS sync..."
+msgstr "Започињем ABS усклађивање..."
+
+#: srcpac:150 srcpac:406
+msgid "done"
+msgstr "извршено"
+
+#: srcpac:404
+msgid "removing source reference %s..."
+msgstr "%s: уклањам напомену на изворни код..."
+
+#: srcpac:434
+msgid "Error: You need to use sudo or to be root"
+msgstr "Грешка: Мораш да користиш sudo или да будеш root"
+
+#: srcpac:439
+msgid "Error: The ABSROOT environment variable is not defined"
+msgstr "Грешка: ABSROOT глобална променљива није дефинисана"
+
+#: srcpac:481
+msgid "Source         : "
+msgstr "Изворни код         : "
+
+#: srcpac:483 srcpac:489
+msgid "Yes"
+msgstr "Да"
+
+#: srcpac:485 srcpac:491
+msgid "No"
+msgstr "Не"
+
+#: srcpac:487
+msgid "Patchfile      : "
+msgstr "Закрпни фајл      : "
+
+#: srcpac:496
+msgid " [source]"
+msgstr " [изворни код]"
+
+#: srcpac:580
+msgid "Source Targets:"
+msgstr "Пакети За Изградњу:"
+
+#: srcpac:586
+msgid "Proceed? [Y/n]"
+msgstr "Настави? [D/n]"
+
+#: srcpac:588
+msgid "y"
+msgstr "d"
+
+#: srcpac:588
+msgid "Y"
+msgstr "D"
+
+#: srcpac:599
+msgid "Build failed for:%s"
+msgstr "Изградња није успела за:%s"
+
+

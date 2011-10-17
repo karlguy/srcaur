@@ -1,0 +1,163 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2011
+# This file is distributed under the same license as the srcpac package.
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: srcpac\n"
+"Report-Msgid-Bugs-To: https://bugs.archlinux.org/\n"
+"POT-Creation-Date: 2011-10-12 01:45+0200\n"
+"PO-Revision-Date: 2011-10-11 23:50+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Polish (http://www.transifex.net/projects/p/srcpac/team/pl/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pl\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+
+#: srcpac:36
+msgid "usage: %s <operation> [...]"
+msgstr ""
+
+#: srcpac:37
+msgid "operations:"
+msgstr ""
+
+#: srcpac:38
+msgid "        %s {-h --help}"
+msgstr ""
+
+#: srcpac:39
+msgid "        %s {-V --version}"
+msgstr ""
+
+#: srcpac:40
+msgid "        %s {-Q --query}   [options] [<package(s)>]"
+msgstr ""
+
+#: srcpac:41
+msgid "        %s {-R --remove}  [options] <package(s)>"
+msgstr ""
+
+#: srcpac:42
+msgid "        %s {-S --sync}    [options] [package(s)]"
+msgstr ""
+
+#: srcpac:43
+msgid "%s options are based on pacman, so check the pacman man page"
+msgstr ""
+
+#: srcpac:44
+msgid "%s adds some option to -S:"
+msgstr ""
+
+#: srcpac:45
+msgid "  -b, --build    builds the targets from source"
+msgstr ""
+
+#: srcpac:46
+msgid "  -bb            builds targets and their dependencies from source"
+msgstr ""
+
+#: srcpac:47
+msgid ""
+"  -bbb           builds targets, dependencies and their makedeps from source"
+msgstr ""
+
+#: srcpac:48
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr ""
+
+#: srcpac:49
+msgid ""
+"  -o, --onlyconf applies the changes and displays the PKGBUILD without "
+"building"
+msgstr ""
+
+#: srcpac:50
+msgid "%s adds some option to -Q:"
+msgstr ""
+
+#: srcpac:51
+msgid "  -b, --build    show all packages built from source"
+msgstr ""
+
+#: srcpac:52
+msgid "%s adds some option to -R:"
+msgstr ""
+
+#: srcpac:53
+msgid "  -b, --build    remove build-flag only, not the package"
+msgstr ""
+
+#: srcpac:54
+msgid "  -o, --onlyconf remove the patchfile only"
+msgstr ""
+
+#: srcpac:139
+msgid "Error: Could not find %s under %s"
+msgstr ""
+
+#: srcpac:148
+msgid "Starting ABS sync..."
+msgstr ""
+
+#: srcpac:150 srcpac:406
+msgid "done"
+msgstr ""
+
+#: srcpac:404
+msgid "removing source reference %s..."
+msgstr ""
+
+#: srcpac:434
+msgid "Error: You need to use sudo or to be root"
+msgstr ""
+
+#: srcpac:439
+msgid "Error: The ABSROOT environment variable is not defined"
+msgstr ""
+
+#: srcpac:481
+msgid "Source         : "
+msgstr ""
+
+#: srcpac:483 srcpac:489
+msgid "Yes"
+msgstr ""
+
+#: srcpac:485 srcpac:491
+msgid "No"
+msgstr ""
+
+#: srcpac:487
+msgid "Patchfile      : "
+msgstr ""
+
+#: srcpac:496
+msgid " [source]"
+msgstr ""
+
+#: srcpac:580
+msgid "Source Targets:"
+msgstr ""
+
+#: srcpac:586
+msgid "Proceed? [Y/n]"
+msgstr ""
+
+#: srcpac:588
+msgid "y"
+msgstr ""
+
+#: srcpac:588
+msgid "Y"
+msgstr ""
+
+#: srcpac:599
+msgid "Build failed for:%s"
+msgstr ""
+
+

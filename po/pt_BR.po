@@ -1,0 +1,169 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2004-2011
+# This file is distributed under the same license as the srcpac package.
+# 
+# Translators:
+# Rafael  <rafael.f.f1@gmail.com>, 2011.
+msgid ""
+msgstr ""
+"Project-Id-Version: srcpac\n"
+"Report-Msgid-Bugs-To: https://bugs.archlinux.org/\n"
+"POT-Creation-Date: 2011-10-12 01:45+0200\n"
+"PO-Revision-Date: 2011-10-17 12:54+0000\n"
+"Last-Translator: rafaelff1 <rafael.f.f1@gmail.com>\n"
+"Language-Team: Portuguese (Brazilian) (http://www.transifex.net/projects/p/srcpac/team/pt_BR/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+
+#: srcpac:36
+msgid "usage: %s <operation> [...]"
+msgstr "uso: %s <operação> [...]"
+
+#: srcpac:37
+msgid "operations:"
+msgstr "operações:"
+
+#: srcpac:38
+msgid "        %s {-h --help}"
+msgstr "        %s {-h --help}"
+
+#: srcpac:39
+msgid "        %s {-V --version}"
+msgstr "        %s {-V --version}"
+
+#: srcpac:40
+msgid "        %s {-Q --query}   [options] [<package(s)>]"
+msgstr "        %s {-Q --query}   [opções] [<pacote(s)>]"
+
+#: srcpac:41
+msgid "        %s {-R --remove}  [options] <package(s)>"
+msgstr "        %s {-R --remove}  [opções] <pacote(s)>"
+
+#: srcpac:42
+msgid "        %s {-S --sync}    [options] [package(s)]"
+msgstr "        %s {-S --sync}    [opções] [pacote(s)]"
+
+#: srcpac:43
+msgid "%s options are based on pacman, so check the pacman man page"
+msgstr ""
+"%s tem opções baseadas no pacman, então verifique a página man do pacman"
+
+#: srcpac:44
+msgid "%s adds some option to -S:"
+msgstr "%s adiciona algumas opções a -S:"
+
+#: srcpac:45
+msgid "  -b, --build    builds the targets from source"
+msgstr "  -b, --build    compila os alvos a partir dos fontes"
+
+#: srcpac:46
+msgid "  -bb            builds targets and their dependencies from source"
+msgstr "  -bb            compila alvos e suas dependências dos fontes"
+
+#: srcpac:47
+msgid ""
+"  -bbb           builds targets, dependencies and their makedeps from source"
+msgstr ""
+"  -bbb           compila alvos, dependências e suas dependências de compilação\\n\n"
+"                 dos fontes."
+
+#: srcpac:48
+msgid "  -m, --makedeps remove the makedepends after the build"
+msgstr ""
+"  -m, --makedeps remove as dependências de compilação depois de compilar"
+
+#: srcpac:49
+msgid ""
+"  -o, --onlyconf applies the changes and displays the PKGBUILD without "
+"building"
+msgstr ""
+"  -o, --onlyconf aplica as alterações e exibições do PKGBUILD sem compilar"
+
+#: srcpac:50
+msgid "%s adds some option to -Q:"
+msgstr "%s adiciona algumas opções a -Q:"
+
+#: srcpac:51
+msgid "  -b, --build    show all packages built from source"
+msgstr "  -b, --build    exibe todos pacotes compilados dos fontes"
+
+#: srcpac:52
+msgid "%s adds some option to -R:"
+msgstr "%s adiciona algumas opções a -R:"
+
+#: srcpac:53
+msgid "  -b, --build    remove build-flag only, not the package"
+msgstr "  -b, --build    remove somente a marca de compilação, não o pacote"
+
+#: srcpac:54
+msgid "  -o, --onlyconf remove the patchfile only"
+msgstr "  -o, --onlyconf remove o arquivo patch somente"
+
+#: srcpac:139
+msgid "Error: Could not find %s under %s"
+msgstr "Erro: Não foi possível encontrar %s em %s"
+
+#: srcpac:148
+msgid "Starting ABS sync..."
+msgstr "Iniciando sincronização do ABS..."
+
+#: srcpac:150 srcpac:406
+msgid "done"
+msgstr "feito"
+
+#: srcpac:404
+msgid "removing source reference %s..."
+msgstr "removendo referências fontes de %s..."
+
+#: srcpac:434
+msgid "Error: You need to use sudo or to be root"
+msgstr "Erro: Você precisa usar sudo ou ser o root"
+
+#: srcpac:439
+msgid "Error: The ABSROOT environment variable is not defined"
+msgstr "Erro: A variável de ambiente ABSROOT não está definindo"
+
+#: srcpac:481
+msgid "Source         : "
+msgstr "Fonte          : "
+
+#: srcpac:483 srcpac:489
+msgid "Yes"
+msgstr "Sim"
+
+#: srcpac:485 srcpac:491
+msgid "No"
+msgstr "Não"
+
+#: srcpac:487
+msgid "Patchfile      : "
+msgstr "Arq. Patch   :"
+
+#: srcpac:496
+msgid " [source]"
+msgstr " [fonte]"
+
+#: srcpac:580
+msgid "Source Targets:"
+msgstr "Alvos Fontes   :"
+
+#: srcpac:586
+msgid "Proceed? [Y/n]"
+msgstr "Continuar? [S/n]"
+
+#: srcpac:588
+msgid "y"
+msgstr "s"
+
+#: srcpac:588
+msgid "Y"
+msgstr "S"
+
+#: srcpac:599
+msgid "Build failed for:%s"
+msgstr "Compilação falhou para:%s"
+
+
