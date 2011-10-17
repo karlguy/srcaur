@@ -432,14 +432,9 @@ remove()
 ##
 # Check if a package has been built using srcpac
 ##
-is_built()
-{
-  built=0
-  if [ -f /var/lib/srcpac/$1 ]; then
-    built=1
-  else
-    built=0
-  fi
+is_built() {
+  ls /var/lib/srcpac/$1 &> /dev/null
+  return $?
 }
 
 main()
@@ -498,9 +493,10 @@ main()
 
         if [ $valid -eq 0 ]; then
           is_built $pkg
+          built=$?
           if [ $INFO -eq 1 ]; then
             printf "$(gettext "Source         : ")"
-            if [ $built -eq 1 ]; then
+            if [ $built -eq 0 ]; then
               printf "$(gettext "Yes")\n"
             else
               printf "$(gettext "No")\n"
@@ -513,7 +509,7 @@ main()
             fi
             echo
           else
-            if [ $built -eq 1 ]; then
+            if [ $built -eq 0 ]; then
               printf "$(gettext " [source]")\n"
             else
               echo
@@ -541,7 +537,8 @@ main()
         declare -a regpkg
         for pkg in ${output}; do
           is_built $pkg
-          if [ $built -eq 1 ]; then
+          built=$?
+          if [ $built -eq 0 ]; then
             packages="${packages} $pkg"
           else
             regpkg[${#regpkg[@]}]=$pkg
@@ -558,6 +555,10 @@ main()
         if [ -n "${regpkg[*]}" ]; then
           $PACMAN $PACARGS ${regpkg[@]}
         fi
+
+        for pkg in $packages; do
+          get_candidates $pkg 1
+        done
       else
         [ $REFRESH -eq 1 ] && refresh
         $PACMAN $ARGLIST
