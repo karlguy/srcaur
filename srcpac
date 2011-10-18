@@ -451,6 +451,14 @@ main()
     exit 1
   fi
 
+  if [ -f /run/srcpac.lock ]; then
+    printf "$(gettext "\
+Another instance of srcpac is already running.\n\
+  If you're sure srcpac is not already running\n\
+  you can remove /run/srcpac.lock")\n"
+    exit 1
+  fi
+
   if [ -z "${ABSROOT}" ]; then
     printf "$(gettext "Error: The ABSROOT environment variable is not defined")\n"
     exit 1
@@ -598,6 +606,9 @@ main()
     fi
 
     if [ -n "${candidates[*]}" ]; then
+
+      touch /run/srcpac.lock
+
       echo
       printf "$(gettext "Source Targets:") "
       for pkg in ${candidates[@]}; do
@@ -615,6 +626,8 @@ main()
       for pkg in ${candidates[@]}; do
         build_package "install" ${pkg}
       done
+
+      rm /run/srcpac.lock
     fi
 
     if [ -n "${broken}" ]; then
