@@ -55,6 +55,7 @@ usage()
   printf "$(gettext "  -bbb           builds targets, dependencies and their makedeps from source")\n"
   printf "$(gettext "  -m, --makedeps remove the makedepends after the build")\n"
   printf "$(gettext "  -o, --onlyconf applies the changes and displays the PKGBUILD without building")\n"
+  printf "$(gettext "  -y, --refresh  download fresh package databases and syncronize the abs tree")\n" 
   printf "$(gettext "%s adds some option to %s:")\n" "$(basename $0)" "-Q"
   printf "$(gettext "  -b, --build    show all packages built from source")\n"
   printf "$(gettext "%s adds some option to %s:")\n" "$(basename $0)" "-R"
