@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: srcpac\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-18 09:42+0200\n"
+"POT-Creation-Date: 2011-11-02 12:39+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,7 +49,7 @@ msgstr ""
 msgid "%s options are based on pacman, so check the pacman man page"
 msgstr ""
 
-#: srcpac:52 srcpac:58 srcpac:60
+#: srcpac:52 srcpac:59 srcpac:61
 msgid "%s adds some option to %s:"
 msgstr ""
 
@@ -76,84 +76,89 @@ msgid ""
 "building"
 msgstr ""
 
-#: srcpac:59
+#: srcpac:58
+msgid ""
+"  -y, --refresh  download fresh package databases and syncronize the abs tree"
+msgstr ""
+
+#: srcpac:60
 msgid "  -b, --build    show all packages built from source"
 msgstr ""
 
-#: srcpac:61
+#: srcpac:62
 msgid "  -b, --build    remove build-flag only, not the package"
 msgstr ""
 
-#: srcpac:62
+#: srcpac:63
 msgid "  -o, --onlyconf remove the patchfile only"
 msgstr ""
 
-#: srcpac:160
+#: srcpac:161
 msgid "Error: Could not find %s under %s"
 msgstr ""
 
-#: srcpac:169
+#: srcpac:170
 msgid "Starting ABS sync..."
 msgstr ""
 
-#: srcpac:171 srcpac:427
+#: srcpac:172 srcpac:428
 msgid "done"
 msgstr ""
 
-#: srcpac:425
+#: srcpac:426
 msgid "removing source reference %s..."
 msgstr ""
 
-#: srcpac:450
+#: srcpac:451
 msgid "Error: You need to use sudo or to be root"
 msgstr ""
 
-#: srcpac:455
+#: srcpac:456
 msgid ""
 "Another instance of srcpac is already running.\\n  If you're sure srcpac is "
 "not already running\\n  you can remove /run/srcpac.lock"
 msgstr ""
 
-#: srcpac:463
+#: srcpac:464
 msgid "Error: The ABSROOT environment variable is not defined"
 msgstr ""
 
-#: srcpac:506
+#: srcpac:507
 msgid "Source         : "
 msgstr ""
 
-#: srcpac:508 srcpac:514
+#: srcpac:509 srcpac:515
 msgid "Yes"
 msgstr ""
 
-#: srcpac:510 srcpac:516
+#: srcpac:511 srcpac:517
 msgid "No"
 msgstr ""
 
-#: srcpac:512
+#: srcpac:513
 msgid "Patchfile      : "
 msgstr ""
 
-#: srcpac:521
+#: srcpac:522
 msgid " [source]"
 msgstr ""
 
-#: srcpac:613
+#: srcpac:614
 msgid "Source Targets:"
 msgstr ""
 
-#: srcpac:619
+#: srcpac:620
 msgid "Proceed? [Y/n]"
 msgstr ""
 
-#: srcpac:621
+#: srcpac:622
 msgid "y"
 msgstr ""
 
-#: srcpac:621
+#: srcpac:622
 msgid "Y"
 msgstr ""
 
-#: srcpac:634
+#: srcpac:635
 msgid "Build failed for:%s"
 msgstr ""
