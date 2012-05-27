@@ -1,5 +1,6 @@
 VERSION    DESCRIPTION                                          AUTHOR
 -------------------------------------------------------------------------------
+         - Move variables values to srcpac.conf                 Andrea Scarpino
 0.10.9   - Fix when running a system update                     Andrea Scarpino
          - Ignore versioned make/dependencies                   Andrea Scarpino
          - Add more translations from Transifex                 Andrea Scarpino

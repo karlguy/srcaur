@@ -25,8 +25,6 @@ ver=0.10.9
 export TEXTDOMAIN='srcpac'
 export TEXTDOMAINDIR='/usr/share/locale'
 
-PACMAN="/usr/bin/pacman"
-
 declare -a args
 
 source_file() {
@@ -88,7 +86,6 @@ apply_config()
   conf=/etc/srcpac.d/${1}
   if [ -f ${conf} ]; then
     if [ "${3}" = "noreplace" ]; then
-      [ -z ${PAGER} ] && PAGER=less
       sed -f ${conf} ${2}/PKGBUILD | ${PAGER}
     else
       sed -i -f ${conf} ${2}/PKGBUILD
