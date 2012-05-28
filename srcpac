@@ -249,7 +249,7 @@ build_package() {
   if [ $succeed -ne 1 ]; then
     broken="${broken} ${pkg}"
   else
-    local CACHEDIR=$((grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
+    local CACHEDIR=$( (grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
     local filename="${pkg}-$(get_full_version ${epoch:-0} ${pkgver} ${pkgrel})-$(get_arch ${arch}).pkg.tar.?z"
     cp -f ${builddir}/${filename} "${CACHEDIR}"
     rm -rf ${builddir}
