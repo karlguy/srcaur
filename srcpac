@@ -19,7 +19,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-ver=0.10.9
+ver=0.10.10
 
 # gettext initialization
 export TEXTDOMAIN='srcpac'
@@ -68,7 +68,7 @@ version()
   echo
   echo "                       $(basename $0) v${ver}"
   echo "                       Copyright (C) 2004-2009 Jason Chu"
-  echo "                       Copyright (C) 2009-2012 Andrea Scarpino"
+  echo "                       Copyright (C) 2009-2013 Andrea Scarpino"
   echo
   echo "                       This program may be freely redistributed under"
   echo "                       the terms of the GNU General Public License."
