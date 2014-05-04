@@ -632,6 +632,7 @@ Another instance of srcpac is already running.\n\
         printf "$(gettext "Proceed? [Y/n]") "
         read
         if [ "${REPLY}" != "$(gettext "y")" -a "${REPLY}" != "$(gettext "Y")" -a "${REPLY}" != "" ]; then
+          rm /run/srcpac.lock &> /dev/null
           exit 0
         fi
       fi
@@ -640,7 +641,7 @@ Another instance of srcpac is already running.\n\
         build_package "install" ${pkg}
       done
 
-      rm /run/srcpac.lock
+      rm /run/srcpac.lock &> /dev/null
     fi
 
     if [ -n "${broken}" ]; then
