@@ -153,7 +153,7 @@ get_candidates()
 
   if [ ${found} -eq 1 ]; then
     candidate="${pkgbuild##${ABSROOT}}"
-    candidates[${#candidates[@]}]="${candidate%%/PKGBUILD}/${1}"
+    candidates[${#candidates[@]}]="${candidate%%/PKGBUILD}"
   else
     printf "$(gettext "Error: Could not find %s under %s")\n" "${1}" "${ABSROOT}"
   fi
@@ -206,7 +206,7 @@ build_package() {
   shift
 
   local pkg=${1##*/}
-  local pkgdir="${ABSROOT}/${1%/*}"
+  local pkgdir="${ABSROOT}/${1}"
   local builddir="/var/srcpac/${pkg}"
 
   local succeed=0
@@ -612,7 +612,7 @@ Another instance of srcpac is already running.\n\
 
       if [ $ONLYCONF -eq 1 ]; then
         for pkg in ${candidates[@]}; do
-          apply_config "${pkg##*/}" "${ABSROOT}/${pkg#*/}" noreplace
+          apply_config "${pkg##*/}" "${ABSROOT}/${pkg}" noreplace
         done
         exit 0
       fi
