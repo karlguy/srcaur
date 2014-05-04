@@ -278,6 +278,7 @@ check_args()
   NODEPS=0
   FORCE=0
   INFO=0
+  GROUP=0
   SYSUPGRADE=0
   DOWNLOAD=0
   REFRESH=0
@@ -331,6 +332,10 @@ check_args()
         INFO=1
         ARGSANS="$ARGSANS $1"
         ;;
+      --groups)
+        GROUP=1
+        ARGSANS="$ARGSANS $1"
+        ;;
       --sysupgrade)
         SYSUPGRADE=1
         ARGSANS="$ARGSANS $1"
@@ -379,7 +384,7 @@ check_args()
           OPTIONAL=$2
         fi
         OPTIND=1
-        while getopts ":VQRSbdfimuyr:ow" opt $1 $OPTIONAL; do
+        while getopts ":VQRSbdfigmuyr:ow" opt $1 $OPTIONAL; do
           case $opt in
             V) version ;;
             Q) MAJOR="query" ;;
@@ -391,6 +396,7 @@ check_args()
             d) NODEPS=1 ;;
             f) FORCE=1 ;;
             i) INFO=1 ;;
+            g) GROUP=1 ;;
             m) MAKEDEPS=0 ;;
             o) ONLYCONF=1 ;;
             r) ROOT=1
@@ -488,6 +494,8 @@ Another instance of srcpac is already running.\n\
       for pkg in `find /var/lib/srcpac/ -type f`; do
         $PACMAN -Q $(basename $pkg)
       done
+    elif [ $GROUP -eq 1 ]; then
+      $PACMAN -Qg ${args[@]}
     else
       for pkg in ${args[@]}; do
         local valid=1
@@ -552,6 +560,7 @@ Another instance of srcpac is already running.\n\
         done
 
         local PACARGS="-S"
+        [ $GROUP -eq 1 ] && PACARGS="${PACARGS}g"
         [ $NODEPS -eq 1 ] && PACARGS="${PACARGS}dd"
         [ $FORCE -eq 1 ] && PACARGS="${PACARGS}f"
         [ $ROOT -eq 1 ] && PACARGS="${PACARGS} -r $NEWROOT"
@@ -584,9 +593,15 @@ Another instance of srcpac is already running.\n\
         local packages="${args[@]}"
       fi
 
-      for pkg in $packages; do
-        get_candidates $pkg 1
-      done
+      if [ $GROUP -eq 1 ]; then
+        for pkg in $($PACMAN -Sqg $packages); do
+          get_candidates $pkg 1
+        done
+      else
+        for pkg in $packages; do
+          get_candidates $pkg 1
+        done
+      fi
 
       if [ $DOWNLOAD -eq 1 ]; then
         for pkg in ${candidates[@]}; do
