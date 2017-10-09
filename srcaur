@@ -180,7 +180,7 @@ build_package() {
   shift
 
   local pkg=${1##*/}
-  local builddir="~/.cache/srcaur"
+  local builddir=~/.cache/srcaur
 
   local succeed=0
 
@@ -190,8 +190,8 @@ build_package() {
   [ $NOCONFIRM -eq 1 ] && MAKEPKGOPTS="${MAKEPKGOPTS} --noconfirm"
 
   # create the build dir and apply configuration
-  [[ ! -d ${builddir} ]] && mkdir ${builddir}
   [[ -d ${builddir}/${pkg} ]] && rm -rf ${builddir}/${pkg}
+  [[ ! -d ${builddir} ]] && mkdir ${builddir}
   pushd ${builddir} 
   pbget --aur ${pkg}
   popd
