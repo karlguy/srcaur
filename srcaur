@@ -217,7 +217,6 @@ build_package() {
     local CACHEDIR=$( (grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
     local filename="${pkg}-$(get_full_version ${epoch:-0} ${pkgver} ${pkgrel})-$(get_arch ${arch}).pkg.tar.?z"
 	sudo cp -f ${builddir}/${pkg}/${filename} "${CACHEDIR}"
-    rm -rf ${builddir}/${pkg}
 
     if [ "${action}" = "install" ]; then
       local PACARGS="-U"
