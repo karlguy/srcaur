@@ -193,7 +193,13 @@ build_package() {
   [[ -d ${builddir}/${pkg} ]] && rm -rf ${builddir}/${pkg}
   [[ ! -d ${builddir} ]] && mkdir ${builddir}
   pushd ${builddir} 
-  pbget --aur ${pkg}
+
+  # check aur for package
+  pacaur -d ${pkg} &> /dev/null
+
+  # if package not found in aur, then retrieve using asp
+  [ $? -eq 1 ] && asp export ${pkg} &> /dev/null
+
   popd
   apply_config ${pkg} ${builddir}/${pkg}
 
@@ -205,7 +211,6 @@ build_package() {
   unset arch
   source PKGBUILD &> /dev/null
 
-  $EDITOR PKGBUILD
   makepkg ${MAKEPKGOPTS}
   [ $? -eq 0 ] && succeed=1
 
@@ -214,9 +219,7 @@ build_package() {
   if [ $succeed -ne 1 ]; then
     broken="${broken} ${pkg}"
   else
-    local CACHEDIR=$( (grep -m 1 '^CacheDir' /etc/pacman.conf || echo 'CacheDir = /var/cache/pacman/pkg') | sed 's/CacheDir\s*=\s*//')
     local filename="${pkg}-$(get_full_version ${epoch:-0} ${pkgver} ${pkgrel})-$(get_arch ${arch}).pkg.tar.?z"
-	sudo cp -f ${builddir}/${pkg}/${filename} "${CACHEDIR}"
 
     if [ "${action}" = "install" ]; then
       local PACARGS="-U"
@@ -227,7 +230,7 @@ build_package() {
       [ $ASEXPLICIT -eq 1 ] && PACARGS="${PACARGS} --asexplicit"
       [ $NOCONFIRM -eq 1 ] && PACARGS="${PACARGS} --noconfirm"
 
-      pacaur $PACARGS "${CACHEDIR}"/${filename}
+      pacaur $PACARGS ${builddir}/${pkg}/${filename} 
       [ $? -eq 0 ] && touch ~/.config/srcaur/${pkg}
     fi
   fi
@@ -497,7 +500,7 @@ Another instance of srcaur is already running.\n\
   if [ "${MAJOR}" = "sync" ]; then
     if [ $BUILD -eq 0 -a $ONLYCONF -ne 1 ]; then
       if [ $SYSUPGRADE -eq 1 ]; then
-        [ $REFRESH -eq 1 ] && refresh
+        #[ $REFRESH -eq 1 ] && refresh
 
         if [ $IGNORE -eq 1 ]; then
           local ignorestr=$(echo $IGNOREPKG | tr "," "|")
