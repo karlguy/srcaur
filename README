@@ -1,0 +1,5 @@
+#srcaur
+an archlinux pacaur wrapper that builds from source
+
+##dependencies
+bash, pbget, pacaur
